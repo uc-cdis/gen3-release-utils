@@ -1,0 +1,16 @@
+arborist
+gen3-statics
+fence
+cdis-data-client
+guppy
+hatchery
+indexd
+manifestservice
+peregrine
+pidgin
+data-portal
+sheepdog
+sower
+ssjdispatcher
+tube
+workspace-token-service
