@@ -8,7 +8,7 @@ This utility (replicate_manifest_config.sh) should facilitate the copy of versio
 
  - How to use it:
  Here is the syntax:
- > /bin/bash replicate_manifest_config.sh <branch>/<environment>/manifest.json <target_manifest>
+ > /bin/bash replicate_manifest_config.sh &lt;branch>/&lt;environment>/manifest.json &lt;target_manifest>
 
  Example:
  > % /bin/bash ../gen3-release-utils/replicate_manifest_config.sh master/internalstaging.datastage.io/manifest.json gen3.datastage.io/manifest.json
