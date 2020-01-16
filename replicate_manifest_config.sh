@@ -36,16 +36,17 @@ echo $versions | jq '.['\"${svc}\"']'
 for service in "${svcs[@]}"; do
   new_version=$(echo $versions | jq '.['\"${service}\"']' | sed 's#/#\\/#g')
   echo "applying version ${new_version} for ${service}"
-  sed -i '.bak' "s/    \"${service}\": \".*,/    \"${service}\": ${new_version}/" $tgt_manifest
+  sed -i '.bak' "s/    \"${service}\": \".*,/    \"${service}\": ${new_version},/" $tgt_manifest
   # TODO: Err check
 done
 
 # replace dictionary
 echo "applying new dictionary ${new_dict}..."
-sed -i ".bak" "s/    \"dictionary_url\": \".*/    \"dictionary_url\": \"${new_dict}\",/" ../gitops-qa/test_manifest.json
+sed -i ".bak" "s/    \"dictionary_url\": \".*/    \"dictionary_url\": ${new_dict},/" $tgt_manifest
 # TODO: err check
 
 # remove backup file (rely on git)
+echo "removing temp file..."
 rm -rfv ${tgt_manifest}.bak
 
 echo "done"
