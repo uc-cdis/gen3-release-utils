@@ -11,15 +11,15 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 2 ]; then
   exit 0;
 fi;
 
-svcs=(arborist fence indexd aws-es-proxy peregrine pidgin revproxy sheepdog portal fluentd spark tube manifestservice wts guppy sower hatchery ambassador)
-
 # TODO: add "ssjdispatcher" "quay.io/cdis/ssjdispatcher:master" when modifying DEV/QA manifests 
 
 # source manifest
-# e.g., internalstaging.datastage.io/manifest.json
-src_manifest="$1"
-echo "fetching source manifest from: https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/${src_manifest}"
-versions_and_dict=$(curl -s "https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/${src_manifest}" | jq '.versions, .global.dictionary_url')
+# <branch>/<environment>/manifest.json
+# e.g., chore/test_pfb_fix_2020Q1/internalstaging.datastage.io/manifest.json
+src_manifest="https://raw.githubusercontent.com/uc-cdis/cdis-manifest/$1"
+# e.g., https://github.com/uc-cdis/cdis-manifest/blob/chore/test_pfb_fix_2020Q1/internalstaging.datastage.io/manifest.json
+echo "fetching source manifest from: ${src_manifest}"
+versions_and_dict=$(curl -s "$src_manifest" | jq '.versions, .global.dictionary_url')
 # TODO: Error check here...
 
 versions=$(echo "$versions_and_dict" | sed '$d')
@@ -31,6 +31,9 @@ tgt_manifest="$2"
 echo "testing"
 svc="aws-es-proxy"
 echo $versions | jq '.['\"${svc}\"']'
+
+# assemble list of services
+svcs=($(echo $versions | jq '. | keys' | sed '1d;$d' | tr "," " " | xargs))
 
 # replace all versions
 for service in "${svcs[@]}"; do
