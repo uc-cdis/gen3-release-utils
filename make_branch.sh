@@ -50,4 +50,4 @@ done < "$repo_list"
 
 cd ..
 echo "### Cleaning up folder gen3-integration ###"
-rm -rfv gen3-integration
+rm -rf gen3-integration

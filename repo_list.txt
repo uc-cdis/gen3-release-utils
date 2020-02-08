@@ -6,6 +6,7 @@ guppy
 hatchery
 indexd
 manifestservice
+pelican
 peregrine
 pidgin
 data-portal
@@ -14,3 +15,6 @@ sower
 ssjdispatcher
 tube
 workspace-token-service
+gen3-fuse
+indexs3client
+gen3-spark
