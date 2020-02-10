@@ -26,7 +26,12 @@ echo >> gen3_release_notes.md
 repo_list="repo_list.txt"
 while IFS= read -r repo; do
   echo "### Getting the release notes for repo ${repo} ###"
-  gen3git --repo "${repoOwner}/${repo}" --github-access-token "${githubAccessToken}" --from-date "${startDate}" gen --to-date "${endDate}" --markdown
+  result=$(gen3git --repo "${repoOwner}/${repo}" --github-access-token "${githubAccessToken}" --from-date "${startDate}" gen --to-date "${endDate}" --markdown)
+  RC=$?
+  if [ $RC -ne 0 ]; then
+    echo "$result"
+    exit 1
+  fi
   if [[ $(wc -l < release_notes.md) -ge 3 ]]; then
     cat release_notes.md >> gen3_release_notes.md
   fi
