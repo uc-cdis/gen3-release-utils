@@ -22,7 +22,7 @@ diff_tool=vimdiff
 manifest_path="manifest.json"
 portal_config_path="portal/gitops.json"
 
-diff_manifest=true
+diff_manifest=false
 diff_portal=true
 
 declare -a urls
@@ -61,7 +61,7 @@ do
   # Parse commons namespace
   namespace=$1
   # If the repo was specified, remove the repo name from the front of the argument
-  if [[ repo_specified ]]
+  if $repo_specified
     then
       namespace=$(echo $namespace | sed -r "s/$repo\/(.*)/\1/")
   fi
@@ -73,38 +73,34 @@ do
   shift
 done
 
-if [[ diff_manifest ]]
+if $diff_manifest
   then
     manifest_a_url="${urls[0]}/$manifest_path"
     echo "Fetching manifest from $manifest_a_url..."
     manifest_a_raw=$(curl -f $manifest_a_url)
-    # echo "$manifest_a_raw"
     manifest_a_formatted=$(echo "$manifest_a_raw" | jq -S '.')
 
     manifest_b_url="${urls[1]}/$manifest_path"
     echo "Fetching manifest from $manifest_b_url..."
     manifest_b_raw=$(curl -f $manifest_b_url)
-    # echo "$manifest_b_raw"
     manifest_b_formatted=$(echo "$manifest_b_raw" | jq -S '.')
     echo "$manifest_b_formatted"
 
     vimdiff <(echo "$manifest_a_formatted") <(echo "$manifest_b_formatted")
 fi
 
-if [[ diff_portal ]]
+if $diff_portal
   then
     portal_a_url="${urls[0]}/$portal_config_path"
     echo "Fetching portal config from $portal_a_url..."
     portal_a_raw=$(curl -f $portal_a_url)
-    # echo "$portal_a_raw"
     portal_a_formatted=$(echo "$portal_a_raw" | jq -S '.')
 
     portal_b_url="${urls[1]}/$portal_config_path"
-    echo "Fetching portal from $portal_b_url..."
+    echo "Fetching portal config from $portal_b_url..."
     portal_b_raw=$(curl -f $portal_b_url)
-    # echo "$portal_b_raw"
     portal_b_formatted=$(echo "$portal_b_raw" | jq -S '.')
-    echo "$portal_b_formatted"
+    echo $portal_b_formatted
 
     vimdiff <(echo "$portal_a_formatted") <(echo "$portal_b_formatted")
 fi
