@@ -2,9 +2,9 @@
 
 if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 2 ]; then
   echo "------------------------------------------------------------------------------"
-  echo "Usage - replicate_manifest_config <source_manifest> <target_manifest>"
+  echo "Usage - replicate_manifest_config <source_manifest_on_remote_branch> <target_manifest_on_local_disk>"
   echo ""
-  echo "e.g., ./replicate_manifest_config.sh internalstaging.datastage.io/manifest.json gitops-qa/jenkins-dcp.planx-pla.net/manifest.json"
+  echo "e.g., ./replicate_manifest_config.sh master/preprod.gen3.biodatacatalyst.nhlbi.nih.gov/manifest.json gitops-qa/jenkins-dcp.planx-pla.net/manifest.json"
   echo ""
   echo "The script pulls data from a source manifest and replaces the versions & dictionary of the target manifest"
   echo "-------------------------------------------------------------------------------"
