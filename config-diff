@@ -22,10 +22,12 @@ diff_tool=vimdiff
 manifest_path="manifest.json"
 portal_config_path="portal/gitops.json"
 
-diff_manifest=true
+diff_manifest=false
 diff_portal=true
 
 declare -a urls
+declare -a namespaces
+declare -a branches
 
 # Iterate over arguments
 while test ${#} -gt 0
@@ -41,7 +43,6 @@ do
     else
       repo=$default_repo
   fi
-  echo "repo: $repo"
 
   # Parse the branch name, if any
   # Test for presence of a colon(':') in the string
@@ -56,7 +57,6 @@ do
     else
       branch=$default_branch
   fi
-  echo "branch: $branch"
 
   # Parse commons namespace
   namespace=$1
@@ -67,9 +67,10 @@ do
   fi
   # Remove the branch name if present
   namespace=$(echo $namespace | sed 's/^\([^:]*\):?.*$/\1/')
-  echo "namespace:$namespace"
 
   urls+=("$github_url_base/$repo/$branch/$namespace")
+  namespaces+=("$namespace")
+  branches+=("$branch")
   shift
 done
 
@@ -84,9 +85,23 @@ if $diff_manifest
     echo "Fetching manifest from $manifest_b_url..."
     manifest_b_raw=$(curl -f $manifest_b_url)
     manifest_b_formatted=$(echo "$manifest_b_raw" | jq -S '.')
-    echo "$manifest_b_formatted"
 
-    vimdiff <(echo "$manifest_a_formatted") <(echo "$manifest_b_formatted")
+    # read manifests into temporary files
+    namespace_a="${namespaces[0]}"
+    namespace_b="${namespaces[1]}"
+    branch_a="${branches[0]}"
+    branch_b="${branches[1]}"
+    manifest_a_file=$(mktemp "/tmp/$namespace_a:$manifest_path@$branch_a")
+    manifest_b_file=$(mktemp "/tmp/$namespace_b:$manifest_path@$branch_b")
+    echo "$manifest_a_formatted" >> $manifest_a_file
+    echo "$manifest_b_formatted" >> $manifest_b_file
+
+    # run diff
+    vimdiff $manifest_a_file $manifest_b_file
+
+    # delete the temporary files
+    rm "$manifest_a_file"
+    rm "$manifest_b_file"
 fi
 
 if $diff_portal
@@ -100,9 +115,24 @@ if $diff_portal
     echo "Fetching portal config from $portal_b_url..."
     portal_b_raw=$(curl -f $portal_b_url)
     portal_b_formatted=$(echo "$portal_b_raw" | jq -S '.')
-    echo $portal_b_formatted
 
-    vimdiff <(echo "$portal_a_formatted") <(echo "$portal_b_formatted")
+    # read manifests into temporary files
+    namespace_a="${namespaces[0]}"
+    namespace_b="${namespaces[1]}"
+    branch_a="${branches[0]}"
+    branch_b="${branches[1]}"
+    portal_config_path="portal_gitops.json"
+    portal_a_file=$(mktemp "/tmp/$namespace_a:$portal_config_path@$branch_a")
+    portal_b_file=$(mktemp "/tmp/$namespace_b:$portal_config_path@$branch_b")
+    echo "$portal_a_formatted" >> $portal_a_file
+    echo "$portal_b_formatted" >> $portal_b_file
+
+    # run diff
+    vimdiff $portal_a_file $portal_b_file
+
+    # delete the temporary files
+    rm "$portal_a_file"
+    rm "$portal_b_file"
 fi
 
 echo "done"
