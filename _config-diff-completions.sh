@@ -9,4 +9,4 @@ _script()
 
   return 0
 }
-complete -o nospace -F _script ./manifest-diff.sh
+complete -o nospace -F _script ./config-diff
