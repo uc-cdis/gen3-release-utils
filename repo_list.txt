@@ -19,5 +19,5 @@ gen3-fuse
 indexs3client
 gen3-spark
 metadata-service
-docker-ngnix
+docker-nginx
 
