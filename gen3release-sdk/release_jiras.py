@@ -100,7 +100,6 @@ def create_ticket(issue_dict, team_member_index):
     return (team_member_index + 1) % len(team_members)
 
 for task in tasks:
-    print('team_member_index: ' + str(team_member_index))
     summary = task['title']
     issue_dict = {
         'project': PROJECT_NAME,
@@ -113,7 +112,6 @@ for task in tasks:
     # Shared tasks required one ticket per team member
     if task['title'].split(':')[0] == 'SHARED':
       for i in range(0, len(team_members)):
-        print('inner loop team_member_index: ' + str(team_member_index))
         issue_dict['summary'] = issue_dict['summary'] + team_members[team_member_index]['name']
         team_member_index = create_ticket(issue_dict, team_member_index)
     else:
