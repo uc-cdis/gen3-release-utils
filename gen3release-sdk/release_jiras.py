@@ -1,8 +1,15 @@
 from jira import JIRA
 import re
 import os
+import sys
+import datetime
 
 release = os.environ['RELEASE']
+
+options = {
+  'server': 'https://ctds-planx.atlassian.net'
+}
+jira = JIRA(options, basic_auth=(os.environ["JIRA_SVC_ACCOUNT"], os.environ["JIRA_API_TOKEN"]))
 
 tasks = [
   {
@@ -50,16 +57,25 @@ team_members = [
 
 # set initial team member index based on the number of the month
 # every month a diff team member will pick a diff task
-month_number = re.search(r'[0-9]{4}\.([0-9]{2})', release)
-team_member_index = int(month_number.group(1)) % len(team_members)
+year_and_month = re.search(r'([0-9]{4})\.([0-9]{2})', release)
+team_member_index = int(year_and_month.group(2)) % len(team_members)
 
-options = {
-  'server': 'https://ctds-planx.atlassian.net'
-}
-jira = JIRA(options, basic_auth=(os.environ["JIRA_SVC_ACCOUNT"], os.environ["JIRA_API_TOKEN"]))
+# get year
+year = year_and_month.group(1)
+# get month string
+month = datetime.date(1900, int(year_and_month.group(2)), 1).strftime('%B')
 
-PROJECT_NAME = "QAT"
-RELEASE_TITLE = "CREATED BY AUTOMATION - PLEASE IGNORE - April 2020 03 Gen3 Core Release"
+# Do not create duplicate Epic + Tasks
+query = jira.search_issues(
+  jql_str='issuetype = Epic AND project = {} AND text ~ "{} {} Gen3 Core Release"'.format(os.environ['JIRA_PROJECT_NAME'], month, year)
+)
+
+if len(query) > 0:
+  print('Epic for {} release [{}] already exists. Abort automatic creation of tickets...'.format(release, query[0]))
+  sys.exit(1)
+
+PROJECT_NAME = os.environ['JIRA_PROJECT_NAME']
+RELEASE_TITLE = 'CREATED BY AUTOMATION - PLEASE IGNORE - {} {} Gen3 Core Release'.format(month, year)
 COMPONENT = 'Team Catch(Err)'
 
 epic_dict = {
