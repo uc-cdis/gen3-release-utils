@@ -1,0 +1,206 @@
+from gith.git import Git as Gh
+from config.env import Env
+from filesys import io
+import argparse
+import os
+import sys
+import logging
+import datetime
+
+# Debugging:
+# $ export LOGLEVEL=DEBUG
+
+# how to run:
+# $ python environments_config_manager.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
+# or
+# $ python environments_config_manager.py copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
+
+# To delete local garbage / experimental branches:
+# % git branch | cat | grep apply | xargs -I {} git branch -D {}
+
+LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
+logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
+logging.getLogger(__name__)
+
+def make_parser():
+    parser = argparse.ArgumentParser(
+        description="Updating configuration for Gen3 environments",
+        formatter_class=argparse.RawTextHelpFormatter,
+        epilog="""\
+Utility to update the version of services or copy all the configuration from one source environment to a target environment.
+The general syntax for this script is:
+
+environments_config_manager <command> <args>
+e.g., python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io 
+You can also use optional arg: "-pr" to create pull requests automatically
+
+The most commonly used commands are:
+   apply    Applies a given version to all services declared in the environment's manifest.
+            e.g. $ python environments_config_manager.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
+            or
+            e.g. $ python environments_config_manager.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io -pr \"task(project): Apply Core Gen3 April release\"
+
+   copy     Copies the entire set of configuration artifacts from a source environment to a target environment (keeping the environment-specific settings, e.g., hostname, vpc, k8s namespace, guppy ES index, etc.)
+            e.g. $ python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
+""",
+    )
+
+    subparsers = parser.add_subparsers()
+
+    parser_apply = subparsers.add_parser(
+        "apply",
+        description="Applies an arbitrary version to all services",
+    )
+    parser_apply.add_argument(
+        "-v",
+        "--version",
+        dest="version",
+        required=True,
+        type=str,
+        help="name of the branch or tag that represents a quay.io Docker image (e.g., 2020.04)",
+    )
+    parser_apply.add_argument(
+        "-e",
+        "--env",
+        dest="env",
+        required=True,
+        type=str,
+        help="name of the environment (e.g., ~/workspace/gitops-qa/qa-dcp.planx-pla.net)",
+    )
+    parser_apply.add_argument(
+        "-pr",
+        "--pull-request-title",
+        dest="pr_title",
+        required=False,
+        type=str,
+        help="triggers automation that creates a pull request on github and sets a title (e.g., chore(qa): Updating qa-dcp with release 2020.04)",
+    )
+    parser_apply.set_defaults(func=apply)
+
+    parser_copy = subparsers.add_parser(
+        "copy",
+        description="Copies ALL artifacts from a given source environment to a target environment",
+    )
+    parser_copy.add_argument(
+        "-s",
+        "--source",
+        dest="source",
+        required=True,
+        type=str,
+        help="name of the source environment whose config will be copied over to the target environment (e.g., ~/workspace/cdis-manifest/preprod.gen3.biodatacatalyst.nhlbi.nih.gov)",
+    )
+    parser_copy.add_argument(
+        "-e",
+        "--env",
+        dest="env",
+        required=True,
+        type=str,
+        help="name of the target environment whose config will be modified once all the config from the source environment is copied over (e.g., ~/workspace/cdis-manifest/gen3.biodatacatalyst.nhlbi.nih.gov)",
+    )    
+    parser_copy.add_argument(
+        "-pr",
+        "--pull-request-title",
+        dest="pr_title",
+        required=False,
+        type=str,
+        help="triggers automation that creates a pull request on github and sets a title (e.g., task(dcf): Promote changes from staging to prod - Release q1 2020)",
+    )
+    parser_copy.set_defaults(func=copy)
+    parser.set_defaults(func=apply)
+    return parser
+
+
+def main():
+    parser = make_parser()
+    args = parser.parse_args()
+    if len(args._get_kwargs()) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+    args.func(args)
+
+
+def apply(args):
+  version = args.version
+  target_env = args.env
+  pr_title = args.pr_title
+  logging.debug("version: {}".format(version))
+  logging.debug("target_env: {}".format(target_env))
+  logging.debug("pr_title: {}".format(pr_title))
+
+  # Create Environment Config object
+  e = Env(target_env)
+
+  modified_files = apply_version_to_environment(version, e)
+
+  # Cut a new brach if the --pull-request-title flag is in place
+  if pr_title and len(modified_files) > 0:
+    ts = str(datetime.datetime.now().timestamp()).split('.')[0]
+    branch_name = 'chore/apply_{}_to_{}_{}'.format(version.replace('.', ''), e.name.replace('.', '_'), ts)
+    repo_name = os.path.basename(e.repo_dir)
+    logging.debug('creating github client obj with repo={}'.format(repo_name))
+    gh = Gh(repo=repo_name)
+    gh_client = gh.get_github_client()
+
+    # create new remote branch
+    new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
+
+    # create local branch, commit, push and create pull request
+    commit_msg = 'Applying version {} to {}'.format(version, e.name)
+    gh.create_pull_request(gh_client, version, e, modified_files, pr_title, commit_msg, branch_name)
+    logging.info('PR created successfully!')
+ 
+
+def apply_version_to_environment(version, e):
+  modified_files = []
+  for manifest_file_name in e.BLOCKS_TO_UPDATE.keys():
+    manifest = '{}/{}/{}'.format(e.repo_dir, e.name, manifest_file_name)
+    current_md5, current_json = io.read_manifest(manifest)
+
+    logging.debug('looking for versions to be replaced in {}'.format(manifest))
+    json_with_version = e.find_and_replace(version, manifest_file_name, current_json)
+
+    new_md5 = io.write_into_manifest(manifest, json_with_version)
+
+    if current_md5 != new_md5:
+      modified_files.append(manifest)
+  return modified_files
+
+
+def copy(args):
+  source_env = args.source
+  target_env = args.env
+  logging.debug("source_env: {}".format(source_env))
+  logging.debug("target_env: {}".format(target_env))
+
+#    modified_files = []
+#    new_branch_ref = None
+#    branch_name = None
+# 
+#    # Check if paths exist
+#    if path.exists('{}'.format(source_env)) and path.exists('{}'.format(target_env)):
+#      try:
+#        # Cut a new brach if the --pull-request-title flag is in place
+#        # create the branch only once
+#        if pr_title and new_branch_ref == None:
+#          # TODO: pick manifest repo from --env argument (gitops-qa or cdis-manifest)
+#          # Hardcoding cdis-manifest for now
+#          ts = datetime.datetime.now().timestamp()
+#          branch_name = 'chore/copy_{}_{}'.format(version.replace('.', ''), str(ts).split('.')[0])
+#          github_lib = GithubLib()
+#          github_client = github_lib.get_github_client()
+#          new_branch_ref = github_lib.cut_new_branch(github_client, branch_name)
+#          logging.info('new branch [{}] has been created successfully (ref: {})'.format(branch_name, str(new_branch_ref)))
+# 
+#        # copy all the files from the source environment folder
+#        # and re-apply the environment-specific parameters
+#        recursive_copy('{}/'.format(source_env), target_env)
+#      except Error as err:
+#        logging.error('something went wrong while trying to copy the environment folder: {}'.format(err))
+#        sys.exit(1)
+#    else:
+#      logging.error('Invalid source and/or target environment. Double-check the paths and try again.')
+#      sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

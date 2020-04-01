@@ -1,5 +1,4 @@
-from github import Github
-from git import Repo
+import GithubFacade from github.GithubFacade as gh
 import argparse
 import os
 from os import path
@@ -23,8 +22,8 @@ LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
 logging.getLogger(__name__)
 
+# TODO: Move this class to its own module script
 class GithubLib():
-#  def __init__(self, org='uc-cdis', repo='cdis-manifest', token=os.environ['GITHUB_TOKEN'].strip()):
   def __init__(self, org='uc-cdis', repo='cdis-manifest', token=os.environ['GITHUB_TOKEN'].strip()):
     """
      Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
@@ -63,6 +62,19 @@ class GithubLib():
     repo.git.push('origin', branch_name)
     # finally, create Pull Request
     github_client.create_pull(title=pr_title, body=commit_msg, head=branch_name, base="master")
+
+# TODO: Move this class to its own module script
+class EnvironmetConfig():
+  def __init__(self, path_to_env_folder, parameters_to_remember={}):
+    """
+     Creates an EnvironmentConfig object to store information related to its folder path and the parameters that need to be stored and re-applied to its JSON files once the artifacts are copied over.
+     This class also contains helper methods to facilitate the manipulation of config data.
+    """
+    environment_path_regex = re.search(r'(.*)\/(.*)', path_to_env_folder)
+    logging.debug('identifying repo directory and name of the environment: {}'.format(str(environment_path_regex)))
+    self.repo_dir = environment_path_regex.group(1)
+    self.name = environment_path_regex.group(2)
+    self.persisting_parameters = persisting_parameters
 
 
 def make_parser():
@@ -160,6 +172,8 @@ def main():
         parser.print_help(sys.stderr)
         sys.exit(1)
     args.func(args)
+
+def get_environment_config_folder_and_name
 
 def merge_json_file_with_stored_environment_params(dst_path, the_file, env_params):
   full_path_to_file = '{}/{}'.format(dst_path, the_file)
@@ -362,15 +376,32 @@ def copy(args):
     target_env = args.env
     logging.debug("source_env: {}".format(source_env))
     logging.debug("target_env: {}".format(target_env))
+
+    modified_files = []
+    new_branch_ref = None
+    branch_name = None
+
     # Check if paths exist
     if path.exists('{}'.format(source_env)) and path.exists('{}'.format(target_env)):
-       try:
-         # Cut a new brach if the --pull-request-title flag is in place
-         
-         recursive_copy('{}/'.format(source_env), target_env)
-       except Error as err:
-         logging.error('something went wrong while trying to copy the environment folder: {}'.format(err))
-         sys.exit(1)
+      try:
+        # Cut a new brach if the --pull-request-title flag is in place
+        # create the branch only once
+        if pr_title and new_branch_ref == None:
+          # TODO: pick manifest repo from --env argument (gitops-qa or cdis-manifest)
+          # Hardcoding cdis-manifest for now
+          ts = datetime.datetime.now().timestamp()
+          branch_name = 'chore/copy_{}_{}'.format(version.replace('.', ''), str(ts).split('.')[0])
+          github_lib = GithubLib()
+          github_client = github_lib.get_github_client()
+          new_branch_ref = github_lib.cut_new_branch(github_client, branch_name)
+          logging.info('new branch [{}] has been created successfully (ref: {})'.format(branch_name, str(new_branch_ref)))
+
+        # copy all the files from the source environment folder
+        # and re-apply the environment-specific parameters
+        recursive_copy('{}/'.format(source_env), target_env)
+      except Error as err:
+        logging.error('something went wrong while trying to copy the environment folder: {}'.format(err))
+        sys.exit(1)
     else:
       logging.error('Invalid source and/or target environment. Double-check the paths and try again.')
       sys.exit(1)
