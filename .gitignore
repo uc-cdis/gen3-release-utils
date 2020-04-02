@@ -1,1 +1,4 @@
 .idea
+gen3release-sdk/config/__pycache__
+gen3release-sdk/filesys/__pycache__
+gen3release-sdk/gith/__pycache__

@@ -3,6 +3,7 @@ from config.env import Env
 from filesys import io
 import argparse
 import os
+from os import path
 import sys
 import logging
 import datetime
@@ -146,8 +147,9 @@ def apply(args):
 
     # create local branch, commit, push and create pull request
     commit_msg = 'Applying version {} to {}'.format(version, e.name)
-    gh.create_pull_request(gh_client, version, e, modified_files, pr_title, commit_msg, branch_name)
+    gh.create_pull_request(gh_client, e, modified_files, pr_title, commit_msg, branch_name)
     logging.info('PR created successfully!')
+    # TODO: Switch local branch to master
  
 
 def apply_version_to_environment(version, e):
@@ -169,37 +171,53 @@ def apply_version_to_environment(version, e):
 def copy(args):
   source_env = args.source
   target_env = args.env
+  pr_title = args.pr_title
   logging.debug("source_env: {}".format(source_env))
   logging.debug("target_env: {}".format(target_env))
+  logging.debug("pr_title: {}".format(pr_title))
+  
+  # Create Environment Config objects
+  srcEnv = Env(source_env)
+  tgtEnv = Env(target_env)
 
-#    modified_files = []
-#    new_branch_ref = None
-#    branch_name = None
-# 
-#    # Check if paths exist
-#    if path.exists('{}'.format(source_env)) and path.exists('{}'.format(target_env)):
-#      try:
-#        # Cut a new brach if the --pull-request-title flag is in place
-#        # create the branch only once
-#        if pr_title and new_branch_ref == None:
-#          # TODO: pick manifest repo from --env argument (gitops-qa or cdis-manifest)
-#          # Hardcoding cdis-manifest for now
-#          ts = datetime.datetime.now().timestamp()
-#          branch_name = 'chore/copy_{}_{}'.format(version.replace('.', ''), str(ts).split('.')[0])
-#          github_lib = GithubLib()
-#          github_client = github_lib.get_github_client()
-#          new_branch_ref = github_lib.cut_new_branch(github_client, branch_name)
-#          logging.info('new branch [{}] has been created successfully (ref: {})'.format(branch_name, str(new_branch_ref)))
-# 
-#        # copy all the files from the source environment folder
-#        # and re-apply the environment-specific parameters
-#        recursive_copy('{}/'.format(source_env), target_env)
-#      except Error as err:
-#        logging.error('something went wrong while trying to copy the environment folder: {}'.format(err))
-#        sys.exit(1)
-#    else:
-#      logging.error('Invalid source and/or target environment. Double-check the paths and try again.')
-#      sys.exit(1)
+  modified_files = copy_all_files(srcEnv, tgtEnv)
+
+    # Cut a new brach if the --pull-request-title flag is in place
+  if pr_title and len(modified_files) > 0:
+    ts = str(datetime.datetime.now().timestamp()).split('.')[0]
+    branch_name = 'chore/copy_{}_to_{}_{}'.format(
+      srcEnv.name.replace('.', '_'),
+      tgtEnv.name.replace('.', '_'),
+      ts)
+    repo_name = os.path.basename(tgtEnv.repo_dir)
+    logging.debug('creating github client obj with repo={}'.format(repo_name))
+    gh = Gh(repo=repo_name)
+    gh_client = gh.get_github_client()
+
+    # create new remote branch
+    new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
+
+    # create local branch, commit, push and create pull request
+    commit_msg = 'copying files from {} to {}'.format(srcEnv.name, tgtEnv.name)
+    gh.create_pull_request(gh_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name)
+    logging.info('PR created successfully!')
+    # TODO: Switch local branch to master
+
+
+def copy_all_files(srcEnv, tgtEnv):
+  # Check if paths exist
+  if path.exists(srcEnv.full_path) and path.exists(tgtEnv.full_path):
+    try:
+      # copy all the files from the source environment folder
+      # and re-apply the environment-specific parameters
+      copied_files = io.recursive_copy([], srcEnv, tgtEnv, srcEnv.full_path, tgtEnv.full_path)
+      return copied_files
+    except Exception as err:
+      logging.error('something went wrong while trying to copy the environment folder: {}'.format(err))
+      sys.exit(1)
+  else:
+    logging.error('Invalid source and/or target environment. Double-check the paths and try again.')
+    sys.exit(1)
 
 
 if __name__ == "__main__":

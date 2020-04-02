@@ -34,7 +34,7 @@ class Git():
     logging.info('new branch [{}] has been created successfully (ref: {})'.format(branch_name, str(git_ref)))
     return git_ref
 
-  def create_pull_request(self, github_client, version, environment, modified_files, pr_title, commit_msg, branch_name):
+  def create_pull_request(self, github_client, environment, modified_files, pr_title, commit_msg, branch_name):
     repo_dir = environment.repo_dir
     name_of_environment = environment.name
     repo = Repo(repo_dir)
