@@ -1,6 +1,6 @@
 .idea
-gen3release-sdk/config/__pycache__
-gen3release-sdk/filesys/__pycache__
-gen3release-sdk/gith/__pycache__
+gen3release-sdk/gen3release/config/__pycache__/
+gen3release-sdk/gen3release/filesys/__pycache__/
+gen3release-sdk/gen3release/gith/__pycache__/
 dist
-gen3release.egg-info
+gen3release-sdk/gen3release.egg-info/

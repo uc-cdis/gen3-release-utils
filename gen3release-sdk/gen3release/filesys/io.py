@@ -36,14 +36,20 @@ def merge_json_file_with_stored_environment_params(dst_path, the_file, env_param
 
 def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
   os.chdir(src)
+  curr_dir = os.getcwd()
+  logging.debug('current_dir: {}'.format(curr_dir))
   try:
     for a_file in os.listdir():
       if a_file == 'README.md': continue
-      logging.debug('copying file: {}'.format(a_file))
-      if os.path.isdir(a_file):
+      logging.debug('copying file: {}'.format(('{}/'.format(curr_dir) + a_file)))
+      if os.path.isdir('{}/'.format(os.getcwd()) + a_file):
+        logging.debug('this file {} is a directory. Stepping into it'.format(a_file))
         new_dst = os.path.join(dst, a_file)
         os.makedirs(new_dst, exist_ok=True)
-        recursive_copy(copied_files, srcEnv, tgtEnv, os.path.abspath(a_file) + '/', new_dst)
+        src = os.path.abspath(a_file)
+        recursive_copy(copied_files, srcEnv, tgtEnv, src, new_dst)
+        logging.debug('finished recursion on folder: {}'.format(a_file))
+        os.chdir(os.path.abspath('..'))
       else:
         logging.debug('copying {} into {}'.format(a_file, dst))
         # files mapped in ENVIRONMENT_SPECIFIC_PARAMS need special treatment
@@ -55,12 +61,12 @@ parameters that need to be saved.'.format(a_file))
           with open('{}/{}'.format(dst, a_file), 'r') as j:
             json_file = json.loads(j.read())
           env_params = tgtEnv.load_environment_params(a_file, json_file)
-          shutil.copy('{}/'.format(src) + a_file, dst)
+          shutil.copy('{}/'.format(curr_dir) + a_file, dst)
           logging.debug('Stored parameters: {}'.format(env_params))
           # re-apply all the stored environment-specific params
           merge_json_file_with_stored_environment_params(dst, a_file, env_params)
         else:
-          shutil.copy(src + a_file, dst)
+          shutil.copy('{}/'.format(curr_dir) + a_file, dst)
         copied_files.append('{}/'.format(dst) + a_file)
     logging.debug('copied files: {}'.format(copied_files))
     return copied_files
