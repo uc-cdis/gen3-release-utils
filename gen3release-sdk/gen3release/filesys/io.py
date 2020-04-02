@@ -60,7 +60,7 @@ parameters that need to be saved.'.format(a_file))
           # re-apply all the stored environment-specific params
           merge_json_file_with_stored_environment_params(dst, a_file, env_params)
         else:
-          shutil.copy(src + a_file, dst)
+          shutil.copy('{}/'.format(src) + a_file, dst)
         copied_files.append('{}/'.format(dst) + a_file)
     logging.debug('copied files: {}'.format(copied_files))
     return copied_files
