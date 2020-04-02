@@ -1,6 +1,6 @@
 import hashlib
 import shutil
-from config.env import Env
+from ..config.env import Env
 from shutil import copytree, Error
 import logging
 import json
