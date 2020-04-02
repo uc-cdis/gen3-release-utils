@@ -1,6 +1,6 @@
-from .gith.git import Git as Gh
-from .config.env import Env
-from .filesys import io
+from gith.git import Git as Gh
+from config.env import Env
+from filesys import io
 import argparse
 import os
 from os import path

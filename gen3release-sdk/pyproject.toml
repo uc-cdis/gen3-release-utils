@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "gen3release"
-version = "0.1.8"
+version = "0.2.0"
 description = "Gen3 Release Management SDK"
 authors = ["CTDS UChicago <cdis@uchicago.edu>"]
 packages = [
-    { include = "gen3release/config" },
-    { include = "gen3release/filesys" },
-    { include = "gen3release/gith" },
+    { include = "config", from = "gen3release" },
+    { include = "filesys", from = "gen3release" },
+    { include = "gith", from = "gen3release" },
     { include = "gen3release/env_cli.py" }
 ]
 

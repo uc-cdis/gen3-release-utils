@@ -3,3 +3,5 @@ fileignoreconfig:
   checksum: e959834e94b06158b3557f9a6faceb4309f77784afa5603f442c98c75ebddaac
 - filename: gen3release-sdk/poetry.lock
   checksum: e5c2d7c57a00004d50163525559f325ea0177d0efe0058013b74059d5f4c6caf
+- filename: gen3release-sdk/gen3release/env_cli.py
+  checksum: c82587f8f86dacdb136c8a7f8a109dbdfbb204607dc028dea3597371e9994a78
