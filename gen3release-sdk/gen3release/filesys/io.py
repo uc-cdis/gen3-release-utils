@@ -52,6 +52,7 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
         os.chdir(os.path.abspath('..'))
       else:
         logging.debug('copying {} into {}'.format(a_file, dst))
+        # TODO: Due to etlMapping.yaml, we need a YAMl parsing module
         # files mapped in ENVIRONMENT_SPECIFIC_PARAMS need special treatment
         if a_file in tgtEnv.ENVIRONMENT_SPECIFIC_PARAMS.keys():
           logging.debug('This file [{}] contains environment-specific \
@@ -68,7 +69,6 @@ parameters that need to be saved.'.format(a_file))
         else:
           shutil.copy('{}/'.format(curr_dir) + a_file, dst)
         copied_files.append('{}/'.format(dst) + a_file)
-    logging.debug('copied files: {}'.format(copied_files))
     return copied_files
   except Exception as e:
     logging.error('something went wrong during the recursive copy of [{}] into [{}]'.format(srcEnv.name, tgtEnv.name))

@@ -182,12 +182,12 @@ def copy(args):
 
   modified_files = copy_all_files(srcEnv, tgtEnv)
 
+  logging.debug('num of modified_files: {}'.format(len(modified_files)))
     # Cut a new brach if the --pull-request-title flag is in place
   if pr_title and len(modified_files) > 0:
     ts = str(datetime.datetime.now().timestamp()).split('.')[0]
-    branch_name = 'chore/copy_{}_to_{}_{}'.format(
+    branch_name = 'chore/promote_{}_{}'.format(
       srcEnv.name.replace('.', '_'),
-      tgtEnv.name.replace('.', '_'),
       ts)
     repo_name = os.path.basename(tgtEnv.repo_dir)
     logging.debug('creating github client obj with repo={}'.format(repo_name))
@@ -197,9 +197,9 @@ def copy(args):
     # create new remote branch
     new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
 
-    # create local branch, commit, push and create pull request
+    # create commit, push files to remote branch and create pull request
     commit_msg = 'copying files from {} to {}'.format(srcEnv.name, tgtEnv.name)
-    gh.create_pull_request(gh_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name)
+    gh.create_pull_request(gh_client, srcEnv, tgtEnv, modified_files, pr_title, commit_msg, branch_name)
     logging.info('PR created successfully!')
     # TODO: Switch local branch to master
 
@@ -211,6 +211,12 @@ def copy_all_files(srcEnv, tgtEnv):
       # copy all the files from the source environment folder
       # and re-apply the environment-specific parameters
       copied_files = io.recursive_copy([], srcEnv, tgtEnv, srcEnv.full_path, tgtEnv.full_path)
+      # keep only relative paths (base_path = workspace)
+      base_path = tgtEnv.full_path
+      logging.debug('base_path: {}'.format(base_path))
+      # remove base_path (keep only the files)
+      copied_files = list(map(lambda f: f.replace(base_path, '').strip("/"), copied_files))
+      logging.debug('copied files: {}'.format(copied_files))
       return copied_files
     except Exception as err:
       logging.error('something went wrong while trying to copy the environment folder: {}'.format(err))
