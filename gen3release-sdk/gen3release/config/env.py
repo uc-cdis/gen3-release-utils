@@ -117,8 +117,11 @@ class Env():
     self.full_path = path_to_env_folder
 
   def _replace_one(self, version, key, json_block):
-    logging.debug('applying version {} to key {} in block {}'.format(version, key, json_block))
-    json_block[key] = '{}:{}'.format(json_block[key].split(':')[0], version)
+    if key in json_block:
+      logging.debug('applying version {} to key {} in block {}'.format(version, key, json_block))
+      json_block[key] = '{}:{}'.format(json_block[key].split(':')[0], version)
+    else:
+      logging.warn('nothing to replace here. The key [{}] was not found in this json block.'.format(key))
     return json_block
 
   def _replace_all_versions(self, version, json_block):
