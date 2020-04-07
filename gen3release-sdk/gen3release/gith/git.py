@@ -33,9 +33,27 @@ class Git():
     logging.info('new branch [{}] has been created successfully (ref: {})'.format(branch_name, str(git_ref)))
     return git_ref
 
-  def create_pull_request(self, github_client, srcEnv, tgtEnv, modified_files, pr_title, commit_msg, branch_name):
+  def create_pull_request_apply(self, github_client, version, tgtEnv, modified_files, pr_title, commit_msg, branch_name):
     # add all files to the remote branch
-    logging.debug
+    for f in modified_files:
+      logging.debug('adding {} to branch {}'.format(f, branch_name))
+      copy_commit = 'apply version {} to {}'.format(version, tgtEnv.name)
+      file_contents = github_client.get_contents('{}/'.format(tgtEnv.name) + f, branch_name)
+      input_file = open('{}/'.format(tgtEnv.full_path) + f, 'rb')
+      data = input_file.read()
+      # create_file(path, message, content, branch=NotSet)
+      logging.debug('branch_name: {}'.format(branch_name))
+      github_client.update_file(
+        '{}/'.format(tgtEnv.name) + f,
+        copy_commit,
+        data,
+        file_contents.sha, branch=branch_name)
+
+    # finally, create Pull Request
+    github_client.create_pull(title=pr_title, body=commit_msg, head=branch_name, base="master")
+
+  def create_pull_request_copy(self, github_client, srcEnv, tgtEnv, modified_files, pr_title, commit_msg, branch_name):
+    # add all files to the remote branch
     for f in modified_files:
       logging.debug('adding {} to branch {}'.format(f, branch_name))
       copy_commit = 'copying {} to {}'.format(f, tgtEnv.name)
