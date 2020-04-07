@@ -18,6 +18,7 @@ This utility (replicate_manifest_config.sh) should facilitate the copy of versio
 This utility uses the gen3git tool to generate release notes for Gen3 monthly releases
 
 - How to use it:
+    - Set environment variable GITHUB_TOKEN with your Github Personal Access Token
     - Install Python and [gen3git](https://github.com/uc-cdis/release-helper/) command line utility  
     ```pip install --editable git+https://github.com/uc-cdis/release-helper.git@gen3release#egg=gen3git```
     - Update `repo_list.txt` with the repositories from which release notes need to be generated
