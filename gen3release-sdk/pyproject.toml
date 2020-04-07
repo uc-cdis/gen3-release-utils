@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gen3release"
-version = "0.2.1"
+version = "0.2.21"
 description = "Gen3 Release Management SDK"
 authors = ["CTDS UChicago <cdis@uchicago.edu>"]
 packages = [
