@@ -16,6 +16,7 @@ class Env():
         'hostname': '',
         'revproxy_arn': '',
         'dictionary_url': '',
+        'portal_app':'',
         'kube_bucket': '',
         'logs_bucket': '',
         'sync_from_dbgap': '',
@@ -87,6 +88,9 @@ class Env():
             'container': 'image'
           },
       ],
+      'jupyterhub': {
+        'root': 'sidecar'
+      },
       'ssjdispatcher': {
         'job_images': 'indexing'
       },
@@ -112,6 +116,11 @@ class Env():
     self.name = environment_path_regex.group(2)
     self.full_path = path_to_env_folder
 
+  def _replace_one(self, version, key, json_block):
+    logging.debug('applying version {} to key {} in block {}'.format(version, key, json_block))
+    json_block[key] = '{}:{}'.format(json_block[key].split(':')[0], version)
+    return json_block
+
   def _replace_all_versions(self, version, json_block):
     for svc in json_block:
       if svc not in self.SVCS_TO_IGNORE:
@@ -133,16 +142,20 @@ class Env():
   def find_and_replace(self, version, manifest_file_name, json):
     for block in list(self.BLOCKS_TO_UPDATE[manifest_file_name].keys()):
       logging.debug('block: {}'.format(block))
-      if block == 'versions':
-        logging.debug('updating versions block from {}'.format(manifest_file_name))
-        json[block] = self._replace_all_versions(version, json[block])
-      else:
-        logging.debug('updating {} block from {}'.format(block, '{}.json'.format(manifest_file_name)))
-        if block in json:
+      if block in json:
+        if block == 'versions':
+          logging.debug('updating versions block from {}'.format(manifest_file_name))
+          json[block] = self._replace_all_versions(version, json[block])
+        elif type(json[block]) != list and 'root' in self.BLOCKS_TO_UPDATE[manifest_file_name][block].keys():
+          logging.debug('updating one parameter from a root block')
+          the_key = self.BLOCKS_TO_UPDATE[manifest_file_name][block]['root']
+          json[block] = self._replace_one(version, the_key, json[block])
+        else:
+          logging.debug('updating {} block from {}'.format(block, '{}.json'.format(manifest_file_name)))
           json_block = json[block] if block != 'root' else json
           json_block = self._replace_on_path(version, json_block, self.BLOCKS_TO_UPDATE[manifest_file_name][block])
-        else:
-          logging.warn('block {} does not exist in {}'.format(block, manifest_file_name))
+      else:
+        logging.warn('block {} does not exist in {}'.format(block, manifest_file_name))
     return json
    
   def save_blocks(self, block, env_params, json_block):

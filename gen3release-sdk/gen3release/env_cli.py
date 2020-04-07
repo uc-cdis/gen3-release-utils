@@ -147,7 +147,7 @@ def apply(args):
 
     # create local branch, commit, push and create pull request
     commit_msg = 'Applying version {} to {}'.format(version, e.name)
-    gh.create_pull_request(gh_client, e, modified_files, pr_title, commit_msg, branch_name)
+    gh.create_pull_request_apply(gh_client, version, e, modified_files, pr_title, commit_msg, branch_name)
     logging.info('PR created successfully!')
     # TODO: Switch local branch to master
  
@@ -168,6 +168,14 @@ def apply_version_to_environment(version, e):
         modified_files.append(manifest)
     else:
       logging.warn('environment [{}] does not contain the manifest file {}'.format(e.name, manifest))
+
+  # keep only relative paths (base_path = workspace)
+  base_path = e.full_path
+  logging.debug('base_path: {}'.format(base_path))
+  # remove base_path (keep only the files)
+  modified_files = list(map(lambda f: f.replace(base_path, '').strip("/"), modified_files))
+  logging.debug('modified files: {}'.format(modified_files))
+
   return modified_files
 
 
@@ -202,7 +210,7 @@ def copy(args):
 
     # create commit, push files to remote branch and create pull request
     commit_msg = 'copying files from {} to {}'.format(srcEnv.name, tgtEnv.name)
-    gh.create_pull_request(gh_client, srcEnv, tgtEnv, modified_files, pr_title, commit_msg, branch_name)
+    gh.create_pull_request_copy(gh_client, srcEnv, tgtEnv, modified_files, pr_title, commit_msg, branch_name)
     logging.info('PR created successfully!')
     # TODO: Switch local branch to master
 
