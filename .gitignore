@@ -2,5 +2,4 @@
 gen3release-sdk/gen3release/config/__pycache__/
 gen3release-sdk/gen3release/filesys/__pycache__/
 gen3release-sdk/gen3release/gith/__pycache__/
-dist
 gen3release-sdk/gen3release.egg-info/

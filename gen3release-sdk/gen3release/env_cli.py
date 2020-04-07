@@ -32,7 +32,7 @@ Utility to update the version of services or copy all the configuration from one
 The general syntax for this script is:
 
 environments_config_manager <command> <args>
-e.g., python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io 
+e.g.: python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io 
 You can also use optional arg: "-pr" to create pull requests automatically
 
 The most commonly used commands are:
@@ -156,15 +156,18 @@ def apply_version_to_environment(version, e):
   modified_files = []
   for manifest_file_name in e.BLOCKS_TO_UPDATE.keys():
     manifest = '{}/{}/{}'.format(e.repo_dir, e.name, manifest_file_name)
-    current_md5, current_json = io.read_manifest(manifest)
+    if path.exists(manifest):
+      current_md5, current_json = io.read_manifest(manifest)
 
-    logging.debug('looking for versions to be replaced in {}'.format(manifest))
-    json_with_version = e.find_and_replace(version, manifest_file_name, current_json)
+      logging.debug('looking for versions to be replaced in {}'.format(manifest))
+      json_with_version = e.find_and_replace(version, manifest_file_name, current_json)
 
-    new_md5 = io.write_into_manifest(manifest, json_with_version)
+      new_md5 = io.write_into_manifest(manifest, json_with_version)
 
-    if current_md5 != new_md5:
-      modified_files.append(manifest)
+      if current_md5 != new_md5:
+        modified_files.append(manifest)
+    else:
+      logging.warn('environment [{}] does not contain the manifest file {}'.format(e.name, manifest))
   return modified_files
 
 

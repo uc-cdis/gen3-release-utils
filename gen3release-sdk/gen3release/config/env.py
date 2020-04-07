@@ -138,9 +138,11 @@ class Env():
         json[block] = self._replace_all_versions(version, json[block])
       else:
         logging.debug('updating {} block from {}'.format(block, '{}.json'.format(manifest_file_name)))
-        json_block = json[block] if block != 'root' else json
-        json_block = self._replace_on_path(version, json_block, self.BLOCKS_TO_UPDATE[manifest_file_name][block])
-
+        if block in json:
+          json_block = json[block] if block != 'root' else json
+          json_block = self._replace_on_path(version, json_block, self.BLOCKS_TO_UPDATE[manifest_file_name][block])
+        else:
+          logging.warn('block {} does not exist in {}'.format(block, manifest_file_name))
     return json
    
   def save_blocks(self, block, env_params, json_block):
