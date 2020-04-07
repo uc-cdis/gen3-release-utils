@@ -5,6 +5,8 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 0 ]; then
   echo "Usage - generate_release_notes"
   echo ""
   echo "Provide the list of repositories to operate upon in a file named repo_list.txt"
+  echo ""
+  echo "Ensure env var GITHUB_TOKEN is set with the Github Personal Access Token"
   echo "-------------------------------------------------------------------------------"
   exit 0;
 fi;
@@ -12,7 +14,7 @@ fi;
 repoOwner="uc-cdis"
 startDate="2019-12-30"
 endDate="2020-01-24"
-githubAccessToken=<GITHUB PERSONAL ACCESS TOKEN>
+githubAccessToken=$GITHUB_TOKEN
 
 if find . -name "release_notes.md" -type f; then
   echo "Deleting existing release notes"
