@@ -40,6 +40,12 @@ while IFS= read -r repo; do
     echo "$result"
     exit 1
   fi
+  result=$(git push origin "${targetBranchName}")
+  RC=$?
+  if [ $RC -ne 0 ]; then
+    echo "$result"
+    exit 1
+  fi
   result=$(git tag "${tagName}" -a -m "Gen3 Core Release ${tagName}")
   RC=$?
   if [ $RC -ne 0 ]; then
