@@ -50,7 +50,8 @@ class Git():
         file_contents.sha, branch=branch_name)
 
     # finally, create Pull Request
-    github_client.create_pull(title=pr_title, body=commit_msg, head=branch_name, base="master")
+    the_pr = github_client.create_pull(title=pr_title, body=commit_msg, head=branch_name, base="master")
+    the_pr.add_to_labels('automerge')
 
   def create_pull_request_copy(self, github_client, srcEnv, tgtEnv, modified_files, pr_title, commit_msg, branch_name):
     # add all files to the remote branch

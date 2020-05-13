@@ -77,7 +77,8 @@ class Env():
     'aws-es-proxy',
     'fluentd',
     'ambassador',
-    'nb2'
+    'nb2',
+    'jupyterhub'
   ]
 
   BLOCKS_TO_UPDATE = {
