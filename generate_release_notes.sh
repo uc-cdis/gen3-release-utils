@@ -12,8 +12,8 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 0 ]; then
 fi;
 
 repoOwner="uc-cdis"
-startDate="2019-12-30"
-endDate="2020-01-24"
+startDate="$START_DATE"
+endDate="$END_DATE"
 githubAccessToken=$GITHUB_TOKEN
 
 if find . -name "release_notes.md" -type f; then
@@ -22,7 +22,7 @@ if find . -name "release_notes.md" -type f; then
 fi
 
 touch gen3_release_notes.md
-echo "# Core Gen3 Release 202002 (Aurora)" >> gen3_release_notes.md
+echo "# $RELEASE_NAME" >> gen3_release_notes.md
 echo >> gen3_release_notes.md
 
 repo_list="repo_list.txt"
