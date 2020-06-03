@@ -125,11 +125,19 @@ class Env():
       logging.warn('nothing to replace here. The key [{}] was not found in this json block.'.format(key))
     return json_block
 
-  def _replace_all_versions(self, version, json_block):
-    for svc in json_block:
+  def _replace_all_versions(self, version, override, json_block):
+    try:
+      dict_override = eval(override)
+    except:
+      logging.debug('Malformed override json string passed - {}'.format(override))
+      dict_override = {}
+    for svc in json_block:        
       if svc not in self.SVCS_TO_IGNORE:
         logging.debug('applying version {} to {}'.format(version, svc))
         json_block[svc] = '{}:{}'.format(json_block[svc].split(':')[0], version)
+    for svc in dict_override:
+      logging.debug('applying version {} to {}'.format(dict_override[svc], svc))
+      json_block[svc] = dict_override[svc]
     return json_block
 
   def _replace_on_path(self, version, json_block, path):
@@ -143,13 +151,13 @@ class Env():
         json_block[sub_block][img_ref] = '{}:{}'.format(json_block[sub_block][img_ref].split(':')[0], version)
     return json_block
 
-  def find_and_replace(self, version, manifest_file_name, json):
+  def find_and_replace(self, version, override, manifest_file_name, json):
     for block in list(self.BLOCKS_TO_UPDATE[manifest_file_name].keys()):
       logging.debug('block: {}'.format(block))
       if block in json:
         if block == 'versions':
           logging.debug('updating versions block from {}'.format(manifest_file_name))
-          json[block] = self._replace_all_versions(version, json[block])
+          json[block] = self._replace_all_versions(version, override, json[block])
         elif type(json[block]) != list and 'root' in self.BLOCKS_TO_UPDATE[manifest_file_name][block].keys():
           logging.debug('updating one parameter from a root block')
           the_key = self.BLOCKS_TO_UPDATE[manifest_file_name][block]['root']

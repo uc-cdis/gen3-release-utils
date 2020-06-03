@@ -61,6 +61,15 @@ The most commonly used commands are:
         help="name of the branch or tag that represents a quay.io Docker image (e.g., 2020.04)",
     )
     parser_apply.add_argument(
+      "-o",
+      "--override",
+      dest="override",
+      required=False,
+      type=str,
+      default='{}',
+      help="overrides versions as specified in a json-like format e.g., {'ambassador':'1.4.2'}"
+    )
+    parser_apply.add_argument(
         "-e",
         "--env",
         dest="env",
@@ -122,16 +131,18 @@ def main():
 
 def apply(args):
   version = args.version
+  override = args.override
   target_env = args.env
   pr_title = args.pr_title
   logging.debug("version: {}".format(version))
+  logging.debug("override: {}".format(override))
   logging.debug("target_env: {}".format(target_env))
   logging.debug("pr_title: {}".format(pr_title))
 
   # Create Environment Config object
   e = Env(target_env)
 
-  modified_files = apply_version_to_environment(version, e)
+  modified_files = apply_version_to_environment(version, override, e)
 
   # Cut a new brach if the --pull-request-title flag is in place
   if pr_title and len(modified_files) > 0:
@@ -152,7 +163,7 @@ def apply(args):
     # TODO: Switch local branch to master
  
 
-def apply_version_to_environment(version, e):
+def apply_version_to_environment(version, override, e):
   modified_files = []
   for manifest_file_name in e.BLOCKS_TO_UPDATE.keys():
     manifest = '{}/{}/{}'.format(e.repo_dir, e.name, manifest_file_name)
@@ -160,7 +171,7 @@ def apply_version_to_environment(version, e):
       current_md5, current_json = io.read_manifest(manifest)
 
       logging.debug('looking for versions to be replaced in {}'.format(manifest))
-      json_with_version = e.find_and_replace(version, manifest_file_name, current_json)
+      json_with_version = e.find_and_replace(version, override, manifest_file_name, current_json)
 
       new_md5 = io.write_into_manifest(manifest, json_with_version)
 

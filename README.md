@@ -22,7 +22,11 @@ This utility uses the gen3git tool to generate release notes for Gen3 monthly re
     - Install Python and [gen3git](https://github.com/uc-cdis/release-helper/) command line utility  
     ```pip install --editable git+https://github.com/uc-cdis/release-helper.git@gen3release#egg=gen3git```
     - Update `repo_list.txt` with the repositories from which release notes need to be generated
-    - Update the variables `githubAccessToken`, `startDate`, `endDate` in the script `generate_release_notes.sh` 
+    - Set the following environment variables in the terminal:
+        - RELEASE_NAME - Release name e.g., `Core Gen3 Release 202006 (Edgewater)`   
+        - START_DATE - Start date in YYYY-MM-DD format  
+        - END_DATE - End date in YYYY-MM-DD format  
+        - GITHUB_TOKEN - Github personal access token
     - Execute generate_release_notes.sh  
     ```./generate_release_notes.sh```
    
