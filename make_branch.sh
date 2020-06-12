@@ -12,7 +12,7 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 2 ]; then
   exit 0;
 fi;
 
-urlPrefix="https://github.com/uc-cdis/"
+urlPrefix="https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/uc-cdis/"
 sourceBranchName=$1
 targetBranchName=$2
 
