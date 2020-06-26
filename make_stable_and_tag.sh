@@ -34,7 +34,7 @@ while IFS= read -r repo; do
   git clone "${urlPrefix}${repo}"
   cd "${repo}" || exit 1
   git checkout "${targetBranchName}"
-  git config --global user.name "${GITHUB_USERNAME}"
+  git config user.name "${GITHUB_USERNAME}"
   result=$(git pull origin "${sourceBranchName}")
   RC=$?
   if [ $RC -ne 0 ]; then
