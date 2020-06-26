@@ -22,7 +22,12 @@ class Git():
     """
     g = Github(self.token)
     org = g.get_organization(self.org)
-    repo = org.get_repo(self.repo)
+    try:
+      repo = org.get_repo(self.repo)
+    except Exception:
+      print(repo)
+
+
     return repo
 
   def cut_new_branch(self, github_client, branch_name):

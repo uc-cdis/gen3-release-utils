@@ -23,16 +23,32 @@ def write_into_manifest(manifest, json_with_changes):
     m.truncate()
     return hashlib.md5(m.read().encode('utf-8'))
 
-def merge_json_file_with_stored_environment_params(dst_path, the_file, env_params):
+def merge_json_file_with_stored_environment_params(dst_path, the_file, env_params, srcEnc, trgEnv):
   full_path_to_file = '{}/{}'.format(dst_path, the_file)
   logging.debug('merging stored data from [{}] into {}'.format(the_file, full_path_to_file))
   with open(full_path_to_file, 'r+') as f:
     json_file = json.loads(f.read())
     merged_json = {**json_file, **env_params}
+    if the_file == "manifest.json":
+      merged_json = remove_superfluous_from_sowers(merged_json, srcEnc, trgEnv)
     f.seek(0)
     f.write(json.dumps(merged_json, indent=2))
     f.truncate()
 
+def remove_superfluous_from_sowers(mani_json, srcEnv, trgEnv):
+  superflous_resources = []
+  if len(srcEnv.SOWER) == len(trgEnv.SOWER):
+    return []
+
+  srcnames = [x["name"] for x in srcEnv.SOWER]
+  trgnames = [x["name"] for x in trgEnv.SOWER]
+  for name in srcnames:
+    if name not in trgnames:
+      superflous_resources.append(name)
+  logging.debug("Original Target environment does not have {}, removing from target".format(superflous_resources))
+
+  mani_json["sower"] = [x for x in mani_json["sower"] if x["name"] not in superflous_resources]
+  return mani_json
 
 def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
   os.chdir(src)
@@ -46,14 +62,30 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
         logging.debug('this file {} is a directory. Stepping into it'.format(a_file))
         new_dst = os.path.join(dst, a_file)
         os.makedirs(new_dst, exist_ok=True)
-        src = os.path.abspath(a_file)
-        recursive_copy(copied_files, srcEnv, tgtEnv, src, new_dst)
+        curr_src = os.path.abspath(a_file)
+        recursive_copy(copied_files, srcEnv, tgtEnv, curr_src, new_dst)
         logging.debug('finished recursion on folder: {}'.format(a_file))
         os.chdir(os.path.abspath('..'))
       else:
         logging.debug('copying {} into {}'.format(a_file, dst))
         # TODO: Due to etlMapping.yaml, we need a YAMl parsing module
         # files mapped in ENVIRONMENT_SPECIFIC_PARAMS need special treatment
+        if a_file == 'manifest.json': 
+          logging.debug("Loading source and dest sowers into env")
+          with open('{}/{}'.format(src, a_file), 'r') as j:
+            json_file = json.loads(j.read())
+            try:
+              srcEnv.SOWER = json_file["sower"]
+            except KeyError:
+              srcEnv.SOWER = []
+          with open('{}/{}'.format(dst, a_file), 'r') as j:
+            json_file = json.loads(j.read())
+            try:
+              tgtEnv.SOWER = json_file["sower"]
+            except KeyError:
+              tgtEnv.SOWER = []
+          
+
         if a_file in tgtEnv.ENVIRONMENT_SPECIFIC_PARAMS.keys():
           logging.debug('This file [{}] contains environment-specific \
 parameters that need to be saved.'.format(a_file))
@@ -65,7 +97,9 @@ parameters that need to be saved.'.format(a_file))
           shutil.copy('{}/'.format(curr_dir) + a_file, dst)
           logging.debug('Stored parameters: {}'.format(env_params))
           # re-apply all the stored environment-specific params
-          merge_json_file_with_stored_environment_params(dst, a_file, env_params)
+          merge_json_file_with_stored_environment_params(dst, a_file, env_params, srcEnv, tgtEnv)
+          
+
         else:
           shutil.copy('{}/'.format(curr_dir) + a_file, dst)
         copied_files.append('{}/'.format(dst) + a_file)

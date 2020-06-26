@@ -2,6 +2,7 @@ import re
 import os
 import logging
 import traceback
+import json
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
@@ -15,7 +16,6 @@ class Env():
         'environment': '', # VPC
         'hostname': '',
         'revproxy_arn': '',
-        'dictionary_url': '',
         'portal_app':'',
         'kube_bucket': '',
         'logs_bucket': '',
@@ -30,6 +30,16 @@ class Env():
             'HOSTNAME': ''
           }
         },
+      },
+      "guppy": {
+    "indices": [
+      {
+        "index": '',
+      },
+      {
+        "index": '',
+      }
+    ]
       },
       'scaling': {
         'arborist': {
@@ -73,6 +83,10 @@ class Env():
     }
   }
 
+  SOWER = []
+
+  
+
   SVCS_TO_IGNORE = [
     'aws-es-proxy',
     'fluentd',
@@ -80,6 +94,8 @@ class Env():
     'nb2',
     'jupyterhub'
   ]
+  
+  SOWER = {'sower': ''}
 
   BLOCKS_TO_UPDATE = {
     'manifest.json': {
@@ -111,11 +127,18 @@ class Env():
      Creates an EnvironmentConfig object to store information related to its folder path and the name of the environment.
      This class also contains helper methods to facilitate the manipulation of config data.
     """
-    environment_path_regex = re.search(r'(.*)\/(.*)', path_to_env_folder)
+    # environment_path_regex = re.search(r'(.*)\/(.*)', path_to_env_folder)
+    if "/" == path_to_env_folder[-1]:
+      path_to_env_folder = path_to_env_folder[:-1]
+    environment_path_regex = path_to_env_folder.split('/')
+
     logging.debug('identifying repo directory and name of the environment: {}'.format(str(environment_path_regex)))
-    self.repo_dir = environment_path_regex.group(1)
-    self.name = environment_path_regex.group(2)
+    # self.repo_dir = environment_path_regex.group(1)
+    # self.name = environment_path_regex.group(2)
+    self.repo_dir = environment_path_regex[-2]
+    self.name = environment_path_regex[-1]
     self.full_path = path_to_env_folder
+
 
   def _replace_one(self, version, key, json_block):
     if key in json_block:
@@ -180,8 +203,11 @@ class Env():
     else:
       logging.debug('saving block [{}]. Here is the value from the file: {}'.format(block, json_block[block]))
       env_params[block] = json_block[block]
+
    
   def load_environment_params(self, file_name, json_data):
+    """Places environment specific values from target into object, 
+    removes fields from object not found in target and returns the dictionary with fields"""
     logging.debug('storing info from: ' + file_name)
     try:
       env_params = self.ENVIRONMENT_SPECIFIC_PARAMS[file_name]
