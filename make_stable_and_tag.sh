@@ -60,7 +60,6 @@ while IFS= read -r repo; do
     exit 1
   fi
   cd ..
-  exit 1
 done < "$repo_list"
 
 cd ..
