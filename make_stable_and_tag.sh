@@ -46,6 +46,7 @@ while IFS= read -r repo; do
     echo "$result"
     exit 1
   fi
+  git config --global user.name "$GITHUB_USERNAME"
   result=$(git tag "${tagName}" -a -m "Gen3 Core Release ${tagName}")
   RC=$?
   if [ $RC -ne 0 ]; then
