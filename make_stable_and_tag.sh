@@ -34,6 +34,7 @@ while IFS= read -r repo; do
   git clone "${urlPrefix}${repo}"
   cd "${repo}" || exit 1
   git checkout "${targetBranchName}"
+  git config user.name "Gen3 QA"
   result=$(git pull origin "${sourceBranchName}")
   RC=$?
   if [ $RC -ne 0 ]; then
