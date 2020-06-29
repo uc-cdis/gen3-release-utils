@@ -29,11 +29,11 @@ tasks = [
     'description': 'At the end of the 2nd week, we need to merge the integration branch into stable and tag the release (and make sure all Docker images are successfully built).'
   },
   {
-    'title': 'publish release manifest cdis-manifest/<year>/<month> folder with release notes and knownbugs files',
+    'title': 'publish release manifest cdis-manifest/<year>/<month> folder with release notes and known bugs files',
     'description': 'Check instructions on the release mgmt guide'
   },
   {
-    'title': 'SHARED: Prepare PRs in cdis-manifest to deploy the {} release to PROD environments'.format(release),
+    'title': 'prepare PRs in cdis-manifest to deploy the {} release to PROD environments'.format(release),
     'description': 'You can utilize the replicate_manifest_config.sh script to replicate changes between manifests'
   },
 ]
