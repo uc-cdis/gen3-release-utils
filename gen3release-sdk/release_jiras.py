@@ -18,7 +18,7 @@ tasks = [
   },
   {
     'title': 'create gitops-qa PRs to deploy the integration branch to QA environments',
-    'description': 'Once the first manifest is ready, it can be replicated with: replicate_manifest_config.sh <remote_branch_in_gitops-qa>/qa-brain/manifest.json gitops-qa/qa-dcp.planx-pla.net/manifest.json. \n The QA team will collaborate to troubleshoot / debug whatever is necessary to make the PR checks pass (this should be done early in the 1st week of testing)'
+    'description': 'Once the first manifest is ready, it can be replicated with: replicate_manifest_config.sh <remote_branch_in_gitops-qa>/qa-brain/manifest.json gitops-qa/qa-dcp.planx-pla.net/manifest.json gitops-qa/qa-jcoin.planx-pla.net/manifest.json \n The QA team will collaborate to troubleshoot / debug whatever is necessary to make the PR checks pass (this should be done early in the 1st week of testing)'
   },
   {
     'title': 'SHARED: 2w release testing round: automated tests, manual tests and load tests against qa envs',
@@ -33,8 +33,16 @@ tasks = [
     'description': 'Check instructions on the release mgmt guide'
   },
   {
-    'title': 'prepare PRs in cdis-manifest to deploy the {} release to PROD environments'.format(release),
-    'description': 'You can utilize the replicate_manifest_config.sh script to replicate changes between manifests'
+    'title': 'create cdis-manifest PRs'.format(release),
+    'description': 'You can utilize create-prs-for-all-monthly-release-envs job to create cdis-manifest PRs'
+  },
+  {
+    'title': 'SHARED: Follow up with PMs to merge the PRs of respective commons',
+    'description': 'Following up with PMs to approve the PRs and merging them'
+  },
+  {
+    'title': 'Pushing monthly release quay images to AWS ECR (as a backup)',
+    'description': 'You can utilize the Jenkins job push-gen3-monthly-release-images-to-aws-ecr to perform this ticket'
   },
 ]
 
