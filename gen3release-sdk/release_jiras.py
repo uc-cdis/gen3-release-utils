@@ -13,28 +13,44 @@ jira = JIRA(options, basic_auth=(os.environ["JIRA_SVC_ACCOUNT"], os.environ["JIR
 
 tasks = [
   {
-    'title': 'cut the integration branch integration{}'.format(release.replace('.','')),
-    'description': 'At the end of the 2nd week of every other sprint we have to cut the integration branch. How to: ./make_branch.sh "master" "integration{}"'.format(release.replace('.',''))
+    'title': '1. Cut the integration branch integration{}'.format(release.replace('.','')),
+    'description': 'Kick off this job: https://jenkins.planx-pla.net/job/create-gen3-release-candidate-branch/'
   },
   {
-    'title': 'create gitops-qa PRs to deploy the integration branch to QA environments',
-    'description': 'Once the first manifest is ready, it can be replicated with: replicate_manifest_config.sh <remote_branch_in_gitops-qa>/qa-brain/manifest.json gitops-qa/qa-dcp.planx-pla.net/manifest.json. \n The QA team will collaborate to troubleshoot / debug whatever is necessary to make the PR checks pass (this should be done early in the 1st week of testing)'
+    'title': '2. Create gitops-qa PRs to deploy the integration branch to QA environments',
+    'description': 'Run the folling command to apply the integration branch images against the target QA environment: python gen3release/env_cli.py apply -v integration2020<nn> -e ~/workspace/gitops-qa/qa-<environment>.planx-pla.net'
   },
   {
-    'title': 'SHARED: 2w release testing round: automated tests, manual tests and load tests against qa envs',
+    'title': '3. Create release retro wiki page',
+    'description': 'Clone an existing page, e.g., https://ctds-planx.atlassian.net/wiki/spaces/PLA/pages/466321418/RELEASE+200205+-+Retrospective'
+  },
+  {
+    'title': '4. Generate spreadsheet for the monthly testing rounds',
+    'description': 'Instructions: Run this command `node generate-test-plan.js` from the `gen3-qa` repo. Once the spreadsheet is generated, copy and paste its contents into the main google Sheet containing all the monthly-separated tabs.'
+  },
+  {
+    'title': 'SHARED: 5. Release testing round: automated tests, manual tests and load tests against qa envs',
     'description': 'Full list of tests tracked in the "Test Plan - Gen3 Releases" spreadsheet'
   },
   {
-    'title': 'merge the integration branch into stable and tag the release',
-    'description': 'At the end of the 2nd week, we need to merge the integration branch into stable and tag the release (and make sure all Docker images are successfully built).'
+    'title': '6. Merge the integration branch into stable and tag the release',
+    'description': 'Kick off this job: https://jenkins.planx-pla.net/job/merge-integration-branch-into-stable-and-tag/. Once the tag-based images are built in Quay, sanity check the images by creating a `gitops-qa` PR to deploy them against one of the QA environments.'
+  },  
+  {
+    'title': '7. Generate release notes and publish release manifest into `cdis-manifest/<year>/<month>` folder',
+    'description': 'Generate the release notes with this Jenkins job: https://jenkins.planx-pla.net/job/gen3-qa-monthly-release-notes-generator. The cdis-manifest PR is tailored manually and it should include release notes and known bugs files (the PR must be labeled with `doc-only`).'
   },
   {
-    'title': 'publish release manifest cdis-manifest/<year>/<month> folder with release notes and knownbugs files',
-    'description': 'Check instructions on the release mgmt guide'
+    'title': '8. Create cdis-manifest PRs for {}'.format(release),
+    'description': 'Kick off this job: https://jenkins.planx-pla.net/job/create-prs-for-all-monthly-release-envs/'
   },
   {
-    'title': 'SHARED: Prepare PRs in cdis-manifest to deploy the {} release to PROD environments'.format(release),
-    'description': 'You can utilize the replicate_manifest_config.sh script to replicate changes between manifests'
+    'title': 'SHARED: 9. Follow up with PMs to merge the PRs of respective commons',
+    'description': 'The `automerge` label is applied automatically to all PRs, once the PM approves it, the changes will be automatically merged and deployed to the environment. The QA engineers should monitor the PRs in case of any CI check failures.'
+  },
+  {
+    'title': '10. Pushing monthly release quay images to AWS ECR (as a backup)',
+    'description': 'Kick off this job: https://jenkins.planx-pla.net/job/push-gen3-monthly-release-images-to-aws-ecr. Also double-check if the repos_list.txt is up-to-date.'
   },
 ]
 
