@@ -80,6 +80,23 @@ class Env():
         'NAMESPACE': '', # KUBE_NAMESPACE
         'HOSTNAME': ''
       },
+      'sidecar': {
+        'env': {
+          'NAMESPACE': '',
+          'HOSTNAME': ''
+        }
+      }
+    },
+    'etlMapping.yaml':{
+      'mappings': [
+        {
+          'name': '',
+        },
+        {
+          'name': ''
+        }
+        ]
+
     }
   }
 
@@ -127,16 +144,16 @@ class Env():
      Creates an EnvironmentConfig object to store information related to its folder path and the name of the environment.
      This class also contains helper methods to facilitate the manipulation of config data.
     """
-    # environment_path_regex = re.search(r'(.*)\/(.*)', path_to_env_folder)
-    if "/" == path_to_env_folder[-1]:
-      path_to_env_folder = path_to_env_folder[:-1]
-    environment_path_regex = path_to_env_folder.split('/')
+    environment_path_regex = re.search(r'(.*)\/(.*)', path_to_env_folder)
+    # if "/" == path_to_env_folder[-1]:
+    #   path_to_env_folder = path_to_env_folder[:-1]
+    # environment_path_regex = path_to_env_folder.split('/')
 
     logging.debug('identifying repo directory and name of the environment: {}'.format(str(environment_path_regex)))
-    # self.repo_dir = environment_path_regex.group(1)
-    # self.name = environment_path_regex.group(2)
-    self.repo_dir = environment_path_regex[-2]
-    self.name = environment_path_regex[-1]
+    self.repo_dir = environment_path_regex.group(1)
+    self.name = environment_path_regex.group(2)
+    # self.repo_dir = environment_path_regex[-2]
+    # self.name = environment_path_regex[-1]
     self.full_path = path_to_env_folder
 
 
@@ -204,6 +221,15 @@ class Env():
       logging.debug('saving block [{}]. Here is the value from the file: {}'.format(block, json_block[block]))
       env_params[block] = json_block[block]
 
+  def convert_yaml_blocks(self, block, env_params, json_block):
+    print('block: {}'.format(block))
+    for m in range(len(json_block[block])):
+      subblock = json_block[block][m]
+      typ = subblock.get('doc_type')
+      name = self.name + "_" + typ
+      env_params[block][m]['name'] = name
+
+  
    
   def load_environment_params(self, file_name, json_data):
     """Places environment specific values from target into object, 
@@ -211,9 +237,13 @@ class Env():
     logging.debug('storing info from: ' + file_name)
     try:
       env_params = self.ENVIRONMENT_SPECIFIC_PARAMS[file_name]
+        
       for block in dict.fromkeys(env_params.keys(),[]).keys():
         if block in json_data.keys():
-          self.save_blocks(block, env_params, json_data)
+          if file_name == 'etlMapping.yaml':
+            self.convert_yaml_blocks(block, env_params, json_data)
+          else:
+            self.save_blocks(block, env_params, json_data)
         else:
           del env_params[block]
           logging.warn('block {} does not exist in json file {}, ignoring this block.'.format(block, file_name))

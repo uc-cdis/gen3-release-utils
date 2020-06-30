@@ -64,7 +64,7 @@ class Git():
       logging.debug('adding {} to branch {}'.format(f, branch_name))
       copy_commit = 'copying {} to {}'.format(f, tgtEnv.name)
       file_contents = github_client.get_contents('{}/'.format(tgtEnv.name) + f, branch_name)
-      input_file = open('{}/'.format(srcEnv.full_path) + f, 'rb')
+      input_file = open('{}/'.format(tgtEnv.full_path) + f, 'rb')
       data = input_file.read()
       # create_file(path, message, content, branch=NotSet)
       logging.debug('branch_name: {}'.format(branch_name))
