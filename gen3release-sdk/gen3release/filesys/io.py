@@ -7,6 +7,7 @@ import json
 import os
 import traceback
 from ruamel.yaml import YAML
+from os import path
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
@@ -17,24 +18,18 @@ def read_manifest(manifest):
   with open(manifest, 'r') as m:
     contents = m.read()
     return hashlib.md5(contents.encode('utf-8')), json.loads(contents)
+
 def merge(source, destination):
-    """
-    run me with nosetests --with-doctest file.py
+  "Recursively merges dictionary source into dictionary destination"""
+  for key, value in source.items():
+      if isinstance(value, dict):
+          # get node or create one
+          node = destination.setdefault(key, {})
+          merge(value, node)
+      else:
+          destination[key] = value
 
-    >>> a = { 'first' : { 'all_rows' : { 'pass' : 'dog', 'number' : '1' } } }
-    >>> b = { 'first' : { 'all_rows' : { 'fail' : 'cat', 'number' : '5' } } }
-    >>> merge(b, a) == { 'first' : { 'all_rows' : { 'pass' : 'dog', 'fail' : 'cat', 'number' : '5' } } }
-    True
-    """
-    for key, value in source.items():
-        if isinstance(value, dict):
-            # get node or create one
-            node = destination.setdefault(key, {})
-            merge(value, node)
-        else:
-            destination[key] = value
-
-    return destination
+  return destination
 
 def write_into_manifest(manifest, json_with_changes):
   with open(manifest, 'r+') as m:
@@ -82,6 +77,8 @@ def merge_json_file_with_stored_environment_params(dst_path, the_file, env_param
 
 def handle_guppy(mani_json, srcEnv, trgEnv):
   gp = mani_json.get("guppy")
+  if not gp:
+    return mani_json
   indices = gp['indices']
   for i in indices:
     i["index"] = trgEnv.name + "_" + i['type']
@@ -92,7 +89,7 @@ def handle_guppy(mani_json, srcEnv, trgEnv):
 def remove_superfluous_from_sowers(mani_json, srcEnv, trgEnv):
   superflous_resources = []
   if len(srcEnv.SOWER) == len(trgEnv.SOWER):
-    return []
+    return mani_json
 
   srcnames = [x["name"] for x in srcEnv.SOWER]
   trgnames = [x["name"] for x in trgEnv.SOWER]
@@ -124,41 +121,42 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
         logging.debug('copying {} into {}'.format(a_file, dst))
         # TODO: Due to etlMapping.yaml, we need a YAMl parsing module
         # files mapped in ENVIRONMENT_SPECIFIC_PARAMS need special treatment
-        if a_file == 'manifest.json': 
-          logging.debug("Loading source and dest sowers into env")
-          with open('{}/{}'.format(src, a_file), 'r') as j:
-            json_file = json.loads(j.read())
-            try:
-              srcEnv.SOWER = json_file["sower"]
-            except KeyError:
-              srcEnv.SOWER = []
-          with open('{}/{}'.format(dst, a_file), 'r') as j:
-            json_file = json.loads(j.read())
-            try:
-              tgtEnv.SOWER = json_file["sower"]
-            except KeyError:
-              tgtEnv.SOWER = []
-                  
-
-        if a_file in tgtEnv.ENVIRONMENT_SPECIFIC_PARAMS.keys():
-          logging.debug('This file [{}] contains environment-specific \
-parameters that need to be saved.'.format(a_file))
-          # remember environment-specific information
-          json_file = None
-          if '.yaml' in a_file:
-            with open('{}/{}'.format(dst, a_file), 'r') as j:
-
-              yaml=YAML(typ='safe')   # default, if not specfied, is 'rt' (round-trip)
-              json_file = yaml.load(j)
-
-          else:
+        if path.exists("{}/{}".format(dst, a_file)):
+          if a_file == 'manifest.json': 
+            logging.debug("Loading source and dest sowers into env")
+            with open('{}/{}'.format(src, a_file), 'r') as j:
+              json_file = json.loads(j.read())
+              try:
+                srcEnv.SOWER = json_file["sower"]
+              except KeyError:
+                srcEnv.SOWER = []
             with open('{}/{}'.format(dst, a_file), 'r') as j:
               json_file = json.loads(j.read())
-          env_params = tgtEnv.load_environment_params(a_file, json_file)
-          shutil.copy('{}/'.format(curr_dir) + a_file, dst)
-          logging.debug('Stored parameters: {}'.format(env_params))
-          # re-apply all the stored environment-specific params
-          merge_json_file_with_stored_environment_params(dst, a_file, env_params, srcEnv, tgtEnv)
+              try:
+                tgtEnv.SOWER = json_file["sower"]
+              except KeyError:
+                tgtEnv.SOWER = []
+                    
+
+          if a_file in tgtEnv.ENVIRONMENT_SPECIFIC_PARAMS.keys():
+            logging.debug('This file [{}] contains environment-specific parameters that need to be saved.'.format(a_file))
+            # remember environment-specific information
+            json_file = None
+            if '.yaml' in a_file:
+              with open('{}/{}'.format(dst, a_file), 'r') as j:
+
+                yaml=YAML(typ='safe')   # default, if not specfied, is 'rt' (round-trip)
+                json_file = yaml.load(j)
+
+            else:
+              with open('{}/{}'.format(dst, a_file), 'r') as j:
+                json_file = json.loads(j.read())
+            env_params = tgtEnv.load_environment_params(a_file, json_file)
+            logging.debug('Stored parameters: {}'.format(env_params))
+
+            shutil.copy('{}/'.format(curr_dir) + a_file, dst)
+            # re-apply all the stored environment-specific params
+            merge_json_file_with_stored_environment_params(dst, a_file, env_params, srcEnv, tgtEnv)
           
 
         else:

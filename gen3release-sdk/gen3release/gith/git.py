@@ -63,16 +63,20 @@ class Git():
     for f in modified_files:
       logging.debug('adding {} to branch {}'.format(f, branch_name))
       copy_commit = 'copying {} to {}'.format(f, tgtEnv.name)
-      file_contents = github_client.get_contents('{}/'.format(tgtEnv.name) + f, branch_name)
       input_file = open('{}/'.format(tgtEnv.full_path) + f, 'rb')
       data = input_file.read()
       # create_file(path, message, content, branch=NotSet)
       logging.debug('branch_name: {}'.format(branch_name))
-      github_client.update_file(
-        '{}/'.format(tgtEnv.name) + f,
-        copy_commit,
-        data,
-        file_contents.sha, branch=branch_name)
+      try:
+        file_contents = github_client.get_contents('{}/'.format(tgtEnv.name) + f, branch_name)
+        github_client.update_file(
+          '{}/'.format(tgtEnv.name) + f,
+          copy_commit,
+          data,
+          file_contents.sha, branch=branch_name)
+      except Exception as e:
+        github_client.create_file('{}/'.format(tgtEnv.name) + f, copy_commit, data, branch=branch_name)
+
 
     # finally, create Pull Request
     github_client.create_pull(title=pr_title, body=commit_msg, head=branch_name, base="master")
