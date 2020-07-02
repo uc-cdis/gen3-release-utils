@@ -23,6 +23,7 @@ LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
 logging.getLogger(__name__)
 
+
 def make_parser():
     parser = argparse.ArgumentParser(
         description="Updating configuration for Gen3 environments",
@@ -49,8 +50,7 @@ The most commonly used commands are:
     subparsers = parser.add_subparsers()
 
     parser_apply = subparsers.add_parser(
-        "apply",
-        description="Applies an arbitrary version to all services",
+        "apply", description="Applies an arbitrary version to all services",
     )
     parser_apply.add_argument(
         "-v",
@@ -61,13 +61,13 @@ The most commonly used commands are:
         help="name of the branch or tag that represents a quay.io Docker image (e.g., 2020.04)",
     )
     parser_apply.add_argument(
-      "-o",
-      "--override",
-      dest="override",
-      required=False,
-      type=str,
-      default='{}',
-      help="overrides versions as specified in a json-like format e.g., {'ambassador':'1.4.2'}"
+        "-o",
+        "--override",
+        dest="override",
+        required=False,
+        type=str,
+        default="{}",
+        help="overrides versions as specified in a json-like format e.g., {'ambassador':'1.4.2'}",
     )
     parser_apply.add_argument(
         "-e",
@@ -106,7 +106,7 @@ The most commonly used commands are:
         required=True,
         type=str,
         help="name of the target environment whose config will be modified once all the config from the source environment is copied over (e.g., ~/workspace/cdis-manifest/gen3.biodatacatalyst.nhlbi.nih.gov)",
-    )    
+    )
     parser_copy.add_argument(
         "-pr",
         "--pull-request-title",
@@ -130,122 +130,137 @@ def main():
 
 
 def apply(args):
-  version = args.version
-  override = args.override
-  target_env = args.env
-  pr_title = args.pr_title
-  logging.debug("version: {}".format(version))
-  logging.debug("override: {}".format(override))
-  logging.debug("target_env: {}".format(target_env))
-  logging.debug("pr_title: {}".format(pr_title))
+    version = args.version
+    override = args.override
+    target_env = args.env
+    pr_title = args.pr_title
+    logging.debug("version: {}".format(version))
+    logging.debug("override: {}".format(override))
+    logging.debug("target_env: {}".format(target_env))
+    logging.debug("pr_title: {}".format(pr_title))
 
-  # Create Environment Config object
-  e = Env(target_env)
+    # Create Environment Config object
+    e = Env(target_env)
 
-  modified_files = apply_version_to_environment(version, override, e)
+    modified_files = apply_version_to_environment(version, override, e)
 
-  # Cut a new brach if the --pull-request-title flag is in place
-  if pr_title and len(modified_files) > 0:
-    ts = str(datetime.datetime.now().timestamp()).split('.')[0]
-    branch_name = 'chore/apply_{}_to_{}_{}'.format(version.replace('.', ''), e.name.replace('.', '_'), ts)
-    repo_name = os.path.basename(e.repo_dir)
-    logging.debug('creating github client obj with repo={}'.format(repo_name))
-    gh = Gh(repo=repo_name)
-    gh_client = gh.get_github_client()
+    # Cut a new brach if the --pull-request-title flag is in place
+    if pr_title and len(modified_files) > 0:
+        ts = str(datetime.datetime.now().timestamp()).split(".")[0]
+        branch_name = "chore/apply_{}_to_{}_{}".format(
+            version.replace(".", ""), e.name.replace(".", "_"), ts
+        )
+        repo_name = os.path.basename(e.repo_dir)
+        logging.debug("creating github client obj with repo={}".format(repo_name))
+        gh = Gh(repo=repo_name)
+        gh_client = gh.get_github_client()
 
-    # create new remote branch
-    new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
+        # create new remote branch
+        new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
 
-    # create local branch, commit, push and create pull request
-    commit_msg = 'Applying version {} to {}'.format(version, e.name)
-    gh.create_pull_request_apply(gh_client, version, e, modified_files, pr_title, commit_msg, branch_name)
-    logging.info('PR created successfully!')
-    # TODO: Switch local branch to master
- 
+        # create local branch, commit, push and create pull request
+        commit_msg = "Applying version {} to {}".format(version, e.name)
+        gh.create_pull_request_apply(
+            gh_client, version, e, modified_files, pr_title, commit_msg, branch_name
+        )
+        logging.info("PR created successfully!")
+        # TODO: Switch local branch to master
+
 
 def apply_version_to_environment(version, override, e):
-  modified_files = []
-  for manifest_file_name in e.BLOCKS_TO_UPDATE.keys():
-    manifest = '{}/{}/{}'.format(e.repo_dir, e.name, manifest_file_name)
-    if path.exists(manifest):
-      current_md5, current_json = io.read_manifest(manifest)
+    modified_files = []
+    for manifest_file_name in e.BLOCKS_TO_UPDATE.keys():
+        manifest = "{}/{}/{}".format(e.repo_dir, e.name, manifest_file_name)
+        if path.exists(manifest):
+            current_md5, current_json = io.read_manifest(manifest)
 
-      logging.debug('looking for versions to be replaced in {}'.format(manifest))
-      json_with_version = e.find_and_replace(version, override, manifest_file_name, current_json)
+            logging.debug("looking for versions to be replaced in {}".format(manifest))
+            json_with_version = e.find_and_replace(
+                version, override, manifest_file_name, current_json
+            )
 
-      new_md5 = io.write_into_manifest(manifest, json_with_version)
+            new_md5 = io.write_into_manifest(manifest, json_with_version)
 
-      if current_md5 != new_md5:
-        modified_files.append(manifest)
-    else:
-      logging.warn('environment [{}] does not contain the manifest file {}'.format(e.name, manifest))
+            if current_md5 != new_md5:
+                modified_files.append(manifest)
+        else:
+            logging.warn(
+                "environment [{}] does not contain the manifest file {}".format(
+                    e.name, manifest
+                )
+            )
 
-  # keep only relative paths (base_path = workspace)
-  base_path = e.full_path
-  logging.debug('base_path: {}'.format(base_path))
-  # remove base_path (keep only the files)
-  modified_files = list(map(lambda f: f.replace(base_path, '').strip("/"), modified_files))
-  logging.debug('modified files: {}'.format(modified_files))
+    # keep only relative paths (base_path = workspace)
+    base_path = e.full_path
+    logging.debug("base_path: {}".format(base_path))
+    # remove base_path (keep only the files)
+    modified_files = list(
+        map(lambda f: f.replace(base_path, "").strip("/"), modified_files)
+    )
+    logging.debug("modified files: {}".format(modified_files))
 
-  return modified_files
+    return modified_files
 
 
 def copy(args):
-  source_env = args.source
-  target_env = args.env
-  pr_title = args.pr_title
-  logging.debug("source_env: {}".format(source_env))
-  logging.debug("target_env: {}".format(target_env))
-  logging.debug("pr_title: {}".format(pr_title))
-  
-  # Create Environment Config objects
-  srcEnv = Env(source_env)
-  tgtEnv = Env(target_env)
+    source_env = args.source
+    target_env = args.env
+    pr_title = args.pr_title
+    logging.debug("source_env: {}".format(source_env))
+    logging.debug("target_env: {}".format(target_env))
+    logging.debug("pr_title: {}".format(pr_title))
 
-  modified_files = copy_all_files(srcEnv, tgtEnv)
+    # Create Environment Config objects
+    srcEnv = Env(source_env)
+    tgtEnv = Env(target_env)
 
-  logging.debug('num of modified_files: {}'.format(len(modified_files)))
+    modified_files = copy_all_files(srcEnv, tgtEnv)
+
+    logging.debug("num of modified_files: {}".format(len(modified_files)))
     # Cut a new brach if the --pull-request-title flag is in place
-  if pr_title and len(modified_files) > 0:
-    ts = str(datetime.datetime.now().timestamp()).split('.')[0]
-    branch_name = 'chore/promote_{}_{}'.format(
-      srcEnv.name.replace('.', '_'),
-      ts)
-    repo_name = os.path.basename(tgtEnv.repo_dir)
-    logging.debug('creating github client obj with repo={}'.format(repo_name))
-    gh = Gh(repo=repo_name)
-    gh_client = gh.get_github_client()
+    if pr_title and len(modified_files) > 0:
+        ts = str(datetime.datetime.now().timestamp()).split(".")[0]
+        branch_name = "chore/promote_{}_{}".format(srcEnv.name.replace(".", "_"), ts)
+        repo_name = os.path.basename(tgtEnv.repo_dir)
+        logging.debug("creating github client obj with repo={}".format(repo_name))
+        gh = Gh(repo=repo_name)
+        gh_client = gh.get_github_client()
 
-    # create new remote branch
-    new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
+        # create new remote branch
+        new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
 
-    # create commit, push files to remote branch and create pull request
-    commit_msg = 'copying files from {} to {}'.format(srcEnv.name, tgtEnv.name)
-    gh.create_pull_request_copy(gh_client, srcEnv, tgtEnv, modified_files, pr_title, commit_msg, branch_name)
-    logging.info('PR created successfully!')
-    # TODO: Switch local branch to master
+        # create commit, push files to remote branch and create pull request
+        commit_msg = "copying files from {} to {}".format(srcEnv.name, tgtEnv.name)
+        gh.create_pull_request_copy(
+            gh_client, srcEnv, tgtEnv, modified_files, pr_title, commit_msg, branch_name
+        )
+        logging.info("PR created successfully!")
+        # TODO: Switch local branch to master
 
 
 def copy_all_files(srcEnv, tgtEnv):
-  # Check if paths exist
-  if path.exists(srcEnv.full_path) and path.exists(tgtEnv.full_path):
-    try:
-      # copy all the files from the source environment folder
-      # and re-apply the environment-specific parameters
-      copied_files = io.recursive_copy([], srcEnv, tgtEnv, srcEnv.full_path, tgtEnv.full_path)
-      # keep only relative paths (base_path = workspace)
-      base_path = tgtEnv.full_path
-      logging.debug('base_path: {}'.format(base_path))
-      # remove base_path (keep only the files)
-      copied_files = list(map(lambda f: f.replace(base_path, '').strip("/"), copied_files))
-      logging.debug('copied files: {}'.format(copied_files))
-      return copied_files
-    except Exception as err:
-      logging.error('something went wrong while trying to copy the environment folder: {}'.format(err))
-      sys.exit(1)
-  else:
-    logging.error('Invalid source and/or target environment. Double-check the paths and try again.')
-    sys.exit(1)
+    # Check if paths exist
+    if path.exists(srcEnv.full_path) and path.exists(tgtEnv.full_path):
+        try:
+            # copy all the files from the source environment folder
+            # and re-apply the environment-specific parameters
+            copied_files = io.recursive_copy(
+                [], srcEnv, tgtEnv, srcEnv.full_path, tgtEnv.full_path
+            )
+            # keep only relative paths (base_path = workspace)
+            base_path = tgtEnv.full_path
+            logging.debug("base_path: {}".format(base_path))
+            # remove base_path (keep only the files)
+            copied_files = list(
+                map(lambda f: f.replace(base_path, "").strip("/"), copied_files)
+            )
+            logging.debug("copied files: {}".format(copied_files))
+            return copied_files
+        except Exception as err:
+            raise Exception("something went wrong while trying to copy the environment folder: {}".format(err))
+                
+    else:
+        raise NameError("Invalid source and/or target environment. Double-check the paths and try again.")
 
 
 if __name__ == "__main__":
