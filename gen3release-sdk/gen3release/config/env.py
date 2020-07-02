@@ -89,7 +89,7 @@ class Env:
         params = self.PARAMS_TO_SET[the_file]
         if the_file == "manifest.json":
             param_guppy = params["guppy"]
-            file_guppy = json["guppy"]
+            file_guppy = json.get("guppy")
             if not file_guppy:
                 return
             for index in file_guppy.get("indices"):
