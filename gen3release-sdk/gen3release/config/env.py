@@ -17,17 +17,16 @@ class Env:
                 "environment": "",  # VPC
                 "hostname": "",
                 "revproxy_arn": "",
-                "portal_app": "",
                 "kube_bucket": "",
                 "logs_bucket": "",
                 "sync_from_dbgap": "",
                 "useryaml_s3path": "",
             },
+            "sower": [],
             "hatchery": {
                 "user-namespace": "",
                 "sidecar": {"env": {"NAMESPACE": "", "HOSTNAME": ""}},  # KUBE_NAMESPACE
             },
-            "guppy": {"indices": [{"index": "",}, {"index": "",}]},
             "scaling": {
                 "arborist": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
                 "fence": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
@@ -46,10 +45,12 @@ class Env:
             "env": {"NAMESPACE": "", "HOSTNAME": ""},  # KUBE_NAMESPACE
             "sidecar": {"env": {"NAMESPACE": "", "HOSTNAME": ""}},
         },
-        "etlMapping.yaml": {"mappings": [{"name": "",}, {"name": ""}]},
     }
 
-    SOWER = []
+    PARAMS_TO_SET = {
+        "manifest.json": {"guppy": {"indices": [], "config_index": ""},},
+        "etlMapping.yaml": {"mappings": []},
+    }
 
     SVCS_TO_IGNORE = ["aws-es-proxy", "fluentd", "ambassador", "nb2", "jupyterhub"]
 
@@ -81,6 +82,27 @@ class Env:
         self.repo_dir = environment_path_regex.group(1)
         self.name = environment_path_regex.group(2)
         self.full_path = path_to_env_folder
+
+    def set_params(self, the_file, json):
+        params = self.PARAMS_TO_SET[the_file]
+        if the_file == "manifest.json":
+            param_guppy = params["guppy"]
+            file_guppy = json["guppy"]
+            if not file_guppy:
+                return
+            for index in file_guppy.get("indices"):
+                param_guppy["indices"].append(
+                    {"index": self.name + "_" + index.get("type")}
+                )
+            config_index = file_guppy.get("config_index")
+            if config_index:
+                param_guppy["config_index"] = self.name + "_" + "array-config"
+
+        if the_file == "etlMapping.yaml":
+            for field in json["mappings"]:
+                params["mappings"].append(
+                    {"name": self.name + "_" + field.get("doc_type")}
+                )
 
     def _replace_one(self, version, key, json_block):
         if key in json_block:
@@ -179,7 +201,7 @@ class Env:
             env_params[block] = json_block[block]
 
     def convert_yaml_blocks(self, block, env_params, json_block):
-        print("block: {}".format(block))
+
         for m in range(len(json_block[block])):
             subblock = json_block[block][m]
             typ = subblock.get("doc_type")
@@ -195,10 +217,7 @@ class Env:
 
             for block in dict.fromkeys(env_params.keys(), []).keys():
                 if block in json_data.keys():
-                    if file_name == "etlMapping.yaml":
-                        self.convert_yaml_blocks(block, env_params, json_data)
-                    else:
-                        self.save_blocks(block, env_params, json_data)
+                    self.save_blocks(block, env_params, json_data)
                 else:
                     del env_params[block]
                     logging.warn(

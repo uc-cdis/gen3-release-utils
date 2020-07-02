@@ -42,76 +42,65 @@ def write_into_manifest(manifest, json_with_changes):
 
 
 def merge_json_file_with_stored_environment_params(
-    dst_path, the_file, env_params, srcEnc, trgEnv
+    dst_path, the_file, env_params, srcEnc, tgtEnv
 ):
     full_path_to_file = "{}/{}".format(dst_path, the_file)
     logging.debug(
         "merging stored data from [{}] into {}".format(the_file, full_path_to_file)
     )
-    if the_file == "etlMapping.yaml":
-        with open(full_path_to_file, "r") as f:
 
-            yaml = YAML(typ="safe")
-            json_file = yaml.load(f)
-            items = json_file["mappings"]
-            for i in range(len(items)):
-                items[i]["name"] = env_params["mappings"][i]["name"]
+    with open(full_path_to_file, "r+") as f:
+        json_file = json.loads(f.read())
+        if the_file == "manifest.json":
+            json_file = remove_superfluous_resources(
+                json_file,
+                srcEnc.ENVIRONMENT_SPECIFIC_PARAMS,
+                tgtEnv.ENVIRONMENT_SPECIFIC_PARAMS,
+            )
+            tgtEnv.set_params(the_file, json_file)
+            target_guppy = tgtEnv.PARAMS_TO_SET[the_file]["guppy"]
+            json_guppy = json_file.get("guppy")
+            if json_guppy:
+                for i in range(len(json_guppy["indices"])):
+                    json_guppy["indices"][i]["index"] = target_guppy["indices"][i][
+                        "index"
+                    ]
+                if target_guppy["config_index"]:
+                    json_guppy["config_index"] = target_guppy["config_index"]
+        merged_json = merge(env_params, json_file)
 
-        ###For coverting to json
-        # merged_json = {**json_file, **env_params}
-        # path = full_path_to_file.replace("yaml", "json")
-
-        # with open(path, 'w') as f:
-        #   f.write(json.dumps(json_file, indent=2))
-        # os.system("rm {}".format(full_path_to_file))
-        with open(full_path_to_file, "w") as f:
-            yaml = YAML()
-            yaml.default_flow_style = False
-            yaml.dump(json_file, f)
-
-    else:
-        with open(full_path_to_file, "r+") as f:
-            json_file = json.loads(f.read())
-            # merged_json = {**json_file, **env_params}
-            # merged_json = {**env_params, **json_file}
-            merged_json = merge(env_params, json_file)
-            if the_file == "manifest.json":
-                merged_json = remove_superfluous_from_sowers(
-                    merged_json, srcEnc, trgEnv
-                )
-                merged_json = handle_guppy(merged_json, srcEnc, trgEnv)
-            f.seek(0)
-            f.write(json.dumps(merged_json, indent=2))
-            f.truncate()
+        f.seek(0)
+        f.write(json.dumps(merged_json, indent=2))
+        f.truncate()
 
 
-def handle_guppy(mani_json, srcEnv, trgEnv):
+def handle_guppy(mani_json, srcEnv, tgtEnv):
+    """Changes the Guppy index fields to be of the form <commonsname>_<type>"""
     gp = mani_json.get("guppy")
     if not gp:
         return mani_json
     indices = gp["indices"]
     for i in indices:
-        i["index"] = trgEnv.name + "_" + i["type"]
-    gp["config_index"] = trgEnv.name + "_" + "array-config"
+        i["index"] = tgtEnv.name + "_" + i["type"]
+    gp["config_index"] = tgtEnv.name + "_" + "array-config"
     return mani_json
 
 
-def remove_superfluous_from_sowers(mani_json, srcEnv, trgEnv):
+def remove_superfluous_resources(mani_json, srcEnv, tgtEnv):
+    """Removes resources added to target environment by source 
+    environment not found in original target environment"""
     superflous_resources = []
-    if len(srcEnv.SOWER) == len(trgEnv.SOWER):
-        return mani_json
 
-    srcnames = [x["name"] for x in srcEnv.SOWER]
-    trgnames = [x["name"] for x in trgEnv.SOWER]
+    srcnames = [x["name"] for x in srcEnv["manifest.json"]["sower"]]
+    trgnames = [x["name"] for x in tgtEnv["manifest.json"]["sower"]]
     for name in srcnames:
         if name not in trgnames:
             superflous_resources.append(name)
     logging.debug(
-        "Original Target environment does not have {}, removing from target".format(
+        "Original target environment does not have {}, removing from target".format(
             superflous_resources
         )
     )
-
     mani_json["sower"] = [
         x for x in mani_json["sower"] if x["name"] not in superflous_resources
     ]
@@ -141,21 +130,6 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                 logging.debug("copying {} into {}".format(a_file, dst))
                 # files mapped in ENVIRONMENT_SPECIFIC_PARAMS need special treatment
                 if path.exists("{}/{}".format(dst, a_file)):
-                    if a_file == "manifest.json":
-                        logging.debug("Loading source and dest sowers into env")
-                        with open("{}/{}".format(src, a_file), "r") as j:
-                            json_file = json.loads(j.read())
-                            try:
-                                srcEnv.SOWER = json_file["sower"]
-                            except KeyError:
-                                srcEnv.SOWER = []
-                        with open("{}/{}".format(dst, a_file), "r") as j:
-                            json_file = json.loads(j.read())
-                            try:
-                                tgtEnv.SOWER = json_file["sower"]
-                            except KeyError:
-                                tgtEnv.SOWER = []
-
                     if a_file in tgtEnv.ENVIRONMENT_SPECIFIC_PARAMS.keys():
                         logging.debug(
                             "This file [{}] contains environment-specific parameters that need to be saved.".format(
@@ -164,27 +138,40 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                         )
                         # remember environment-specific information
                         json_file = None
-                        if ".yaml" in a_file:
-                            with open("{}/{}".format(dst, a_file), "r") as j:
-
-                                yaml = YAML(
-                                    typ="safe"
-                                )  # default, if not specfied, is 'rt' (round-trip)
-                                json_file = yaml.load(j)
-
-                        else:
-                            with open("{}/{}".format(dst, a_file), "r") as j:
-                                json_file = json.loads(j.read())
+                        with open("{}/{}".format(dst, a_file), "r") as j:
+                            json_file = json.loads(j.read())
                         env_params = tgtEnv.load_environment_params(a_file, json_file)
                         logging.debug("Stored parameters: {}".format(env_params))
 
                         shutil.copy("{}/".format(curr_dir) + a_file, dst)
+
                         # re-apply all the stored environment-specific params
                         merge_json_file_with_stored_environment_params(
                             dst, a_file, env_params, srcEnv, tgtEnv
                         )
+                    elif a_file == "etlMapping.yaml":
+                        full_path_to_file = "{}/{}".format(dst, a_file)
+                        with open(full_path_to_file, "r+") as f:
+                            yaml = YAML(typ="safe")
+                            yam_file = yaml.load(f)
+                            tgtEnv.set_params(a_file, yam_file)
+                            target_mappings = tgtEnv.PARAMS_TO_SET[a_file]["mappings"]
+                            yam_mappings = yam_file["mappings"]
+                            for i in range(len(target_mappings)):
+                                yam_mappings[i]["name"] = target_mappings[i]["name"]
+
+                            yaml = YAML()
+                            f.seek(0)
+                            yaml.default_flow_style = False
+                            yaml.dump(yam_file, f)
+                            f.truncate()
 
                 else:
+                    logging.debug(
+                        "{} not found in target env, adding from source env".format(
+                            a_file
+                        )
+                    )
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
                 copied_files.append("{}/".format(dst) + a_file)
         return copied_files

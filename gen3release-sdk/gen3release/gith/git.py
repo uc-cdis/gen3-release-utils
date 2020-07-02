@@ -30,8 +30,8 @@ class Git:
         org = g.get_organization(self.org)
         try:
             repo = org.get_repo(self.repo)
-        except Exception:
-            print(repo)
+        except Exception as e:
+            Exception("Could not get remote repositiory: {}".format(e))
             exit(1)
 
         return repo
