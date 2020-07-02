@@ -68,7 +68,6 @@ class Git:
             )
             input_file = open("{}/".format(tgtEnv.full_path) + f, "rb")
             data = input_file.read()
-            # create_file(path, message, content, branch=NotSet)
             logging.debug("branch_name: {}".format(branch_name))
             github_client.update_file(
                 "{}/".format(tgtEnv.name) + f,
@@ -100,7 +99,6 @@ class Git:
             copy_commit = "copying {} to {}".format(f, tgtEnv.name)
             input_file = open("{}/".format(tgtEnv.full_path) + f, "rb")
             data = input_file.read()
-            # create_file(path, message, content, branch=NotSet)
             logging.debug("branch_name: {}".format(branch_name))
             try:
                 file_contents = github_client.get_contents(
