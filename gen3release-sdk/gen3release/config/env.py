@@ -92,6 +92,7 @@ class Env:
             file_guppy = json.get("guppy")
             if not file_guppy:
                 return
+            # Changes the Guppy index names to be of the form <commonsname>_<type>
             for index in file_guppy.get("indices"):
                 param_guppy["indices"].append({"index": self.name + "_" + index.get("type")})
             config_index = file_guppy.get("config_index")

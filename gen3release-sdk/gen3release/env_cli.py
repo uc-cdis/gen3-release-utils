@@ -257,17 +257,10 @@ def copy_all_files(srcEnv, tgtEnv):
             logging.debug("copied files: {}".format(copied_files))
             return copied_files
         except Exception as err:
-            logging.error(
-                "something went wrong while trying to copy the environment folder: {}".format(
-                    err
-                )
-            )
-            sys.exit(1)
+            raise Exception("something went wrong while trying to copy the environment folder: {}".format(err))
+                
     else:
-        logging.error(
-            "Invalid source and/or target environment. Double-check the paths and try again."
-        )
-        sys.exit(1)
+        raise NameError("Invalid source and/or target environment. Double-check the paths and try again.")
 
 
 if __name__ == "__main__":

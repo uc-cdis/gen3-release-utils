@@ -53,7 +53,7 @@ def merge_json_file_with_stored_environment_params(
     with open(full_path_to_file, "r+") as f:
         json_file = json.loads(f.read())
         if the_file == "manifest.json":
-            json_file = remove_superfluous_resources(
+            json_file = remove_superfluous_sower_jobs(
                 json_file, srcEnc.ENVIRONMENT_SPECIFIC_PARAMS, tgtEnv.ENVIRONMENT_SPECIFIC_PARAMS
             )
             tgtEnv.set_params(the_file, json_file)
@@ -71,9 +71,9 @@ def merge_json_file_with_stored_environment_params(
         f.truncate()
 
 
-def remove_superfluous_resources(mani_json, srcEnv, tgtEnv):
-    """Removes resources added to target environment by source 
-    environment not found in original target environment"""
+def remove_superfluous_sower_jobs(mani_json, srcEnv, tgtEnv):
+    """Removes sower jobs added to target environment by source 
+    environment if job was not found in original target environment"""
     superflous_resources = []
 
     srcnames = [x["name"] for x in srcEnv["manifest.json"]["sower"]]
