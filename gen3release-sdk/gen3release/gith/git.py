@@ -1,7 +1,7 @@
 from github import Github
 import os
 import logging
-
+from github.GithubException import UnknownObjectException
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
@@ -114,7 +114,8 @@ class Git:
                     file_contents.sha,
                     branch=branch_name,
                 )
-            except Exception as e:
+            except UnknownObjectException as e:
+                logging.DEBUG("{} has occured, likely because file not found in remote, creating file..".format(e))
                 github_client.create_file(
                     "{}/".format(tgtEnv.name) + f, copy_commit, data, branch=branch_name
                 )

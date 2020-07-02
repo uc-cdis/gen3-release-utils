@@ -44,12 +44,14 @@ class Env:
             "user-namespace": "",
             "env": {"NAMESPACE": "", "HOSTNAME": ""},  # KUBE_NAMESPACE
             "sidecar": {"env": {"NAMESPACE": "", "HOSTNAME": ""}},
-        },
+        }
     }
-
+   
     PARAMS_TO_SET = {
-        "manifest.json": {"guppy": {"indices": [], "config_index": ""},},
-        "etlMapping.yaml": {"mappings": []},
+       "manifest.json":{
+            "guppy": {"indices": [], "config_index":""},
+       },
+        "etlMapping.yaml": {"mappings": []}
     }
 
     SVCS_TO_IGNORE = ["aws-es-proxy", "fluentd", "ambassador", "nb2", "jupyterhub"]
@@ -91,18 +93,16 @@ class Env:
             if not file_guppy:
                 return
             for index in file_guppy.get("indices"):
-                param_guppy["indices"].append(
-                    {"index": self.name + "_" + index.get("type")}
-                )
+                param_guppy["indices"].append({"index": self.name + "_" + index.get("type")})
             config_index = file_guppy.get("config_index")
             if config_index:
                 param_guppy["config_index"] = self.name + "_" + "array-config"
-
+            
         if the_file == "etlMapping.yaml":
             for field in json["mappings"]:
-                params["mappings"].append(
-                    {"name": self.name + "_" + field.get("doc_type")}
-                )
+                params["mappings"].append({"name":  self.name + "_" + field.get("doc_type")})
+
+
 
     def _replace_one(self, version, key, json_block):
         if key in json_block:
@@ -186,7 +186,6 @@ class Env:
         return json
 
     def save_blocks(self, block, env_params, json_block):
-        print("block: {}".format(block))
         if type(env_params[block]) is dict:
             for sub_block in env_params[block].keys():
                 # if the value of a given key is a dict and it is declared in ENVIRONMENT_SPECIFIC_PARAMS
@@ -200,16 +199,9 @@ class Env:
             )
             env_params[block] = json_block[block]
 
-    def convert_yaml_blocks(self, block, env_params, json_block):
-
-        for m in range(len(json_block[block])):
-            subblock = json_block[block][m]
-            typ = subblock.get("doc_type")
-            name = self.name + "_" + typ
-            env_params[block][m]["name"] = name
 
     def load_environment_params(self, file_name, json_data):
-        """Places environment specific values from target into object, 
+        """Places environment specific values from target environment into  env object, 
     removes fields from object not found in target and returns the dictionary with fields"""
         logging.debug("storing info from: " + file_name)
         try:
@@ -224,7 +216,7 @@ class Env:
                         "block {} does not exist in json file {}, ignoring this block.".format(
                             block, file_name
                         )
-                    )
+                    )       
             return env_params
         except Exception as e:
             logging.error("failed to load parameters from {}.".format(file_name))
