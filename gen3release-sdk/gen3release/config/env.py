@@ -22,7 +22,6 @@ class Env:
                 "sync_from_dbgap": "",
                 "useryaml_s3path": "",
             },
-            "sower": [],
             "hatchery": {
                 "user-namespace": "",
                 "sidecar": {"env": {"NAMESPACE": "", "HOSTNAME": ""}},  # KUBE_NAMESPACE
@@ -84,6 +83,11 @@ class Env:
         self.repo_dir = environment_path_regex.group(1)
         self.name = environment_path_regex.group(2)
         self.full_path = path_to_env_folder
+        self.sowers = None
+        
+
+    def load_sowers(self, json_data):
+        self.sowers = json_data.get("sower")
 
     def set_params(self, the_file, json):
         params = self.PARAMS_TO_SET[the_file]

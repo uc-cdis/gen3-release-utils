@@ -54,7 +54,7 @@ def merge_json_file_with_stored_environment_params(
         json_file = json.loads(f.read())
         if the_file == "manifest.json":
             json_file = remove_superfluous_sower_jobs(
-                json_file, srcEnc.ENVIRONMENT_SPECIFIC_PARAMS, tgtEnv.ENVIRONMENT_SPECIFIC_PARAMS
+                json_file, srcEnc.sowers, tgtEnv.sowers
             )
             tgtEnv.set_params(the_file, json_file)
             target_guppy = tgtEnv.PARAMS_TO_SET[the_file]["guppy"]
@@ -76,8 +76,8 @@ def remove_superfluous_sower_jobs(mani_json, srcEnv, tgtEnv):
     environment if job was not found in original target environment"""
     superflous_resources = []
 
-    srcnames = [x["name"] for x in srcEnv["manifest.json"]["sower"]]
-    trgnames = [x["name"] for x in tgtEnv["manifest.json"]["sower"]]
+    srcnames = [x["name"] for x in srcEnv]
+    trgnames = [x["name"] for x in tgtEnv]
     for name in srcnames:
         if name not in trgnames:
             superflous_resources.append(name)
@@ -126,9 +126,14 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                         )
                     )
                     # remember environment-specific information
+                    src_json = None
+                    with open("{}/{}".format(src, a_file), "r") as j:
+                        src_json = json.loads(j.read())
+                    srcEnv.load_sowers(src_json)
                     json_file = None
                     with open("{}/{}".format(dst, a_file), "r") as j:
                         json_file = json.loads(j.read())
+                    tgtEnv.load_sowers(json_file)
                     env_params = tgtEnv.load_environment_params(a_file, json_file)
                     logging.debug("Stored parameters: {}".format(env_params))
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
