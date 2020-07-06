@@ -54,7 +54,7 @@ def merge_json_file_with_stored_environment_params(
         json_file = json.loads(f.read())
         if the_file == "manifest.json":
             json_file = remove_superfluous_sower_jobs(
-                json_file, srcEnc.sowers, tgtEnv.sowers
+                json_file, srcEnc.sower_jobs, tgtEnv.sower_jobs
             )
             tgtEnv.set_params(the_file, json_file)
             target_guppy = tgtEnv.PARAMS_TO_SET[the_file]["guppy"]
