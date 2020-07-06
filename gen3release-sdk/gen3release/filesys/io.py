@@ -126,7 +126,7 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                         )
                     )
                     # remember environment-specific information
-                    src_json = None
+                   
                     with open("{}/{}".format(src, a_file), "r") as j:
                         src_json = json.loads(j.read())
                         srcEnv.load_sower_jobs(src_json)
