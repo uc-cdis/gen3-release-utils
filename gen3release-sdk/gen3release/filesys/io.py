@@ -129,11 +129,11 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                     src_json = None
                     with open("{}/{}".format(src, a_file), "r") as j:
                         src_json = json.loads(j.read())
-                    srcEnv.load_sowers(src_json)
+                    srcEnv.load_sower_jobs(src_json)
                     json_file = None
                     with open("{}/{}".format(dst, a_file), "r") as j:
                         json_file = json.loads(j.read())
-                    tgtEnv.load_sowers(json_file)
+                    tgtEnv.load_sower_jobs(json_file)
                     env_params = tgtEnv.load_environment_params(a_file, json_file)
                     logging.debug("Stored parameters: {}".format(env_params))
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)

@@ -83,11 +83,11 @@ class Env:
         self.repo_dir = environment_path_regex.group(1)
         self.name = environment_path_regex.group(2)
         self.full_path = path_to_env_folder
-        self.sowers = None
+        self.sower_jobs = None
         
 
-    def load_sowers(self, json_data):
-        self.sowers = json_data.get("sower")
+    def load_sower_jobs(self, json_data):
+        self.sower_jobs = json_data.get("sower")
 
     def set_params(self, the_file, json):
         params = self.PARAMS_TO_SET[the_file]
