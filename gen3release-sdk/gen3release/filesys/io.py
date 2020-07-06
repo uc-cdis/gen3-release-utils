@@ -159,7 +159,9 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                         yaml.default_flow_style = False
                         yaml.dump(yam_file, f)
                         f.truncate()
-    
+                else:
+                    shutil.copy("{}/".format(curr_dir) + a_file, dst)
+
                 copied_files.append("{}/".format(dst) + a_file)
         return copied_files
     except Exception as e:
