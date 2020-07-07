@@ -15,7 +15,7 @@ logging.getLogger(__name__)
 
 
 def validate_name(name):
-    """Makes sure index names follow rules set in 
+    """Makes sure index name follow rules set in 
     https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
     BAD_CHARS = ["\\", "/", "*", "?", '"', "<", ">", "|", " ", ",", "#", ":"]
     BAD_START_CHARS = ["-", "_", "+"]
@@ -214,7 +214,7 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                 # files mapped in ENVIRONMENT_SPECIFIC_PARAMS need special treatment
                 if not path.exists("{}/{}".format(dst, a_file)):
                     logging.debug(
-                        "{} not found in target env, adding from source env".format(
+                        "File [{}] not found in target env, adding from source env".format(src + "/" +
                             a_file
                         )
                     )
@@ -223,7 +223,7 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                     continue
                 if a_file in tgtEnv.ENVIRONMENT_SPECIFIC_PARAMS.keys():
                     logging.debug(
-                        "This file [{}] contains environment-specific parameters that need to be saved.".format(
+                        "This file [{}] contains environment-specific parameters that need to be saved.".format(dst + "/"+
                             a_file
                         )
                     )
@@ -242,21 +242,6 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                         "Making sure this file [{}] has correct names.".format(a_file)
                     )
                     write_index_names(curr_dir, dst, a_file, tgtEnv)
-                    # full_path_to_file = "{}/{}".format(dst, a_file)
-                    # with open(full_path_to_file, 'r+') as f:
-                    #     yaml = YAML(typ="safe")
-                    #     yam_file = yaml.load(f)
-                    #     create_env_index_name(tgtEnv, a_file, yam_file)
-                    # target_mappings = tgtEnv.PARAMS_TO_SET[a_file]["mappings"]
-                    # yam_mappings = yam_file["mappings"]
-                    # for i in range(len(target_mappings)):
-                    #     yam_mappings[i]["name"] = target_mappings[i]["name"]
-
-                    # yaml=YAML()
-                    # f.seek(0)
-                    # yaml.default_flow_style = False
-                    # yaml.dump(yam_file, f)
-                    # f.truncate()
                 else:
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
 
