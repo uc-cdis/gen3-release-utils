@@ -13,15 +13,16 @@ LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
 logging.getLogger(__name__)
 
+
 def validate_name(name):
     """Makes sure index names follow rules set in 
     https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
-    BAD_CHARS = ["\\","/", "*", "?", "\"", "<", ">", "|", " ", ",", "#", ":"]
+    BAD_CHARS = ["\\", "/", "*", "?", '"', "<", ">", "|", " ", ",", "#", ":"]
     BAD_START_CHARS = ["-", "_", "+"]
     BAD_NAMES = [".", ".."]
     if name in BAD_NAMES:
         raise NameError("The name {} is invalid".format(name))
-    
+
     out_name = ""
     if name[0] in BAD_START_CHARS:
         name = name[1:]
@@ -29,10 +30,15 @@ def validate_name(name):
         if c in BAD_CHARS:
             continue
         out_name += c
-    size = len(out_name.encode('utf-8'))
-    if size > 255: 
-        raise NameError("The name {} is {} bytes, but cannot exceed 255 bytes".format(out_name, size))
+    size = len(out_name.encode("utf-8"))
+    if size > 255:
+        raise NameError(
+            "The name {} is {} bytes, but cannot exceed 255 bytes".format(
+                out_name, size
+            )
+        )
     return out_name.lower()
+
 
 def create_env_index_name(env_obj, the_file, data):
     params = env_obj.PARAMS_TO_SET[the_file]
@@ -56,15 +62,14 @@ def create_env_index_name(env_obj, the_file, data):
         config_index = file_guppy.get("config_index")
         if config_index:
             param_guppy["config_index"] = env_obj.name + "_" + "array-config"
-
+        
         for i in range(len(file_guppy["indices"])):
             file_guppy["indices"][i]["index"] = param_guppy["indices"][i]["index"]
         if param_guppy.get("config_index"):
             file_guppy["config_index"] = param_guppy["config_index"]
-            
-        
-    if the_file == "etlMapping.yaml":
-        #Change name field to be of the form <commonsname>_<type>
+
+    elif the_file == "etlMapping.yaml":
+        # Change name field to be of the form <commonsname>_<type>
         types_seen = {}
         for field in data["mappings"]:
             field_type = field.get("doc_type")
@@ -82,22 +87,23 @@ def create_env_index_name(env_obj, the_file, data):
             yam_mappings[i]["name"] = target_mappings[i]["name"]
     return data
 
+
 def write_index_names(curr_dir, path, filename, env_obj):
     isyaml = filename.endswith("yaml")
     data = None
     full_path_to_target = "{}/{}".format(path, filename)
     if isyaml:
         shutil.copy("{}/".format(curr_dir) + filename, full_path_to_target)
-        fd = open(full_path_to_target, 'r+')
-        yaml = YAML(typ="safe")  
+        fd = open(full_path_to_target, "r+")
+        yaml = YAML(typ="safe")
         data = yaml.load(fd)
     else:
-        fd = open(full_path_to_target, 'r+')
+        fd = open(full_path_to_target, "r+")
         data = json.loads(fd.read())
     create_env_index_name(env_obj, filename, data)
     fd.seek(0)
     if isyaml:
-        yaml=YAML()
+        yaml = YAML()
         yaml.default_flow_style = False
         yaml.dump(data, fd)
     else:
@@ -112,9 +118,7 @@ def store_environment_params(path, env_obj, filename):
     with open("{}/{}".format(path, filename), "r") as j:
         data = json.loads(j.read())
         env_obj.load_sower_jobs(data)
-    return  env_obj.load_environment_params(filename, data)
-
-
+    return env_obj.load_environment_params(filename, data)
 
 
 def read_manifest(manifest):
@@ -144,7 +148,6 @@ def write_into_manifest(manifest, json_with_changes):
         return hashlib.md5(m.read().encode("utf-8"))
 
 
-
 def merge_json_file_with_stored_environment_params(
     dst_path, the_file, env_params, srcEnc, tgtEnv
 ):
@@ -152,26 +155,19 @@ def merge_json_file_with_stored_environment_params(
     logging.debug(
         "merging stored data from [{}] into {}".format(the_file, full_path_to_file)
     )
- 
+
     with open(full_path_to_file, "r+") as f:
         json_file = json.loads(f.read())
         if the_file == "manifest.json":
             json_file = remove_superfluous_sower_jobs(
                 json_file, srcEnc.sower_jobs, tgtEnv.sower_jobs
             )
-            # create_env_index_name(tgtEnv, the_file, json_file)
-            # target_guppy = tgtEnv.PARAMS_TO_SET[the_file]["guppy"]
-            # json_guppy = json_file.get("guppy")
-            # if json_guppy:
-            #     for i in range(len(json_guppy["indices"])):
-            #         json_guppy["indices"][i]["index"] = target_guppy["indices"][i]["index"]
-            #     if target_guppy["config_index"]:
-            #         json_guppy["config_index"] = target_guppy["config_index"]
         merged_json = merge(env_params, json_file)
 
         f.seek(0)
         f.write(json.dumps(merged_json, indent=2))
         f.truncate()
+
 
 def remove_superfluous_sower_jobs(mani_json, srcEnv, tgtEnv):
     """Removes sower jobs added to target environment by source 
@@ -217,7 +213,11 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                 logging.debug("copying {} into {}".format(a_file, dst))
                 # files mapped in ENVIRONMENT_SPECIFIC_PARAMS need special treatment
                 if not path.exists("{}/{}".format(dst, a_file)):
-                    logging.debug("{} not found in target env, adding from source env".format(a_file))
+                    logging.debug(
+                        "{} not found in target env, adding from source env".format(
+                            a_file
+                        )
+                    )
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
                     copied_files.append("{}/".format(dst) + a_file)
                     continue
@@ -232,29 +232,31 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                     env_params = store_environment_params(dst, tgtEnv, a_file)
                     logging.debug("Stored parameters: {}".format(env_params))
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
-                    
+
                     # re-apply all the stored environment-specific params
                     merge_json_file_with_stored_environment_params(
                         dst, a_file, env_params, srcEnv, tgtEnv
                     )
-                elif a_file in tgtEnv.PARAMS_TO_SET.keys():
-                    logging.debug("Making sure this file [{}] has correct names.".format(a_file))
+                if a_file in tgtEnv.PARAMS_TO_SET.keys():
+                    logging.debug(
+                        "Making sure this file [{}] has correct names.".format(a_file)
+                    )
                     write_index_names(curr_dir, dst, a_file, tgtEnv)
                     # full_path_to_file = "{}/{}".format(dst, a_file)
                     # with open(full_path_to_file, 'r+') as f:
-                    #     yaml = YAML(typ="safe")  
+                    #     yaml = YAML(typ="safe")
                     #     yam_file = yaml.load(f)
                     #     create_env_index_name(tgtEnv, a_file, yam_file)
-                        # target_mappings = tgtEnv.PARAMS_TO_SET[a_file]["mappings"]
-                        # yam_mappings = yam_file["mappings"]
-                        # for i in range(len(target_mappings)):
-                        #     yam_mappings[i]["name"] = target_mappings[i]["name"]
+                    # target_mappings = tgtEnv.PARAMS_TO_SET[a_file]["mappings"]
+                    # yam_mappings = yam_file["mappings"]
+                    # for i in range(len(target_mappings)):
+                    #     yam_mappings[i]["name"] = target_mappings[i]["name"]
 
-                        # yaml=YAML()
-                        # f.seek(0)
-                        # yaml.default_flow_style = False
-                        # yaml.dump(yam_file, f)
-                        # f.truncate()
+                    # yaml=YAML()
+                    # f.seek(0)
+                    # yaml.default_flow_style = False
+                    # yaml.dump(yam_file, f)
+                    # f.truncate()
                 else:
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
 
