@@ -113,7 +113,7 @@ class Git:
                 )
             except UnknownObjectException as e:
                 logging.DEBUG(
-                    "{} has occured, likely because file not found in remote, creating file..".format(
+                    "{} has occurred, likely because file not found in remote, creating file..".format(
                         e
                     )
                 )

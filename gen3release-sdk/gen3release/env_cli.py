@@ -265,7 +265,8 @@ def copy_all_files(srcEnv, tgtEnv):
 
     else:
         raise NameError(
-            "Invalid source and/or target environment. Double-check the paths and try again."
+            "Invalid source and/or target environment.Source entered: [{}], target entered: [{}]. \
+             Double-check the paths and try again.".format(srcEnv.full_path, tgtEnv.full_path)
         )
 
 

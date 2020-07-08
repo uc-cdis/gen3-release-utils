@@ -58,11 +58,13 @@ def create_env_index_name(env_obj, the_file, data):
                 types_seen[inx_type] = 1
                 typename = inx_type
             index_name = validate_name(env_obj.name + "_" + typename)
+            logging.debug("Adding index name: {} to guppy".format(index_name))
+
             param_guppy["indices"].append({"index": index_name})
         config_index = file_guppy.get("config_index")
         if config_index:
             param_guppy["config_index"] = env_obj.name + "_" + "array-config"
-        
+        # Transfer values from env_obj params to file
         for i in range(len(file_guppy["indices"])):
             file_guppy["indices"][i]["index"] = param_guppy["indices"][i]["index"]
         if param_guppy.get("config_index"):
@@ -80,6 +82,7 @@ def create_env_index_name(env_obj, the_file, data):
                 types_seen[field_type] = 1
                 typename = field_type
             field_name = validate_name(env_obj.name + "_" + typename)
+            logging.debug("Adding field name: {} to mappings".format(index_name))
             params["mappings"].append({"name": field_name})
         target_mappings = env_obj.PARAMS_TO_SET[the_file]["mappings"]
         yam_mappings = data["mappings"]
