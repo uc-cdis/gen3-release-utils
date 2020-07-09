@@ -8,36 +8,46 @@ import os
 import traceback
 from ruamel.yaml import YAML
 from os import path
+import re
+from collections import defaultdict
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
 logging.getLogger(__name__)
 
 
-def validate_name(name):
+def generate_safe_index_name(envname, doctype):
     """Makes sure index name follow rules set in 
     https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
-    BAD_CHARS = ["\\", "/", "*", "?", '"', "<", ">", "|", " ", ",", "#", ":"]
-    BAD_START_CHARS = ["-", "_", "+"]
     BAD_NAMES = [".", ".."]
-    if name in BAD_NAMES:
-        raise NameError("The name {} is invalid".format(name))
+    BAD_CHARS = "[\\\/*?\"<>|\s,#:]"
+    BAD_START_CHARS = ["-", "_", "+"]
+    MAX_LEN = 255 - len("_" + doctype)
 
-    out_name = ""
-    if name[0] in BAD_START_CHARS:
-        name = name[1:]
-    for c in name:
-        if c in BAD_CHARS:
-            continue
-        out_name += c
-    size = len(out_name.encode("utf-8"))
-    if size > 255:
-        raise NameError(
-            "The name {} is {} bytes, but cannot exceed 255 bytes".format(
-                out_name, size
-            )
-        )
-    return out_name.lower()
+    if envname in BAD_NAMES:
+        raise NameError("The name {} is invalid".format(envname))
+
+    while(envname[0] in BAD_START_CHARS):
+        envname = envname[1:]
+
+    env_name= envname.encode("utf8")[:MAX_LEN].decode("utf8", "ignore")
+
+    outname = env_name + "_" + doctype
+    return re.sub(BAD_CHARS, "_", outname).lower()
+
+def process_index_names(envname, env_obj, file_data, key, typ, subkey):
+    "Assigns index names in the file in the form of <commonsname>_<type>"
+    types_seen = defaultdict(int)
+    for index in file_data.get(key):
+        inx_type = index.get(typ)
+        typename = inx_type + (str(types_seen[inx_type]) if types_seen[inx_type] else "")  
+        types_seen[inx_type] +=1
+        index_name = generate_safe_index_name(envname, typename)
+        logging.debug("Adding index name: {} ".format(index_name))
+        env_obj[key].append({subkey: index_name})
+
+    for i in range(len(file_data[key])):
+        file_data[key][i][subkey] = env_obj[key][i][subkey]
 
 
 def create_env_index_name(env_obj, the_file, data):
@@ -47,47 +57,22 @@ def create_env_index_name(env_obj, the_file, data):
         file_guppy = data.get("guppy")
         if not file_guppy:
             return
-        # Changes the Guppy index names to be of the form <commonsname>_<type>
-        types_seen = {}
-        for index in file_guppy.get("indices"):
-            inx_type = index.get("type")
-            if inx_type in types_seen.keys():
-                types_seen[inx_type] += 1
-                typename = inx_type + str(types_seen[inx_type])
-            else:
-                types_seen[inx_type] = 1
-                typename = inx_type
-            index_name = validate_name(env_obj.name + "_" + typename)
-            logging.debug("Adding index name: {} to guppy".format(index_name))
+        key = "indices"
+        typ = "type"
+        subkey = "index"
+        process_index_names(env_obj.name, param_guppy, file_guppy, key, typ, subkey)
 
-            param_guppy["indices"].append({"index": index_name})
         config_index = file_guppy.get("config_index")
         if config_index:
             param_guppy["config_index"] = env_obj.name + "_" + "array-config"
-        # Transfer values from env_obj params to file
-        for i in range(len(file_guppy["indices"])):
-            file_guppy["indices"][i]["index"] = param_guppy["indices"][i]["index"]
         if param_guppy.get("config_index"):
             file_guppy["config_index"] = param_guppy["config_index"]
 
     elif the_file == "etlMapping.yaml":
-        # Change name field to be of the form <commonsname>_<type>
-        types_seen = {}
-        for field in data["mappings"]:
-            field_type = field.get("doc_type")
-            if field_type in types_seen.keys():
-                types_seen[field_type] += 1
-                typename = field_type + str(types_seen[field_type])
-            else:
-                types_seen[field_type] = 1
-                typename = field_type
-            field_name = validate_name(env_obj.name + "_" + typename)
-            logging.debug("Adding field name: {} to mappings".format(index_name))
-            params["mappings"].append({"name": field_name})
-        target_mappings = env_obj.PARAMS_TO_SET[the_file]["mappings"]
-        yam_mappings = data["mappings"]
-        for i in range(len(target_mappings)):
-            yam_mappings[i]["name"] = target_mappings[i]["name"]
+        key = "mappings"
+        typ = "doc_type"
+        subkey = "name"
+        process_index_names(env_obj.name, env_obj.PARAMS_TO_SET[the_file], data, key, typ, subkey)
     return data
 
 
@@ -97,6 +82,7 @@ def write_index_names(curr_dir, path, filename, env_obj):
     full_path_to_target = "{}/{}".format(path, filename)
     if isyaml:
         shutil.copy("{}/".format(curr_dir) + filename, full_path_to_target)
+        logging.debug("Opening yaml file [{}]".format(full_path_to_target))
         fd = open(full_path_to_target, "r+")
         yaml = YAML(typ="safe")
         data = yaml.load(fd)
