@@ -19,22 +19,23 @@ logging.getLogger(__name__)
 def generate_safe_index_name(envname, doctype):
     """Makes sure index name follow rules set in 
     https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
-    # BAD_NAMES = [".", ".."]
-    BAD_CHARS = "[\\\/*?\"<>|\s,#:]"
-    BAD_START_CHARS = "-_+"
+    # Doesnt work if first char is \
+    if not doctype:
+        raise NameError("No type given. Environment needs a type")
+
+    BAD_CHARS = re.compile(r"[\\/*?\"<>|\s,#:]")
+    BAD_START_CHARS = r"\\/*?\"<>|\s,#:-_+"
     doctype = re.sub(BAD_CHARS, "_", doctype)
     MAX_LEN = 255 - len("_" + doctype)
 
-    # if envname in BAD_NAMES:
-    #     raise NameError("The name {} is invalid".format(envname))
     env_name = re.sub(BAD_CHARS, "_", envname)
-    env_name = env_name.lstrip(BAD_CHARS+BAD_START_CHARS)
+    env_name = env_name.lstrip(BAD_START_CHARS)
     if not env_name:
         raise NameError("Environment needs a name with valid characters")
 
     env_name= env_name.encode("utf8")[:MAX_LEN].decode("utf8")
-
-    return env_name.lower()
+    outname = env_name + "_" + doctype
+    return outname.lower()
 
 def process_index_names(envname, env_obj, file_data, key, typ, subkey):
     "Assigns index names in the file in the form of <commonsname>_<type>"
