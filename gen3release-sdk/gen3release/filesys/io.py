@@ -39,7 +39,7 @@ def generate_safe_index_name(envname, doctype):
 def process_index_names(envname, env_obj, file_data, key, typ, subkey):
     "Assigns index names in the file in the form of <commonsname>_<type>"
     types_seen = defaultdict(int)
-    for index in file_data.get(key):
+    for index in file_data.get(key,[]):
         inx_type = index.get(typ)
         typename = inx_type + (str(types_seen[inx_type]) if types_seen[inx_type] else "")  
         types_seen[inx_type] +=1
