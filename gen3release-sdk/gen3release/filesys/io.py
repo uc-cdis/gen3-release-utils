@@ -23,7 +23,7 @@ def generate_safe_index_name(envname, doctype):
     if not doctype:
         raise NameError("No type given. Environment needs a type")
 
-    BAD_CHARS = re.compile(r"[\\/*?\"<>|\s,#:]")
+    BAD_CHARS = re.compile(r"\\/*?\"<>|\s,#:")
     BAD_START_CHARS = r"\\/*?\"<>|\s,#:-_+"
     doctype = re.sub(BAD_CHARS, "_", doctype)
     MAX_LEN = 255 - len("_" + doctype)
