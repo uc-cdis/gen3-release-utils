@@ -12,7 +12,7 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 2 ]; then
   exit 0;
 fi;
 
-urlPrefix="https://github.com/uc-cdis/"
+urlPrefix="https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/uc-cdis/"
 sourceBranchName=$1
 tagName=$2
 targetBranchName="stable"
@@ -34,6 +34,7 @@ while IFS= read -r repo; do
   git clone "${urlPrefix}${repo}"
   cd "${repo}" || exit 1
   git checkout "${targetBranchName}"
+  git config user.name "${GITHUB_USERNAME}"
   result=$(git pull origin "${sourceBranchName}")
   RC=$?
   if [ $RC -ne 0 ]; then
