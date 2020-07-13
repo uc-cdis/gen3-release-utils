@@ -10,6 +10,7 @@ pidgin
 data-portal
 sheepdog
 sower
+sower-jobs
 ssjdispatcher
 tube
 workspace-token-service
