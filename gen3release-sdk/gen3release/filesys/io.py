@@ -19,9 +19,6 @@ logging.getLogger(__name__)
 def generate_safe_index_name(envname, doctype):
     """Makes sure index name follow rules set in 
     https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
-def generate_safe_index_name(envname, doctype):
-    """Makes sure index name follow rules set in 
-    https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
     if not doctype:
         raise NameError("No type given. Environment needs a type")
     
