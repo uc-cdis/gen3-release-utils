@@ -19,15 +19,18 @@ logging.getLogger(__name__)
 def generate_safe_index_name(envname, doctype):
     """Makes sure index name follow rules set in 
     https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
+def generate_safe_index_name(envname, doctype):
+    """Makes sure index name follow rules set in 
+    https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
     if not doctype:
         raise NameError("No type given. Environment needs a type")
     
-    BAD_CHARS = "[\\\\/*?\"<>| ,#:]"
+    BAD_CHARS = "[\\\/*?\"<>| ,#:]" #If errors occur in matching try \\\\/
     envname = re.sub(BAD_CHARS, "", envname)
     
     BAD_START_CHARS = "-_+"
     doctype = re.sub(BAD_CHARS, "", doctype)
-    MAX_LEN = 255 - len("_" + doctype)
+    MAX_LEN = 255 - (len("_") + len(doctype.encode("utf8")))
 
     env_name = envname.lstrip(BAD_START_CHARS)
     if not env_name:
