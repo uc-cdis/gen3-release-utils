@@ -43,14 +43,12 @@ class Env:
             "user-namespace": "",
             "env": {"NAMESPACE": "", "HOSTNAME": ""},  # KUBE_NAMESPACE
             "sidecar": {"env": {"NAMESPACE": "", "HOSTNAME": ""}},
-        }
+        },
     }
-   
+
     PARAMS_TO_SET = {
-       "manifest.json":{
-            "guppy": {"indices": [], "config_index":""},
-       },
-        "etlMapping.yaml": {"mappings": []}
+        "manifest.json": {"guppy": {"indices": [], "config_index": ""},},
+        "etlMapping.yaml": {"mappings": []},
     }
 
     SVCS_TO_IGNORE = ["aws-es-proxy", "fluentd", "ambassador", "nb2", "jupyterhub"]
@@ -84,30 +82,9 @@ class Env:
         self.name = environment_path_regex.group(2)
         self.full_path = path_to_env_folder
         self.sower_jobs = None
-        
 
     def load_sower_jobs(self, json_data):
         self.sower_jobs = json_data.get("sower")
-
-    def set_params(self, the_file, json):
-        params = self.PARAMS_TO_SET[the_file]
-        if the_file == "manifest.json":
-            param_guppy = params["guppy"]
-            file_guppy = json.get("guppy")
-            if not file_guppy:
-                return
-            # Changes the Guppy index names to be of the form <commonsname>_<type>
-            for index in file_guppy.get("indices"):
-                param_guppy["indices"].append({"index": self.name + "_" + index.get("type")})
-            config_index = file_guppy.get("config_index")
-            if config_index:
-                param_guppy["config_index"] = self.name + "_" + "array-config"
-            
-        if the_file == "etlMapping.yaml":
-            for field in json["mappings"]:
-                params["mappings"].append({"name":  self.name + "_" + field.get("doc_type")})
-
-
 
     def _replace_one(self, version, key, json_block):
         if key in json_block:
@@ -204,7 +181,6 @@ class Env:
             )
             env_params[block] = json_block[block]
 
-
     def load_environment_params(self, file_name, json_data):
         """Places environment specific values from target environment into  env object, 
     removes fields from object not found in target and returns the dictionary with fields"""
@@ -221,7 +197,7 @@ class Env:
                         "block {} does not exist in json file {}, ignoring this block.".format(
                             block, file_name
                         )
-                    )       
+                    )
             return env_params
         except Exception as e:
             logging.error("failed to load parameters from {}.".format(file_name))

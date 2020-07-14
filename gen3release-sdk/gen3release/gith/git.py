@@ -112,7 +112,11 @@ class Git:
                     branch=branch_name,
                 )
             except UnknownObjectException as e:
-                logging.DEBUG("{} has occured, likely because file not found in remote, creating file..".format(e))
+                logging.DEBUG(
+                    "{} has occurred, likely because file not found in remote, creating file..".format(
+                        e
+                    )
+                )
                 github_client.create_file(
                     "{}/".format(tgtEnv.name) + f, copy_commit, data, branch=branch_name
                 )
