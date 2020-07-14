@@ -21,10 +21,10 @@ def generate_safe_index_name(envname, doctype):
     https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
     if not doctype:
         raise NameError("No type given. Environment needs a type")
-    
-    BAD_CHARS = "[\\\/*?\"<>| ,#:]" #If errors occur in matching try \\\\/
+
+    BAD_CHARS = '[\\\/*?"<>| ,#:]'  # If errors occur in matching try \\\\/
     envname = re.sub(BAD_CHARS, "_", envname)
-    
+
     BAD_START_CHARS = "-_+"
     doctype = re.sub(BAD_CHARS, "_", doctype)
     MAX_LEN = 255 - (len("_") + len(doctype.encode("utf8")))
@@ -33,19 +33,24 @@ def generate_safe_index_name(envname, doctype):
     if not env_name:
         raise NameError("Environment needs a name with valid characters")
 
-    env_name= env_name.encode("utf8")[:MAX_LEN].decode("utf8")
+    env_name = env_name.encode("utf8")[:MAX_LEN].decode("utf8")
     outname = env_name + "_" + doctype
     return outname.lower()
+
 
 def process_index_names(envname, env_obj, file_data, key, typ, subkey):
     "Assigns index names in the file in the form of <commonsname>_<type>"
     types_seen = defaultdict(int)
-    for index in file_data.get(key,[]):
+    for index in file_data.get(key, []):
         inx_type = index.get(typ)
         if not inx_type:
-            raise KeyError("No type found in {}, in {} a type must be given".format(index, envname))
-        typename = inx_type + (str(types_seen[inx_type]) if types_seen[inx_type] else "")  
-        types_seen[inx_type] +=1
+            raise KeyError(
+                "No type found in {}, in {} a type must be given".format(index, envname)
+            )
+        typename = inx_type + (
+            str(types_seen[inx_type]) if types_seen[inx_type] else ""
+        )
+        types_seen[inx_type] += 1
         index_name = generate_safe_index_name(envname, typename)
         logging.debug("Adding index name: {} ".format(index_name))
         env_obj[key].append({subkey: index_name})
@@ -76,7 +81,9 @@ def create_env_index_name(env_obj, the_file, data):
         key = "mappings"
         typ = "doc_type"
         subkey = "name"
-        process_index_names(env_obj.name, env_obj.PARAMS_TO_SET[the_file], data, key, typ, subkey)
+        process_index_names(
+            env_obj.name, env_obj.PARAMS_TO_SET[the_file], data, key, typ, subkey
+        )
     return data
 
 
@@ -207,8 +214,8 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                 # files mapped in ENVIRONMENT_SPECIFIC_PARAMS need special treatment
                 if not path.exists("{}/{}".format(dst, a_file)):
                     logging.debug(
-                        "File [{}] not found in target env, adding from source env".format(src + "/" +
-                            a_file
+                        "File [{}] not found in target env, adding from source env".format(
+                            src + "/" + a_file
                         )
                     )
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
@@ -216,8 +223,8 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                     continue
                 if a_file in tgtEnv.ENVIRONMENT_SPECIFIC_PARAMS.keys():
                     logging.debug(
-                        "This file [{}] contains environment-specific parameters that need to be saved.".format(dst + "/"+
-                            a_file
+                        "This file [{}] contains environment-specific parameters that need to be saved.".format(
+                            dst + "/" + a_file
                         )
                     )
                     # remember environment-specific information
