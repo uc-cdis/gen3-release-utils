@@ -42,6 +42,8 @@ def process_index_names(envname, env_obj, file_data, key, typ, subkey):
     types_seen = defaultdict(int)
     for index in file_data.get(key,[]):
         inx_type = index.get(typ)
+        if not inx_type:
+            raise KeyError("No type found in {}, in {} a type must be given".format(index, envname))
         typename = inx_type + (str(types_seen[inx_type]) if types_seen[inx_type] else "")  
         types_seen[inx_type] +=1
         index_name = generate_safe_index_name(envname, typename)
