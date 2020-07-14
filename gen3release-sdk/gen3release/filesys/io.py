@@ -29,7 +29,7 @@ def generate_safe_index_name(envname, doctype):
     envname = re.sub(BAD_CHARS, "", envname)
     
     BAD_START_CHARS = "-_+"
-    doctype = re.sub(BAD_CHARS, "", doctype)
+    doctype = re.sub(BAD_CHARS, "_", doctype)
     MAX_LEN = 255 - (len("_") + len(doctype.encode("utf8")))
 
     env_name = envname.lstrip(BAD_START_CHARS)
