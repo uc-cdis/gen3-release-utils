@@ -23,7 +23,7 @@ def generate_safe_index_name(envname, doctype):
         raise NameError("No type given. Environment needs a type")
     
     BAD_CHARS = "[\\\/*?\"<>| ,#:]" #If errors occur in matching try \\\\/
-    envname = re.sub(BAD_CHARS, "", envname)
+    envname = re.sub(BAD_CHARS, "_", envname)
     
     BAD_START_CHARS = "-_+"
     doctype = re.sub(BAD_CHARS, "_", doctype)
