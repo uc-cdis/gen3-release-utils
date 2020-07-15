@@ -10,7 +10,23 @@ logging.getLogger(__name__)
 
 
 class Env:
-    ENVIRONMENT_SPECIFIC_PARAMS = {
+    
+
+    def __init__(self, path_to_env_folder):
+        """
+     Creates an EnvironmentConfig object to store information related to its folder path and the name of the environment.
+     This class also contains helper methods to facilitate the manipulation of config data.
+    """
+        if "/" == path_to_env_folder[-1]:
+            path_to_env_folder = path_to_env_folder[:-1]
+        environment_path_regex = re.search(r"(.*)\/(.*)", path_to_env_folder)
+
+        logging.debug(
+            "identifying repo directory and name of the environment: {}".format(
+                str(environment_path_regex)
+            )
+        )
+        self.ENVIRONMENT_SPECIFIC_PARAMS = {
         "manifest.json": {
             "notes": [],
             "global": {
@@ -46,42 +62,27 @@ class Env:
         },
     }
 
-    PARAMS_TO_SET = {
-        "manifest.json": {"guppy": {"indices": [], "config_index": ""},},
-        "etlMapping.yaml": {"mappings": []},
-    }
+        self.PARAMS_TO_SET = {
+            "manifest.json": {"guppy": {"indices": [], "config_index": ""},},
+            "etlMapping.yaml": {"mappings": []},
+        }
 
-    SVCS_TO_IGNORE = ["aws-es-proxy", "fluentd", "ambassador", "nb2", "jupyterhub"]
+        self.SVCS_TO_IGNORE = ["aws-es-proxy", "fluentd", "ambassador", "nb2", "jupyterhub"]
 
-    BLOCKS_TO_UPDATE = {
-        "manifest.json": {
-            "versions": "*",
-            "sower": [{"container": "image"},],
-            "jupyterhub": {"root": "sidecar"},
-            "ssjdispatcher": {"job_images": "indexing"},
-            "hatchery": {"sidecar": "image"},
-        },
-        "manifests/hatchery/hatchery.json": {"root": {"sidecar": "image"}},
-    }
-
-    def __init__(self, path_to_env_folder):
-        """
-     Creates an EnvironmentConfig object to store information related to its folder path and the name of the environment.
-     This class also contains helper methods to facilitate the manipulation of config data.
-    """
-        if "/" == path_to_env_folder[-1]:
-            path_to_env_folder = path_to_env_folder[:-1]
-        environment_path_regex = re.search(r"(.*)\/(.*)", path_to_env_folder)
-
-        logging.debug(
-            "identifying repo directory and name of the environment: {}".format(
-                str(environment_path_regex)
-            )
-        )
+        self.BLOCKS_TO_UPDATE = {
+            "manifest.json": {
+                "versions": "*",
+                "sower": [{"container": "image"},],
+                "jupyterhub": {"root": "sidecar"},
+                "ssjdispatcher": {"job_images": "indexing"},
+                "hatchery": {"sidecar": "image"},
+            },
+            "manifests/hatchery/hatchery.json": {"root": {"sidecar": "image"}},
+        }
         self.repo_dir = environment_path_regex.group(1)
         self.name = environment_path_regex.group(2)
         self.full_path = path_to_env_folder
-        self.sower_jobs = None
+        self.sower_jobs = []
 
     def load_sower_jobs(self, json_data):
         self.sower_jobs = json_data.get("sower")
