@@ -92,7 +92,7 @@ def write_index_names(curr_dir, path, filename, env_obj):
     data = None
     full_path_to_target = "{}/{}".format(path, filename)
     if isyaml:
-        shutil.copy("{}/".format(curr_dir) + filename, full_path_to_target)
+        shutil.copy("{}/".format(curr_dir) + filename, full_path_to_target) 
         logging.debug("Opening yaml file [{}]".format(full_path_to_target))
         fd = open(full_path_to_target, "r+")
         yaml = YAML(typ="safe")
@@ -162,7 +162,6 @@ def merge_json_file_with_stored_environment_params(
             json_data = remove_superfluous_sower_jobs(
                 json_data, srcEnc.sower_jobs, tgtEnv.sower_jobs
             )
-        # print(f"envir parasms: \n {env_params}")
         merged_json = merge(env_params, json_data)
         f.seek(0)
         f.write(json.dumps(merged_json, indent=2))
@@ -221,6 +220,7 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                             src + "/" + a_file
                         )
                     )
+
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
                     copied_files.append("{}/".format(dst) + a_file)
                     continue

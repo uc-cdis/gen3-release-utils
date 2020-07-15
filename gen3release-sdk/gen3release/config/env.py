@@ -10,22 +10,12 @@ logging.getLogger(__name__)
 
 
 class Env:
-    
 
     def __init__(self, path_to_env_folder):
         """
      Creates an EnvironmentConfig object to store information related to its folder path and the name of the environment.
      This class also contains helper methods to facilitate the manipulation of config data.
     """
-        if "/" == path_to_env_folder[-1]:
-            path_to_env_folder = path_to_env_folder[:-1]
-        environment_path_regex = re.search(r"(.*)\/(.*)", path_to_env_folder)
-
-        logging.debug(
-            "identifying repo directory and name of the environment: {}".format(
-                str(environment_path_regex)
-            )
-        )
         self.ENVIRONMENT_SPECIFIC_PARAMS = {
         "manifest.json": {
             "notes": [],
@@ -63,7 +53,7 @@ class Env:
     }
 
         self.PARAMS_TO_SET = {
-            "manifest.json": {"guppy": {"indices": [], "config_index": ""},},
+            "manifest.json": {"guppy": {"indices": [], "config_index": ""}},
             "etlMapping.yaml": {"mappings": []},
         }
 
@@ -79,9 +69,20 @@ class Env:
             },
             "manifests/hatchery/hatchery.json": {"root": {"sidecar": "image"}},
         }
+
+        if "/" == path_to_env_folder[-1]:
+            path_to_env_folder = path_to_env_folder[:-1]
+        environment_path_regex = re.search(r"(.*)\/(.*)", path_to_env_folder)
+
+        logging.debug(
+            "identifying repo directory and name of the environment: {}".format(
+                str(environment_path_regex)
+            )
+        )
+
         self.repo_dir = environment_path_regex.group(1)
         self.name = environment_path_regex.group(2)
-        self.full_path = path_to_env_folder
+        self.full_path = os.path.abspath(path_to_env_folder)
         self.sower_jobs = []
 
     def load_sower_jobs(self, json_data):
@@ -96,7 +97,7 @@ class Env:
             )
             json_block[key] = "{}:{}".format(json_block[key].split(":")[0], version)
         else:
-            logging.warn(
+            logging.warning(
                 "nothing to replace here. The key [{}] was not found in this json block.".format(
                     key
                 )
@@ -163,7 +164,7 @@ class Env:
                         self.BLOCKS_TO_UPDATE[manifest_file_name][block],
                     )
             else:
-                logging.warn(
+                logging.warning(
                     "block {} does not exist in {}".format(block, manifest_file_name)
                 )
         return json
@@ -194,7 +195,7 @@ class Env:
                     self.save_blocks(block, env_params, json_data)
                 else:
                     del env_params[block]
-                    logging.warn(
+                    logging.warning(
                         "block {} does not exist in json file {}, ignoring this block.".format(
                             block, file_name
                         )

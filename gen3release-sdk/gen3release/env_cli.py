@@ -184,7 +184,7 @@ def apply_version_to_environment(version, override, e):
             if current_md5 != new_md5:
                 modified_files.append(manifest)
         else:
-            logging.warn(
+            logging.warning(
                 "environment [{}] does not contain the manifest file {}".format(
                     e.name, manifest
                 )

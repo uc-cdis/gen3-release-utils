@@ -357,11 +357,23 @@ def test_create_env_index_name(env_obj, manifest_data, etlMapping_data):
     expected_yaml_names = ["test_environment.$$&_subject", "test_environment.$$&_file"]
     names = [d["name"] for d in etlMapping_data.get("mappings")]
     assert expected_yaml_names == names
-    del env_obj
 
 
 
-# def test_write_index_names()
+def test_write_index_names(env_obj):
+  curr = os.curdir
+  fullpath = os.path.abspath(curr)
+  print(fullpath)
+  os.system("mkdir ./data/temp")
+  os.system("ls data")
+  os.system("cp ./data/test_manifest.json ./data/temp/manifest.json")
+  io.write_index_names(fullpath, fullpath + "/data/temp", "manifest.json", env_obj)
+  os.chdir(fullpath)
+  with open("./data/temp/manifest.json", 'r') as f:
+    with open("./data/testnaming_manifest.json") as f2:
+      assert json.loads(f2.read()) == json.loads(f.read())
+  os.system("rm -r ./data/temp")
+
 
 
 def test_store_environment_params(env_obj, loaded_env_obj):
@@ -374,7 +386,6 @@ def test_store_environment_params(env_obj, loaded_env_obj):
     assert expected_params["manifest.json"] == env_params["manifest.json"], f"Got: {env_params}"
     io.store_environment_params("./data/test_environment.$$&/manifests/hatchery/", env_obj,"hatchery.json")
     assert expected_params["hatchery.json"] == env_params["hatchery.json"]
-    del env_obj
     
 
 
@@ -428,8 +439,6 @@ def test_write_into_manifest():
 
 def test_merge_json_file_with_stored_environment_params(env_obj, loaded_env_obj):
   os.system("cp ./data/test_manifest.json ./data/manifest.json")
-  # h1, j1 = io.read_manifest("./data/manifest.json")
-
   env_params = env_obj.ENVIRONMENT_SPECIFIC_PARAMS["manifest.json"]
   print(env_params)
   io.merge_json_file_with_stored_environment_params("./data", "manifest.json", env_params, env_obj, loaded_env_obj)
@@ -438,6 +447,19 @@ def test_merge_json_file_with_stored_environment_params(env_obj, loaded_env_obj)
       assert f2.read() == f.read()
   os.system("rm ./data/manifest.json")
 
-# def test_remove_superfluous_sower_jobs
+def test_remove_superfluous_sower_jobs(env_obj, loaded_env_obj):
+  with open("./data/test_manifest.json", 'r') as f:
+    data = json.loads(f.read())
+  assert data["sower"] != []
+  io.remove_superfluous_sower_jobs(data, env_obj.sower_jobs, loaded_env_obj.sower_jobs)
+  assert data["sower"] == []
 
-# def test_recursive_copy
+def test_recursive_copy(env_obj):
+  curr = os.curdir
+  fullpath = os.path.abspath(curr)
+  os.system("mkdir ./data/temp")
+  temp_env = env.Env("./data/temp")
+  files = io.recursive_copy([], env_obj,temp_env, env_obj.full_path, temp_env.full_path)
+  os.chdir(fullpath)
+  os.system("rm -r ./data/temp")
+  assert len(files) == 9
