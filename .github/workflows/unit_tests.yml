@@ -19,7 +19,7 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: ~/.cache/pypoetry/virtualenvs
-        key: ${{ runner.os }}-poetry-${{ hashFiles(format('{0}{1}', github.workspace, '/poetry.lock')) }}
+        key: ${{ runner.os }}-poetry-${{ hashFiles(format('{0}{1}', github.workspace, 'gen3release-sdk/poetry.lock')) }}
         restore-keys: |
           ${{ runner.os }}-poetry-
     - name: Install dependencies
