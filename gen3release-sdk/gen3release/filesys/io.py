@@ -157,13 +157,12 @@ def merge_json_file_with_stored_environment_params(
     )
 
     with open(full_path_to_file, "r+") as f:
-        json_file = json.loads(f.read())
+        json_data = json.loads(f.read())
         if the_file == "manifest.json":
-            json_file = remove_superfluous_sower_jobs(
-                json_file, srcEnc.sower_jobs, tgtEnv.sower_jobs
+            json_data = remove_superfluous_sower_jobs(
+                json_data, srcEnc.sower_jobs, tgtEnv.sower_jobs
             )
-        merged_json = merge(env_params, json_file)
-
+        merged_json = merge(env_params, json_data)
         f.seek(0)
         f.write(json.dumps(merged_json, indent=2))
         f.truncate()
@@ -173,9 +172,12 @@ def remove_superfluous_sower_jobs(mani_json, srcEnv, tgtEnv):
     """Removes sower jobs added to target environment by source 
     environment if job was not found in original target environment"""
     superflous_resources = []
+    if srcEnv == []:
+        mani_json["sower"] = []
+        return mani_json
 
-    srcnames = [x["name"] for x in srcEnv]
-    trgnames = [x["name"] for x in tgtEnv]
+    srcnames = [x.get("name") for x in srcEnv]
+    trgnames = [x.get("name") for x in tgtEnv]
     for name in srcnames:
         if name not in trgnames:
             superflous_resources.append(name)
@@ -218,6 +220,7 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                             src + "/" + a_file
                         )
                     )
+
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
                     copied_files.append("{}/".format(dst) + a_file)
                     continue
