@@ -1,0 +1,3 @@
+[console_scripts]
+gen3release = gen3release.env_cli:main
+
