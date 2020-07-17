@@ -10,6 +10,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: uc-cdis/wool@fix/raw_url_req_require_github_token
+    - uses: uc-cdis/wool@master
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.MC_GITHUB_TOKEN }}
