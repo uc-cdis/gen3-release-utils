@@ -14,12 +14,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.7
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/pypoetry/virtualenvs
-        key: ${{ runner.os }}-poetry-${{ hashFiles(format('{0}{1}', github.workspace, '/poetry.lock')) }}
-        restore-keys: |
-          ${{ runner.os }}-poetry-
     - name: Install dependencies
       run: |
         curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
@@ -27,6 +21,6 @@ jobs:
         $HOME/.poetry/bin/poetry install
     - name: Test with pytest
       run: |
-        pip freeze
-        pth=$(which pytest)
-        $pth -vv gen3release-sdk/tests
+        $HOME/.poetry/bin/poetry shell
+        cd tests
+        $pytest -vv test_io.py
