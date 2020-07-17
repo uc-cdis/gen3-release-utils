@@ -21,4 +21,5 @@ jobs:
         $HOME/.poetry/bin/poetry install
     - name: Test with pytest
       run: |
-        pytest -vv gen3release-sdk/tests
+        pth=$(which pytest)
+        $pth -vv gen3release-sdk/tests
