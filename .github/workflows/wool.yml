@@ -5,7 +5,7 @@ name: Wool
 
 jobs:
   runWool:
-    name: Run black
+    name: Run Black
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
