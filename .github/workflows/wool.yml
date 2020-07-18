@@ -5,11 +5,11 @@ name: Wool
 
 jobs:
   runWool:
-    name: Run Black
+    name: Run black
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
 
-    - uses: uc-cdis/wool@fix/raw_url_req_require_github_token
+    - uses: uc-cdis/wool@master
       env:
         GITHUB_TOKEN: ${{ secrets.MC_GITHUB_TOKEN }}
