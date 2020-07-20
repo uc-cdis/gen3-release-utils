@@ -257,7 +257,3 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
             )
         )
         traceback.print_exc()
-<<<<<<< HEAD
-=======
-
->>>>>>> c6c6b9011c395ba5cb63dfae92193ea7608ffc68
