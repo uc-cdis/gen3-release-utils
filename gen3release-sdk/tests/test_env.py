@@ -6,4 +6,3 @@ import json
 @pytest.fixture(scope="function")
 def env_obj():
     return env.Env("./data/test_environment.$$&")
-
