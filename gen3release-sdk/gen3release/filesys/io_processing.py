@@ -1,6 +1,6 @@
 import hashlib
 import shutil
-from config.env import Env
+from gen3release.config.env import Env
 from shutil import copytree, Error
 import logging
 import json
@@ -22,7 +22,7 @@ def generate_safe_index_name(envname, doctype):
     if not doctype:
         raise NameError("No type given. Environment needs a type")
 
-    BAD_CHARS = '[\\\/*?"<>| ,#:]'  # If errors occur in matching try \\\\/
+    BAD_CHARS = '[\\\\/*?"<>| ,#:]'  # If errors occur in matching try \\\\/
     envname = re.sub(BAD_CHARS, "_", envname)
 
     BAD_START_CHARS = "-_+"

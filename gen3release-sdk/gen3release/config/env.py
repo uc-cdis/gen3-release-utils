@@ -77,19 +77,19 @@ class Env:
             "manifests/hatchery/hatchery.json": {"root": {"sidecar": "image"}},
         }
 
+        path_to_env_folder = os.path.abspath(path_to_env_folder)
         if "/" == path_to_env_folder[-1]:
             path_to_env_folder = path_to_env_folder[:-1]
-        environment_path_regex = re.search(r"(.*)\/(.*)", path_to_env_folder)
 
         logging.debug(
             "identifying repo directory and name of the environment: {}".format(
-                str(environment_path_regex)
+                str(path_to_env_folder)
             )
         )
-
-        self.repo_dir = environment_path_regex.group(1)
-        self.name = environment_path_regex.group(2)
-        self.full_path = os.path.abspath(path_to_env_folder)
+        pathsplits = path_to_env_folder.split("/")
+        self.repo_dir = pathsplits[-2]
+        self.name = pathsplits[-1]
+        self.full_path = path_to_env_folder
         self.sower_jobs = []
 
     def load_sower_jobs(self, json_data):
@@ -196,10 +196,10 @@ class Env:
         logging.debug("storing info from: " + file_name)
         try:
             env_params = self.ENVIRONMENT_SPECIFIC_PARAMS[file_name]
-
             for block in dict.fromkeys(env_params.keys(), []).keys():
                 if block in json_data.keys():
                     self.save_blocks(block, env_params, json_data)
+
                 else:
                     del env_params[block]
                     logging.warning(

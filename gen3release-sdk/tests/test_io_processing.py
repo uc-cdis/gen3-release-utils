@@ -1,4 +1,4 @@
-from gen3release.filesys import io
+from gen3release.filesys import io_processing as py_io
 import pytest
 from gen3release.config import env
 import json
@@ -290,17 +290,17 @@ def test_generate_safe_index_name():
     ]
     for inp, oup, in zip(ENV_IN, ENV_OUT):
         print(f"input {inp}")
-        output = io.generate_safe_index_name(inp, "testtype")
+        output = py_io.generate_safe_index_name(inp, "testtype")
         print(f"output {output}")
         assert output == oup
     with pytest.raises(NameError):
-        io.generate_safe_index_name("", "testtype")
+        py_io.generate_safe_index_name("", "testtype")
 
 
 def test_process_index_names(env_obj, manifest_data, etlMapping_data):
     param_guppy = env_obj.PARAMS_TO_SET["manifest.json"].get("guppy")
     file_guppy = manifest_data.get("guppy")
-    io.process_index_names(
+    py_io.process_index_names(
         env_obj.name, param_guppy, file_guppy, "indices", "type", "index"
     )
     expected_guppy = {
@@ -312,7 +312,7 @@ def test_process_index_names(env_obj, manifest_data, etlMapping_data):
         "auth_filter_field": "auth_resource_path",
     }
     assert file_guppy == expected_guppy
-    io.process_index_names(
+    py_io.process_index_names(
         env_obj.name,
         env_obj.PARAMS_TO_SET["etlMapping.yaml"],
         etlMapping_data,
@@ -326,7 +326,7 @@ def test_process_index_names(env_obj, manifest_data, etlMapping_data):
 
 
 def test_create_env_index_name(env_obj, manifest_data, etlMapping_data):
-    mani_data = io.create_env_index_name(env_obj, "manifest.json", manifest_data)
+    mani_data = py_io.create_env_index_name(env_obj, "manifest.json", manifest_data)
     guppy = manifest_data.get("guppy")
     expected_guppy = {
         "indices": [
@@ -338,7 +338,7 @@ def test_create_env_index_name(env_obj, manifest_data, etlMapping_data):
     }
     assert guppy == expected_guppy
 
-    yam_names = io.create_env_index_name(env_obj, "etlMapping.yaml", etlMapping_data)
+    yam_names = py_io.create_env_index_name(env_obj, "etlMapping.yaml", etlMapping_data)
     expected_yaml_names = ["test_environment.$$&_subject", "test_environment.$$&_file"]
     names = [d["name"] for d in etlMapping_data.get("mappings")]
     assert expected_yaml_names == names
@@ -351,7 +351,7 @@ def test_write_index_names(env_obj):
     os.system("mkdir ./data/temp")
     os.system("ls data")
     os.system("cp ./data/test_manifest.json ./data/temp/manifest.json")
-    io.write_index_names(fullpath, fullpath + "/data/temp", "manifest.json", env_obj)
+    py_io.write_index_names(fullpath, fullpath + "/data/temp", "manifest.json", env_obj)
     os.chdir(fullpath)
     with open("./data/temp/manifest.json", "r") as f:
         with open("./data/testnaming_manifest.json") as f2:
@@ -360,7 +360,9 @@ def test_write_index_names(env_obj):
 
 
 def test_store_environment_params(env_obj, loaded_env_obj):
-    io.store_environment_params("./data/test_environment.$$&", env_obj, "manifest.json")
+    py_io.store_environment_params(
+        "./data/test_environment.$$&", env_obj, "manifest.json"
+    )
     sowers = env_obj.sower_jobs
     expected_sower = loaded_env_obj.sower_jobs
     assert expected_sower == sowers
@@ -369,18 +371,18 @@ def test_store_environment_params(env_obj, loaded_env_obj):
     assert (
         expected_params["manifest.json"] == env_params["manifest.json"]
     ), f"Got: {env_params}"
-    io.store_environment_params(
+    py_io.store_environment_params(
         "./data/test_environment.$$&/manifests/hatchery/", env_obj, "hatchery.json"
     )
     assert expected_params["hatchery.json"] == env_params["hatchery.json"]
 
 
 def test_read_manifest():
-    hash1, json1 = io.read_manifest("./data/test_environment.$$&/manifest.json")
-    hash2, json2 = io.read_manifest(
+    hash1, json1 = py_io.read_manifest("./data/test_environment.$$&/manifest.json")
+    hash2, json2 = py_io.read_manifest(
         "./data/test_environment.$$&/manifests/hatchery/hatchery.json"
     )
-    hash3, json3 = io.read_manifest("./data/test_environment.$$&/manifest.json")
+    hash3, json3 = py_io.read_manifest("./data/test_environment.$$&/manifest.json")
     assert hash1.digest() != hash2.digest()
     assert json1 != json2
     assert hash1.digest() == hash3.digest()
@@ -407,7 +409,7 @@ def test_merge():
             },
         }
     }
-    dict3 = io.merge(dict1, dict2)
+    dict3 = py_io.merge(dict1, dict2)
     expected_dict = {
         "scaling": {
             "arborist": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
@@ -427,7 +429,7 @@ def test_write_into_manifest():
     os.system("cp ./data/test_manifest.json ./data/testing_manifest.json")
     with open("./data/testing_manifest.json", "r") as f:
         hash1 = hashlib.md5(f.read().encode("utf-8")).digest()
-    hash2 = io.write_into_manifest("./data/testing_manifest.json", {}).digest()
+    hash2 = py_io.write_into_manifest("./data/testing_manifest.json", {}).digest()
     assert hash1 != hash2
     os.system("rm ./data/testing_manifest.json")
 
@@ -436,7 +438,7 @@ def test_merge_json_file_with_stored_environment_params(env_obj, loaded_env_obj)
     os.system("cp ./data/test_manifest.json ./data/manifest.json")
     env_params = env_obj.ENVIRONMENT_SPECIFIC_PARAMS["manifest.json"]
     print(env_params)
-    io.merge_json_file_with_stored_environment_params(
+    py_io.merge_json_file_with_stored_environment_params(
         "./data", "manifest.json", env_params, env_obj, loaded_env_obj
     )
     with open("./data/manifest.json") as f:
@@ -450,7 +452,7 @@ def test_remove_superfluous_sower_jobs(env_obj, loaded_env_obj):
         data = json.loads(f.read())
     assert data["sower"] != []
     print(env_obj.sower_jobs)
-    io.remove_superfluous_sower_jobs(
+    py_io.remove_superfluous_sower_jobs(
         data, env_obj.sower_jobs, loaded_env_obj.sower_jobs
     )
     assert data["sower"] == []
@@ -461,7 +463,7 @@ def test_recursive_copy(env_obj):
     fullpath = os.path.abspath(curr)
     os.system("mkdir ./data/temp")
     temp_env = env.Env("./data/temp")
-    files = io.recursive_copy(
+    files = py_io.recursive_copy(
         [], env_obj, temp_env, env_obj.full_path, temp_env.full_path
     )
     os.chdir(fullpath)

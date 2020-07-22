@@ -1,6 +1,6 @@
-from gith.git import Git as Gh
-from config.env import Env
-from filesys import io
+from gen3release.gith.git import Git as Gh
+from gen3release.config.env import Env
+from gen3release.filesys import io_processing as py_io
 import argparse
 import os
 from os import path
@@ -172,14 +172,14 @@ def apply_version_to_environment(version, override, e):
     for manifest_file_name in e.BLOCKS_TO_UPDATE.keys():
         manifest = "{}/{}/{}".format(e.repo_dir, e.name, manifest_file_name)
         if path.exists(manifest):
-            current_md5, current_json = io.read_manifest(manifest)
+            current_md5, current_json = py_io.read_manifest(manifest)
 
             logging.debug("looking for versions to be replaced in {}".format(manifest))
             json_with_version = e.find_and_replace(
                 version, override, manifest_file_name, current_json
             )
 
-            new_md5 = io.write_into_manifest(manifest, json_with_version)
+            new_md5 = py_io.write_into_manifest(manifest, json_with_version)
 
             if current_md5 != new_md5:
                 modified_files.append(manifest)
@@ -244,7 +244,7 @@ def copy_all_files(srcEnv, tgtEnv):
         try:
             # copy all the files from the source environment folder
             # and re-apply the environment-specific parameters
-            copied_files = io.recursive_copy(
+            copied_files = py_io.recursive_copy(
                 [], srcEnv, tgtEnv, srcEnv.full_path, tgtEnv.full_path
             )
             # keep only relative paths (base_path = workspace)
