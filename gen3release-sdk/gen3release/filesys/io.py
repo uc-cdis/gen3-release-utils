@@ -17,7 +17,7 @@ logging.getLogger(__name__)
 
 
 def generate_safe_index_name(envname, doctype):
-    """Makes sure index name follow rules set in 
+    """Makes sure index name follow rules set in
     https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
     if not doctype:
         raise NameError("No type given. Environment needs a type")
@@ -170,7 +170,7 @@ def merge_json_file_with_stored_environment_params(
 
 
 def remove_superfluous_sower_jobs(mani_json, srcEnv, tgtEnv):
-    """Removes sower jobs added to target environment by source 
+    """Removes sower jobs added to target environment by source
     environment if job was not found in original target environment"""
     superflous_resources = []
 

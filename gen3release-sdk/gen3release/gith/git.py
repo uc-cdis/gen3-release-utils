@@ -12,7 +12,7 @@ class Git:
     def __init__(
         self,
         org="uc-cdis",
-        repo=os.environ.get('REPO_NAME', 'cdis-manifest'),
+        repo=os.environ.get("REPO_NAME", "cdis-manifest"),
         token=os.environ["GITHUB_TOKEN"].strip(),
     ):
         """

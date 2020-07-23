@@ -11,7 +11,7 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 2 ]; then
   exit 0;
 fi;
 
-# TODO: add "ssjdispatcher" "quay.io/cdis/ssjdispatcher:master" when modifying DEV/QA manifests 
+# TODO: add "ssjdispatcher" "quay.io/cdis/ssjdispatcher:master" when modifying DEV/QA manifests
 
 # source manifest
 # <branch>/<environment>/manifest.json
