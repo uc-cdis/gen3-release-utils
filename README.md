@@ -19,22 +19,22 @@ This utility uses the gen3git tool to generate release notes for Gen3 monthly re
 
 - How to use it:
     - Set environment variable GITHUB_TOKEN with your Github Personal Access Token
-    - Install Python and [gen3git](https://github.com/uc-cdis/release-helper/) command line utility  
+    - Install Python and [gen3git](https://github.com/uc-cdis/release-helper/) command line utility
     ```pip install --editable git+https://github.com/uc-cdis/release-helper.git@gen3release#egg=gen3git```
     - Update `repo_list.txt` with the repositories from which release notes need to be generated
     - Set the following environment variables in the terminal:
-        - RELEASE_NAME - Release name e.g., `Core Gen3 Release 202006 (Edgewater)`   
-        - START_DATE - Start date in YYYY-MM-DD format  
-        - END_DATE - End date in YYYY-MM-DD format  
+        - RELEASE_NAME - Release name e.g., `Core Gen3 Release 202006 (Edgewater)`
+        - START_DATE - Start date in YYYY-MM-DD format
+        - END_DATE - End date in YYYY-MM-DD format
         - GITHUB_TOKEN - Github personal access token
-    - Execute generate_release_notes.sh  
+    - Execute generate_release_notes.sh
     ```./generate_release_notes.sh```
-   
+
 ## Make new branches from existing ones
 
 This utility is used to create integration and stable branches in multiple repos.
 
 - How to use it:
     - Update `repo_list.txt` with the repositories where branches need to be created
-    - Execute the script as follows:  
-    ```./make_branch.sh <sourceBranchName> <targetBranchName``` 
+    - Execute the script as follows:
+    ```./make_branch.sh <sourceBranchName> <targetBranchName```

@@ -33,7 +33,7 @@ Utility to update the version of services or copy all the configuration from one
 The general syntax for this script is:
 
 environments_config_manager <command> <args>
-e.g.: python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io 
+e.g.: python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 You can also use optional arg: "-pr" to create pull requests automatically
 
 The most commonly used commands are:
