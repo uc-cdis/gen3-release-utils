@@ -6,7 +6,7 @@ import os
 from os import path
 import sys
 import logging
-import datetime
+import time
 
 # Debugging:
 # $ export LOGLEVEL=DEBUG
@@ -33,7 +33,7 @@ Utility to update the version of services or copy all the configuration from one
 The general syntax for this script is:
 
 environments_config_manager <command> <args>
-e.g.: python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io 
+e.g.: python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 You can also use optional arg: "-pr" to create pull requests automatically
 
 The most commonly used commands are:
@@ -146,7 +146,7 @@ def apply(args):
 
     # Cut a new brach if the --pull-request-title flag is in place
     if pr_title and len(modified_files) > 0:
-        ts = str(datetime.datetime.now().timestamp()).split(".")[0]
+        ts = str(time.time()).split(".")[0]
         branch_name = "chore/apply_{}_to_{}_{}".format(
             version.replace(".", ""), e.name.replace(".", "_"), ts
         )
@@ -219,21 +219,25 @@ def copy(args):
     logging.debug("num of modified_files: {}".format(len(modified_files)))
     # Cut a new brach if the --pull-request-title flag is in place
     if pr_title and len(modified_files) > 0:
-        ts = str(datetime.datetime.now().timestamp()).split(".")[0]
+        ts = str(time.time()).split(".")[0]
         branch_name = "chore/promote_{}_{}".format(srcEnv.name.replace(".", "_"), ts)
         repo_name = os.path.basename(tgtEnv.repo_dir)
         logging.debug("creating github client obj with repo={}".format(repo_name))
         gh = Gh(repo=repo_name)
         gh_client = gh.get_github_client()
+        logging.info(f"Created a github object {gh_client}")
 
         # create new remote branch
         new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
+        logging.info(f"branch name is {branch_name}")
 
         # create commit, push files to remote branch and create pull request
         commit_msg = "copying files from {} to {}".format(srcEnv.name, tgtEnv.name)
+
         gh.create_pull_request_copy(
             gh_client, srcEnv, tgtEnv, modified_files, pr_title, commit_msg, branch_name
         )
+        logging.info(f"{modified_files}, {commit_msg}")
         logging.info("PR created successfully!")
         # TODO: Switch local branch to master
 
