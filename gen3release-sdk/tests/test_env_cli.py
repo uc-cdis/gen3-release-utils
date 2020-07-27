@@ -7,37 +7,11 @@ import json
 import os
 import argparse
 from argparse import Namespace
-import filecmp
 from unittest.mock import Mock, patch, call
 from github.Repository import Repository
-
+from tests.helpers import are_dir_trees_equal
 
 fullpath_wd = os.path.abspath(".")
-
-
-def are_dir_trees_equal(dir1, dir2):
-    """
-        Compare two directories recursively. Files in each directory are
-        assumed to be equal if their names and contents are equal.
-    """
-    dirs_cmp = filecmp.dircmp(dir1, dir2)
-    if (
-        len(dirs_cmp.left_only) > 0
-        or len(dirs_cmp.right_only) > 0
-        or len(dirs_cmp.funny_files) > 0
-    ):
-        return False
-    (_, mismatch, errors) = filecmp.cmpfiles(
-        dir1, dir2, dirs_cmp.common_files, shallow=False
-    )
-    if len(mismatch) > 0 or len(errors) > 0:
-        return False
-    for common_dir in dirs_cmp.common_dirs:
-        new_dir1 = os.path.join(dir1, common_dir)
-        new_dir2 = os.path.join(dir2, common_dir)
-        if not are_dir_trees_equal(new_dir1, new_dir2):
-            return False
-    return True
 
 
 def test_make_parser():
@@ -79,7 +53,6 @@ def test_copy(mocked_env, copyfiles, mockedtime, mockedGh):
     mocked_env.return_value.name = "env"
     env_cli.copy(args_pr)
     assert mocked_env.call_args_list == [call(args_pr.source), call(args_pr.env)]
-
     mockedGh.assert_called_with(repo="data")
     mockedGh.return_value.cut_new_branch.assert_called_once()
     mockedGh.return_value.create_pull_request_copy.assert_called_with(
@@ -91,4 +64,28 @@ def test_copy(mocked_env, copyfiles, mockedtime, mockedGh):
         "copying files from env to env",
         "chore/promote_env_10",
     )
+    os.system(f"rm -r {fullpath_wd}/data/temp")
+
+
+def test_copy_all_files():
+    with pytest.raises(NameError):
+        s = Env("./fakepath")
+        t = Env("./fakepath")
+        env_cli.copy_all_files(s, t)
+    os.system(f"mkdir {fullpath_wd}/data/temp")
+    src = Env("./data/test_environment.$$&")
+    tgt = Env("./data/temp")
+    files = env_cli.copy_all_files(src, tgt)
+    expected_files = [
+        "portal/gitops-sponsors/nhlbi.png",
+        "portal/gitops-logo.png",
+        "portal/gitops-favicon.ico",
+        "portal/gitops.css",
+        "portal/gitops.json",
+        "etlMapping.yaml",
+        "manifest.json",
+        "manifests/fence/fence-config-public.yaml",
+        "manifests/hatchery/hatchery.json",
+    ]
+    assert files == expected_files
     os.system(f"rm -r {fullpath_wd}/data/temp")

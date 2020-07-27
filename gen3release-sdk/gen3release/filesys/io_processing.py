@@ -1,6 +1,12 @@
 import hashlib
 import shutil
-from gen3release.config.env import Env
+import sys
+
+sys.path.append(
+    "/Users/matthewclark/Documents/ctds/gen3repos/gen3-release-utils/gen3release-sdk/gen3release"
+)
+
+from config.env import Env
 from shutil import copytree, Error
 import logging
 import json
@@ -17,7 +23,7 @@ logging.getLogger(__name__)
 
 
 def generate_safe_index_name(envname, doctype):
-    """Makes sure index name follow rules set in 
+    """Makes sure index name follow rules set in
     https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
     if not doctype:
         raise NameError("No type given. Environment needs a type")
@@ -169,7 +175,7 @@ def merge_json_file_with_stored_environment_params(
 
 
 def remove_superfluous_sower_jobs(mani_json, srcEnv, tgtEnv):
-    """Removes sower jobs added to target environment by source 
+    """Removes sower jobs added to target environment by source
     environment if job was not found in original target environment"""
     superflous_resources = []
     if srcEnv == []:
@@ -257,3 +263,11 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
             )
         )
         traceback.print_exc()
+
+
+# curr = os.curdir
+# absolutepath = os.path.abspath(".")
+# os.system(f"mkdir {absolutepath}/../tests/data/temp")
+# temp_env = Env(f"{absolutepath}/../tests/data/temp")
+# env_obj = Env(absolutepath + "/../tests/data/test_environment.$$&")
+# recursive_copy([], env_obj, temp_env, env_obj.full_path, temp_env.full_path)

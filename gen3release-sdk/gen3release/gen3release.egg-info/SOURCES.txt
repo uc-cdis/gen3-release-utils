@@ -1,0 +1,14 @@
+setup.py
+gen3release/env_cli.py
+gen3release/config/__init__.py
+gen3release/config/env.py
+gen3release/filesys/__init__.py
+gen3release/filesys/io_processing.py
+gen3release/gen3release.egg-info/PKG-INFO
+gen3release/gen3release.egg-info/SOURCES.txt
+gen3release/gen3release.egg-info/dependency_links.txt
+gen3release/gen3release.egg-info/entry_points.txt
+gen3release/gen3release.egg-info/requires.txt
+gen3release/gen3release.egg-info/top_level.txt
+gen3release/gith/__init__.py
+gen3release/gith/git.py

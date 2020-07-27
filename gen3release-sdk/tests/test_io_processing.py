@@ -6,16 +6,19 @@ from ruamel.yaml import YAML
 import hashlib
 import os
 import copy
+from tests.helpers import are_dir_trees_equal
+
+absolutepath = os.path.abspath(".")
 
 
 @pytest.fixture(scope="function")
 def env_obj():
-    return env.Env("./data/test_environment.$$&")
+    return env.Env(absolutepath + "/data/test_environment.$$&")
 
 
 @pytest.fixture()
 def loaded_env_obj():
-    obj = env.Env("./data/test_environment.$$&")
+    obj = env.Env(absolutepath + "/data/test_environment.$$&")
     obj.sower_jobs = [
         {
             "name": "pelican-export",
@@ -258,7 +261,7 @@ def loaded_env_obj():
 @pytest.fixture()
 def manifest_data():
     data = None
-    with open("./data/test_manifest.json", "r") as f:
+    with open(absolutepath + "/data/test_manifest.json", "r") as f:
         data = json.loads(f.read())
     return data
 
@@ -266,7 +269,7 @@ def manifest_data():
 @pytest.fixture()
 def etlMapping_data():
     data = None
-    with open("./data/test_etlMapping.yaml") as f:
+    with open(absolutepath + "/data/test_etlMapping.yaml") as f:
         yaml = YAML(typ="safe")
         data = yaml.load(f)
     return data
@@ -348,20 +351,22 @@ def test_write_index_names(env_obj):
     curr = os.curdir
     fullpath = os.path.abspath(curr)
     print(fullpath)
-    os.system("mkdir ./data/temp")
+    os.system(f"mkdir {absolutepath}/data/temp")
     os.system("ls data")
-    os.system("cp ./data/test_manifest.json ./data/temp/manifest.json")
+    os.system(
+        f"cp {absolutepath}/data/test_manifest.json {absolutepath}/data/temp/manifest.json"
+    )
     py_io.write_index_names(fullpath, fullpath + "/data/temp", "manifest.json", env_obj)
     os.chdir(fullpath)
-    with open("./data/temp/manifest.json", "r") as f:
-        with open("./data/testnaming_manifest.json") as f2:
+    with open(absolutepath + "/data/temp/manifest.json", "r") as f:
+        with open(absolutepath + "/data/testnaming_manifest.json") as f2:
             assert json.loads(f2.read()) == json.loads(f.read())
-    os.system("rm -r ./data/temp")
+    os.system(f"rm -r {absolutepath}/data/temp")
 
 
 def test_store_environment_params(env_obj, loaded_env_obj):
     py_io.store_environment_params(
-        "./data/test_environment.$$&", env_obj, "manifest.json"
+        absolutepath + "/data/test_environment.$$&", env_obj, "manifest.json"
     )
     sowers = env_obj.sower_jobs
     expected_sower = loaded_env_obj.sower_jobs
@@ -372,17 +377,23 @@ def test_store_environment_params(env_obj, loaded_env_obj):
         expected_params["manifest.json"] == env_params["manifest.json"]
     ), f"Got: {env_params}"
     py_io.store_environment_params(
-        "./data/test_environment.$$&/manifests/hatchery/", env_obj, "hatchery.json"
+        absolutepath + "/data/test_environment.$$&/manifests/hatchery/",
+        env_obj,
+        "hatchery.json",
     )
     assert expected_params["hatchery.json"] == env_params["hatchery.json"]
 
 
 def test_read_manifest():
-    hash1, json1 = py_io.read_manifest("./data/test_environment.$$&/manifest.json")
-    hash2, json2 = py_io.read_manifest(
-        "./data/test_environment.$$&/manifests/hatchery/hatchery.json"
+    hash1, json1 = py_io.read_manifest(
+        absolutepath + "/data/test_environment.$$&/manifest.json"
     )
-    hash3, json3 = py_io.read_manifest("./data/test_environment.$$&/manifest.json")
+    hash2, json2 = py_io.read_manifest(
+        absolutepath + "/data/test_environment.$$&/manifests/hatchery/hatchery.json"
+    )
+    hash3, json3 = py_io.read_manifest(
+        absolutepath + "/data/test_environment.$$&/manifest.json"
+    )
     assert hash1.digest() != hash2.digest()
     assert json1 != json2
     assert hash1.digest() == hash3.digest()
@@ -426,29 +437,37 @@ def test_merge():
 
 
 def test_write_into_manifest():
-    os.system("cp ./data/test_manifest.json ./data/testing_manifest.json")
-    with open("./data/testing_manifest.json", "r") as f:
+    os.system(
+        f"cp {absolutepath}/data/test_manifest.json {absolutepath}/data/testing_manifest.json"
+    )
+    with open(absolutepath + "/data/testing_manifest.json", "r") as f:
         hash1 = hashlib.md5(f.read().encode("utf-8")).digest()
-    hash2 = py_io.write_into_manifest("./data/testing_manifest.json", {}).digest()
+    hash2 = py_io.write_into_manifest(
+        absolutepath + "/data/testing_manifest.json", {}
+    ).digest()
     assert hash1 != hash2
     os.system("rm ./data/testing_manifest.json")
 
 
 def test_merge_json_file_with_stored_environment_params(env_obj, loaded_env_obj):
-    os.system("cp ./data/test_manifest.json ./data/manifest.json")
+    os.system(
+        f"cp {absolutepath}/data/test_manifest.json {absolutepath}/data/manifest.json"
+    )
     env_params = env_obj.ENVIRONMENT_SPECIFIC_PARAMS["manifest.json"]
     print(env_params)
     py_io.merge_json_file_with_stored_environment_params(
-        "./data", "manifest.json", env_params, env_obj, loaded_env_obj
+        absolutepath + "/data", "manifest.json", env_params, env_obj, loaded_env_obj
     )
-    with open("./data/manifest.json") as f:
-        with open("./data/testmerge_manifest.json") as f2:
+    with open(absolutepath + "/data/manifest.json", "a") as f:
+        f.write("\n")  # because all files must be ended with newline
+    with open(absolutepath + "/data/manifest.json", "r+") as f:
+        with open(absolutepath + "/data/testmerge_manifest.json", "r") as f2:
             assert f2.read() == f.read()
     os.system("rm ./data/manifest.json")
 
 
 def test_remove_superfluous_sower_jobs(env_obj, loaded_env_obj):
-    with open("./data/test_manifest.json", "r") as f:
+    with open(absolutepath + "/data/test_manifest.json", "r") as f:
         data = json.loads(f.read())
     assert data["sower"] != []
     print(env_obj.sower_jobs)
@@ -461,11 +480,14 @@ def test_remove_superfluous_sower_jobs(env_obj, loaded_env_obj):
 def test_recursive_copy(env_obj):
     curr = os.curdir
     fullpath = os.path.abspath(curr)
-    os.system("mkdir ./data/temp")
-    temp_env = env.Env("./data/temp")
+    os.system(f"mkdir {absolutepath}/data/temp")
+    temp_env = env.Env(f"{absolutepath}/data/temp")
     files = py_io.recursive_copy(
         [], env_obj, temp_env, env_obj.full_path, temp_env.full_path
     )
     os.chdir(fullpath)
-    os.system("rm -r ./data/temp")
     assert len(files) == 9
+    assert are_dir_trees_equal(
+        absolutepath + "/data/temp", absolutepath + "/data/test_environment.$$&"
+    )
+    os.system(f"rm -r {absolutepath}/data/temp")

@@ -78,6 +78,7 @@ class Env:
         }
 
         path_to_env_folder = os.path.abspath(path_to_env_folder)
+
         if "/" == path_to_env_folder[-1]:
             path_to_env_folder = path_to_env_folder[:-1]
 
@@ -191,7 +192,7 @@ class Env:
             env_params[block] = json_block[block]
 
     def load_environment_params(self, file_name, json_data):
-        """Places environment specific values from target environment into  env object, 
+        """Places environment specific values from target environment into  env object,
     removes fields from object not found in target and returns the dictionary with fields"""
         logging.debug("storing info from: " + file_name)
         try:

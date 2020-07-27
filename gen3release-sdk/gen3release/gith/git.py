@@ -39,6 +39,7 @@ class Git:
         source_branch = "master"
         target_branch = branch_name
         sb = github_client.get_branch(source_branch)
+        print(sb)
         git_ref = github_client.create_git_ref(
             ref="refs/heads/" + target_branch, sha=sb.commit.sha
         )
@@ -104,13 +105,7 @@ class Git:
                 file_contents = github_client.get_contents(
                     "{}/".format(tgtEnv.name) + f, branch_name
                 )
-                github_client.update_file(
-                    "{}/".format(tgtEnv.name) + f,
-                    copy_commit,
-                    data,
-                    file_contents.sha,
-                    branch=branch_name,
-                )
+                error_occurred = False
             except UnknownObjectException as e:
                 logging.DEBUG(
                     "{} has occurred, likely because file not found in remote, creating file..".format(
@@ -119,6 +114,15 @@ class Git:
                 )
                 github_client.create_file(
                     "{}/".format(tgtEnv.name) + f, copy_commit, data, branch=branch_name
+                )
+                error_occurred = True
+            if not error_occurred:
+                github_client.update_file(
+                    "{}/".format(tgtEnv.name) + f,
+                    copy_commit,
+                    data,
+                    file_contents.sha,
+                    branch=branch_name,
                 )
 
         # finally, create Pull Request
