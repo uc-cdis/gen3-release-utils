@@ -1,7 +1,7 @@
 arborist
-gen3 - statics
+gen3-statics
 fence
-cdis - data - client
+cdis-data-client
 guppy
 hatchery
 indexd
@@ -9,15 +9,15 @@ manifestservice
 pelican
 peregrine
 pidgin
-data - portal
+data-portal
 sheepdog
 sower
-sower - jobs
+sower-jobs
 ssjdispatcher
 tube
-workspace - token - service
-gen3 - fuse
+workspace-token-service
+gen3-fuse
 indexs3client
-gen3 - spark
-metadata - service
-docker - nginx
+gen3-spark
+metadata-service
+docker-nginx
