@@ -114,6 +114,7 @@ def write_index_names(curr_dir, path, filename, env_obj):
         yaml.dump(data, fd)
     else:
         fd.write(json.dumps(data, indent=2))
+    fd.write("\n")  # add newline standard
     fd.truncate()
     fd.close()
 
@@ -171,6 +172,7 @@ def merge_json_file_with_stored_environment_params(
         merged_json = merge(env_params, json_data)
         f.seek(0)
         f.write(json.dumps(merged_json, indent=2))
+        f.write("\n")
         f.truncate()
 
 

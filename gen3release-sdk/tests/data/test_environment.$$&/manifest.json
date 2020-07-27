@@ -304,15 +304,15 @@
   "guppy": {
     "indices": [
       {
-        "index": "internalstaging_etl",
+        "index": "test_environment.$$&_subject",
         "type": "subject"
       },
       {
-        "index": "internalstaging_file",
+        "index": "test_environment.$$&_file",
         "type": "file"
       }
     ],
-    "config_index": "internalstaging_array-config",
+    "config_index": "test_environment.$$&_array-config",
     "auth_filter_field": "auth_resource_path"
   },
   "scaling": {

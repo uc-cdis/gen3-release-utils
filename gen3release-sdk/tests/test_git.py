@@ -3,6 +3,9 @@ import pytest
 from github.Repository import Repository
 from unittest.mock import Mock, patch, call
 from gen3release.config import env
+import os
+
+fullpath = os.path.abspath(".")
 
 
 @pytest.fixture()
@@ -17,13 +20,17 @@ def mock_repo():
 
 @pytest.fixture(scope="function")
 def env_obj():
-    return env.Env("./data/test_environment.$$&")
+    return env.Env(f"{fullpath}/data/test_environment.$$&")
 
 
-def test_get_github_client(ghub):
-    repo = ghub.get_github_client()
-    assert type(repo) == Repository
-    assert repo.git_url == "git://github.com/uc-cdis/cdis-manifest.git"
+@patch("gen3release.gith.git.Github")
+def test_get_github_client(mocked_gh, ghub):
+    ghub.get_github_client()
+    mocked_gh.assert_called_with("MEH-123")
+    mocked_gh.return_value.get_organization.assert_called_with("uc-cdis")
+    mocked_gh.return_value.get_organization.return_value.get_repo.assert_called_with(
+        "cdis-manifest"
+    )
 
 
 def test_cut_new_branch(ghub, mock_repo):
@@ -50,8 +57,8 @@ def test_create_pull_request_copy(ghub, env_obj, mock_repo):
         call("test_environment.$$&/manifest.json", "new_branch_name"),
     ]
     assert expected_args == mock_repo.get_contents.call_args_list
-    data1 = open("./data/test_environment.$$&/etlMapping.yaml", "rb")
-    data2 = open("./data/test_environment.$$&/manifest.json", "rb")
+    data1 = open(f"{fullpath}/data/test_environment.$$&/etlMapping.yaml", "rb")
+    data2 = open(f"{fullpath}/data/test_environment.$$&/manifest.json", "rb")
     expct_args = [
         call(
             "test_environment.$$&/etlMapping.yaml",

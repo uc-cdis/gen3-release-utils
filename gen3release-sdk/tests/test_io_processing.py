@@ -7,6 +7,7 @@ import hashlib
 import os
 import copy
 from tests.helpers import are_dir_trees_equal
+import hashlib
 
 absolutepath = os.path.abspath(".")
 
@@ -274,8 +275,7 @@ def etlMapping_data():
         data = yaml.load(f)
     return data
 
-
-def test_generate_safe_index_name():
+    # def test_generate_safe_index_name():
 
     ENV_IN = [
         r"s\ngen3.b/iodatac\\atalyst.nhlbi.nih\n.go\v\n",
@@ -348,19 +348,27 @@ def test_create_env_index_name(env_obj, manifest_data, etlMapping_data):
 
 
 def test_write_index_names(env_obj):
-    curr = os.curdir
-    fullpath = os.path.abspath(curr)
-    print(fullpath)
     os.system(f"mkdir {absolutepath}/data/temp")
-    os.system("ls data")
     os.system(
         f"cp {absolutepath}/data/test_manifest.json {absolutepath}/data/temp/manifest.json"
     )
-    py_io.write_index_names(fullpath, fullpath + "/data/temp", "manifest.json", env_obj)
-    os.chdir(fullpath)
+    py_io.write_index_names(
+        absolutepath + "/data", absolutepath + "/data/temp", "manifest.json", env_obj
+    )
+    os.chdir(absolutepath)
+    shahash1 = hashlib.sha1()
+    shahash2 = hashlib.sha1()
     with open(absolutepath + "/data/temp/manifest.json", "r") as f:
-        with open(absolutepath + "/data/testnaming_manifest.json") as f2:
-            assert json.loads(f2.read()) == json.loads(f.read())
+        for l in f:
+            shahash1.update(l.encode("utf-8"))
+    with open(absolutepath + "/data/testnaming_manifest.json", "r") as f2:
+        for l in f2:
+            shahash2.update(l.encode("utf-8"))
+
+    os.system(
+        f"diff {absolutepath}/data/temp/manifest.json {absolutepath}/data/testnaming_manifest.json"
+    )
+    assert shahash1.digest() == shahash2.digest()
     os.system(f"rm -r {absolutepath}/data/temp")
 
 
@@ -458,8 +466,7 @@ def test_merge_json_file_with_stored_environment_params(env_obj, loaded_env_obj)
     py_io.merge_json_file_with_stored_environment_params(
         absolutepath + "/data", "manifest.json", env_params, env_obj, loaded_env_obj
     )
-    with open(absolutepath + "/data/manifest.json", "a") as f:
-        f.write("\n")  # because all files must be ended with newline
+
     with open(absolutepath + "/data/manifest.json", "r+") as f:
         with open(absolutepath + "/data/testmerge_manifest.json", "r") as f2:
             assert f2.read() == f.read()
