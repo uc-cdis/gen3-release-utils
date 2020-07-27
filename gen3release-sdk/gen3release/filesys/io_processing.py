@@ -265,11 +265,3 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
             )
         )
         traceback.print_exc()
-
-
-# curr = os.curdir
-# absolutepath = os.path.abspath(".")
-# os.system(f"mkdir {absolutepath}/../tests/data/temp")
-# temp_env = Env(f"{absolutepath}/../tests/data/temp")
-# env_obj = Env(absolutepath + "/../tests/data/test_environment.$$&")
-# recursive_copy([], env_obj, temp_env, env_obj.full_path, temp_env.full_path)

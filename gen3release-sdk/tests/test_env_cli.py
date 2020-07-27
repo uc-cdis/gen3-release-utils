@@ -87,6 +87,5 @@ def test_copy_all_files():
         "manifests/fence/fence-config-public.yaml",
         "manifests/hatchery/hatchery.json",
     ]
-    # a bogus update
     assert sorted(files) == sorted(expected_files)
     os.system(f"rm -r {fullpath_wd}/data/temp")

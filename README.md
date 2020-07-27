@@ -36,10 +36,5 @@ This utility is used to create integration and stable branches in multiple repos
 
 - How to use it:
     - Update `repo_list.txt` with the repositories where branches need to be created
-<<<<<<< HEAD
     - Execute the script as follows:
     ```./make_branch.sh <sourceBranchName> <targetBranchName```
-=======
-    - Execute the script as follows:
-    ```./make_branch.sh <sourceBranchName> <targetBranchName```
->>>>>>> 227ae9f1a94eb8af511f7601e293dcc14e4eda8e
