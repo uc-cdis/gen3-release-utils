@@ -36,10 +36,6 @@ def test_cut_new_branch(ghub, mock_repo):
 
 
 def test_create_pull_request_copy(ghub, env_obj, mock_repo):
-    mock_repo.get_contents = Mock()
-    mock_repo.update_file = Mock()
-    mock_repo.create_file = Mock()
-    mock_repo.create_pull = Mock()
     ghub.create_pull_request_copy(
         mock_repo,
         env_obj,
