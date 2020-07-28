@@ -13,13 +13,11 @@ def are_dir_trees_equal(dir1, dir2):
         or len(dirs_cmp.right_only) > 0
         or len(dirs_cmp.funny_files) > 0
     ):
-        print("Mismatch in dir tree")
         return False
     (_, mismatch, errors) = filecmp.cmpfiles(
         dir1, dir2, dirs_cmp.common_files, shallow=False
     )
     if len(mismatch) > 0 or len(errors) > 0:
-        print("mismatch in files or error occured")
         return False
     for common_dir in dirs_cmp.common_dirs:
         new_dir1 = os.path.join(dir1, common_dir)

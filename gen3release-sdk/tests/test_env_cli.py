@@ -11,7 +11,14 @@ from unittest.mock import Mock, patch, call
 from github.Repository import Repository
 from tests.helpers import are_dir_trees_equal
 
-fullpath_wd = os.path.abspath(".")
+ABS_PATH = os.path.abspath(".")
+
+
+@pytest.fixture()
+def setUptearDown():
+    os.system(f"mkdir {ABS_PATH}/data/temp")
+    yield
+    os.system(f"rm -r {ABS_PATH}/data/temp")
 
 
 def test_make_parser():
@@ -39,12 +46,11 @@ def test_make_parser():
 @patch("gen3release.env_cli.time")
 @patch("gen3release.env_cli.copy_all_files")
 @patch("gen3release.env_cli.Env")
-def test_copy(mocked_env, copyfiles, mockedtime, mockedGh):
+def test_copy(mocked_env, copyfiles, mockedtime, mockedGh, setUptearDown):
 
-    os.system(f"mkdir {fullpath_wd}/data/temp")
     args_pr = Namespace(
-        source=fullpath_wd + "/data/test_environment.$$&",
-        env=fullpath_wd + "/data/temp",
+        source=ABS_PATH + "/data/test_environment.$$&",
+        env=ABS_PATH + "/data/temp",
         pr_title="A pr title",
     )
     copyfiles.return_value = ["file_1", "file_2"]
@@ -64,15 +70,13 @@ def test_copy(mocked_env, copyfiles, mockedtime, mockedGh):
         "copying files from env to env",
         "chore/promote_env_10",
     )
-    os.system(f"rm -r {fullpath_wd}/data/temp")
 
 
-def test_copy_all_files():
+def test_copy_all_files(setUptearDown):
     with pytest.raises(NameError):
         s = Env("./fakepath")
         t = Env("./fakepath")
         env_cli.copy_all_files(s, t)
-    os.system(f"mkdir {fullpath_wd}/data/temp")
     src = Env("./data/test_environment.$$&")
     tgt = Env("./data/temp")
     files = env_cli.copy_all_files(src, tgt)
@@ -88,4 +92,3 @@ def test_copy_all_files():
         "manifests/hatchery/hatchery.json",
     ]
     assert sorted(files) == sorted(expected_files)
-    os.system(f"rm -r {fullpath_wd}/data/temp")

@@ -6,7 +6,7 @@ sys.path.append(
     "/Users/matthewclark/Documents/ctds/gen3repos/gen3-release-utils/gen3release-sdk/gen3release"
 )
 
-from config.env import Env
+from gen3release.config.env import Env
 from shutil import copytree, Error
 import logging
 import json

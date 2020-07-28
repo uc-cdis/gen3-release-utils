@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch, call
 from gen3release.config import env
 import os
 
-fullpath = os.path.abspath(".")
+ABS_PATH = os.path.abspath(".")
 
 
 @pytest.fixture()
@@ -20,7 +20,7 @@ def mock_repo():
 
 @pytest.fixture(scope="function")
 def env_obj():
-    return env.Env(f"{fullpath}/data/test_environment.$$&")
+    return env.Env(f"{ABS_PATH}/data/test_environment.$$&")
 
 
 @patch("gen3release.gith.git.Github")
@@ -57,8 +57,8 @@ def test_create_pull_request_copy(ghub, env_obj, mock_repo):
         call("test_environment.$$&/manifest.json", "new_branch_name"),
     ]
     assert expected_args == mock_repo.get_contents.call_args_list
-    data1 = open(f"{fullpath}/data/test_environment.$$&/etlMapping.yaml", "rb")
-    data2 = open(f"{fullpath}/data/test_environment.$$&/manifest.json", "rb")
+    data1 = open(f"{ABS_PATH}/data/test_environment.$$&/etlMapping.yaml", "rb")
+    data2 = open(f"{ABS_PATH}/data/test_environment.$$&/manifest.json", "rb")
     expct_args = [
         call(
             "test_environment.$$&/etlMapping.yaml",
