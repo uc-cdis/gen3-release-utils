@@ -1,31 +1,33 @@
-from gen3release.config import env
 import pytest
 import json
 import os
 
-
-@pytest.fixture(scope="function")
-def env_obj():
-    return env.Env("./data/test_environment.$$&")
+from gen3release.config import env
+from tests.conftest import target_env
 
 
 @pytest.fixture()
 def manifest_data():
     data = None
-    with open("./data/test_manifest.json", "r") as f:
+    with open("./data/fake_source_env/manifest.json", "r") as f:
         data = json.loads(f.read())
     return data
 
 
 def test___init___():
-
-    envobj = env.Env("./data/test_environment.$$&")
-    assert envobj.name == "test_environment.$$&"
+    """
+    Test that the constructor correctly assigns member variables
+    """
+    envobj = env.Env("./data/fake_target_env")
+    assert envobj.name == "fake_target_env"
     assert envobj.repo_dir == "data"
-    assert envobj.full_path == os.path.abspath("./data/test_environment.$$&")
+    assert envobj.full_path == os.path.abspath("./data/fake_target_env")
 
 
-def test_load_environment_params(env_obj):
+def test_load_environment_params(target_env):
+    """
+    Test that environment specifc params are correctly loaded into ENVIRONMENT_SPECIFIC PARMS
+    """
     json_data = {
         "notes": ["These values should be loaded into env"],
         "global": {
@@ -44,15 +46,18 @@ def test_load_environment_params(env_obj):
             },  # KUBE_NAMESPACE
         },
     }
-    env_params = env_obj.ENVIRONMENT_SPECIFIC_PARAMS
-    env_obj.load_environment_params("manifest.json", json_data)
+    env_params = target_env.environment_specific_params
+    target_env.load_environment_params("manifest.json", json_data)
     assert json_data.get("notes") == env_params["manifest.json"].get("notes")
     assert json_data.get("global") == env_params["manifest.json"].get("global")
     assert json_data.get("hatchery") == env_params["manifest.json"].get("hatchery")
     assert not env_params["manifest.json"].get("scaling")
 
 
-def test_load_sower_jobs(env_obj):
+def test_load_sower_jobs(target_env):
+    """
+    Test that sower jobs are correctly loaded into sower_jobs member variable
+    """
     json_data = {
         "sower": [
             {
@@ -111,83 +116,16 @@ def test_load_sower_jobs(env_obj):
                     },
                 ],
                 "restart_policy": "Never",
-            },
-            {
-                "name": "ingest-metadata-manifest",
-                "action": "ingest-metadata-manifest",
-                "activeDeadlineSeconds": 86400,
-                "serviceAccountName": "jobs-preprod-gen3-biodatacatalyst-nhlbi-nih-gov",
-                "container": {
-                    "name": "job-task",
-                    "image": "quay.io/cdis/metadata-manifest-ingestion:1.1.6",
-                    "pull_policy": "Always",
-                    "env": [
-                        {
-                            "name": "GEN3_HOSTNAME",
-                            "valueFrom": {
-                                "configMapKeyRef": {
-                                    "name": "manifest-global",
-                                    "key": "hostname",
-                                }
-                            },
-                        }
-                    ],
-                    "volumeMounts": [
-                        {
-                            "name": "creds-volume",
-                            "readOnly": True,
-                            "mountPath": "/creds.json",
-                            "subPath": "creds.json",
-                        }
-                    ],
-                    "cpu-limit": "1",
-                    "memory-limit": "1Gi",
-                },
-                "volumes": [
-                    {
-                        "name": "creds-volume",
-                        "secret": {"secretName": "sower-jobs-g3auto"},
-                    }
-                ],
-                "restart_policy": "Never",
-            },
-            {
-                "name": "get-dbgap-metadata",
-                "action": "get-dbgap-metadata",
-                "serviceAccountName": "jobs-preprod-gen3-biodatacatalyst-nhlbi-nih-gov",
-                "container": {
-                    "name": "job-task",
-                    "image": "quay.io/cdis/get-dbgap-metadata:1.1.6",
-                    "pull_policy": "Always",
-                    "env": [],
-                    "volumeMounts": [
-                        {
-                            "name": "creds-volume",
-                            "readOnly": True,
-                            "mountPath": "/creds.json",
-                            "subPath": "creds.json",
-                        }
-                    ],
-                    "cpu-limit": "1",
-                    "memory-limit": "1Gi",
-                },
-                "volumes": [
-                    {
-                        "name": "creds-volume",
-                        "secret": {"secretName": "sower-jobs-g3auto"},
-                    }
-                ],
-                "restart_policy": "Never",
-            },
+            }
         ]
     }
-    env_obj.load_sower_jobs(json_data)
+    target_env.load_sower_jobs(json_data)
     sowersgot = json_data.get("sower_jobs")
     print(f"sowers got : {sowersgot}")
-    assert env_obj.sower_jobs == json_data.get("sower")
+    assert target_env.sower_jobs == json_data.get("sower")
 
 
-def test_save_blocks(env_obj):
+def test_save_blocks(target_env):
     data = {
         "scaling": {
             "arborist": {"strategy": "strat1", "min": 10, "max": 10, "targetCpu": 10},
@@ -203,7 +141,7 @@ def test_save_blocks(env_obj):
         },
     }
 
-    mockenv_params = env_obj.ENVIRONMENT_SPECIFIC_PARAMS["manifest.json"]
+    mockenv_params = target_env.environment_specific_params["manifest.json"]
 
-    env_obj.save_blocks("scaling", mockenv_params, data)
+    target_env.save_blocks("scaling", mockenv_params, data)
     assert mockenv_params["scaling"] == data["scaling"]

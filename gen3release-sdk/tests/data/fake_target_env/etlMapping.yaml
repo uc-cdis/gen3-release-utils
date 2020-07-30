@@ -1,0 +1,32 @@
+mappings:
+  - name: fake_target_env_etl
+    doc_type: subject
+    type: aggregator
+    root: subject
+    props:
+      - name: submitter_id
+      - name: project_id
+      - name: consent_codes
+    aggregated_props:
+      - name: annotated_sex
+        path: demographics
+        src: annotated_sex
+        fn: set
+      - name: race
+  - name: fake_target_env_file
+    doc_type: file
+    type: collector
+    root: None
+    category: data_file
+    props:
+      - name: object_id
+      - name: md5sum
+      - name: file_name
+      - name: data_format
+      - name: state
+    injecting_props:
+      subject:
+        props:
+          - name: subject_id
+            src: id
+          - name: project_id

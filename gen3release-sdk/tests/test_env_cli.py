@@ -1,27 +1,24 @@
-from gen3release import env_cli
-from gen3release.config.env import Env
-from gen3release.env_cli import Gh
-
 import pytest
 import json
 import os
 import argparse
 from argparse import Namespace
 from unittest.mock import Mock, patch, call
+
 from github.Repository import Repository
+
+from gen3release import env_cli
+from gen3release.config.env import Env
 from tests.helpers import are_dir_trees_equal
+from tests.conftest import setUp_tearDown
 
 ABS_PATH = os.path.abspath(".")
 
 
-@pytest.fixture()
-def setUptearDown():
-    os.system(f"mkdir {ABS_PATH}/data/temp")
-    yield
-    os.system(f"rm -r {ABS_PATH}/data/temp")
-
-
 def test_make_parser():
+    """
+    Test that arguments are parsed into correct variables
+    """
     parser = env_cli.make_parser()
     args = parser.parse_args(
         [
@@ -46,23 +43,25 @@ def test_make_parser():
 @patch("gen3release.env_cli.time")
 @patch("gen3release.env_cli.copy_all_files")
 @patch("gen3release.env_cli.Env")
-def test_copy(mocked_env, copyfiles, mockedtime, mockedGh, setUptearDown):
-
+def test_copy(mocked_env, copy_files, mocked_time, mocked_Gh, setUp_tearDown):
+    """
+    Test that pygithub methods are feed with correct arguments
+    """
     args_pr = Namespace(
-        source=ABS_PATH + "/data/test_environment.$$&",
-        env=ABS_PATH + "/data/temp",
+        source=ABS_PATH + "/data/fake_source_env",
+        env=ABS_PATH + "/data/temp_target_env",
         pr_title="A pr title",
     )
-    copyfiles.return_value = ["file_1", "file_2"]
-    mockedtime.time.return_value = "10.0"
+    copy_files.return_value = ["file_1", "file_2"]
+    mocked_time.time.return_value = "10.0"
     mocked_env.return_value.repo_dir = "./data"
     mocked_env.return_value.name = "env"
     env_cli.copy(args_pr)
     assert mocked_env.call_args_list == [call(args_pr.source), call(args_pr.env)]
-    mockedGh.assert_called_with(repo="data")
-    mockedGh.return_value.cut_new_branch.assert_called_once()
-    mockedGh.return_value.create_pull_request_copy.assert_called_with(
-        mockedGh.return_value.get_github_client.return_value,
+    mocked_Gh.assert_called_with(repo="data")
+    mocked_Gh.return_value.cut_new_branch.assert_called_once()
+    mocked_Gh.return_value.create_pull_request_copy.assert_called_with(
+        mocked_Gh.return_value.get_github_client.return_value,
         mocked_env(),
         mocked_env(),
         ["file_1", "file_2"],
@@ -72,13 +71,15 @@ def test_copy(mocked_env, copyfiles, mockedtime, mockedGh, setUptearDown):
     )
 
 
-def test_copy_all_files(setUptearDown):
+def test_copy_all_files(setUp_tearDown):
+
     with pytest.raises(NameError):
         s = Env("./fakepath")
         t = Env("./fakepath")
         env_cli.copy_all_files(s, t)
-    src = Env("./data/test_environment.$$&")
-    tgt = Env("./data/temp")
+
+    src = Env(ABS_PATH + "/data/fake_source_env")
+    tgt = Env(ABS_PATH + "/data/temp_target_env")
     files = env_cli.copy_all_files(src, tgt)
     expected_files = [
         "portal/gitops-sponsors/nhlbi.png",

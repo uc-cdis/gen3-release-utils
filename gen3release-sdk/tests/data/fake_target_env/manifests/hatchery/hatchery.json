@@ -1,5 +1,5 @@
 {
-  "user-namespace": "jupyter-pods-internalstaging",
+  "user-namespace": "jupyter-pods-fake_target_env",
   "sub-dir": "/lw-workspace",
   "user-volume-size": "500Gi",
   "sidecar": {
@@ -7,8 +7,8 @@
     "memory-limit": "256Mi",
     "image": "quay.io/cdis/gen3fuse-sidecar:0.1.5",
     "env": {
-      "NAMESPACE": "internalstaging",
-      "HOSTNAME": "internalstaging.datastage.io"
+      "NAMESPACE": "fake_target_env",
+      "HOSTNAME": "fake_target_env.datastage.io"
     },
     "args": [],
     "command": [
@@ -97,32 +97,6 @@
       "target-port": 8888,
       "cpu-limit": "1.0",
       "memory-limit": "8096Mi",
-      "name": "Helium Autoencoder Demo",
-      "image": "quay.io/cdis/auntoencoder-copd-demo:latest",
-      "env": {},
-      "args": [
-        "--NotebookApp.base_url=/lw-workspace/proxy/",
-        "--NotebookApp.password=''",
-        "--NotebookApp.token=''"
-      ],
-      "command": [
-        "start-notebook.sh"
-      ],
-      "path-rewrite": "/lw-workspace/proxy/",
-      "use-tls": "false",
-      "ready-probe": "/lw-workspace/proxy/",
-      "lifecycle-post-start": [
-        "/bin/sh",
-        "-c",
-        "export IAM=`whoami`; rm -rf /home/$IAM/pd/dockerHome; ln -s $(pwd) /home/$IAM/pd/dockerHome; mkdir -p /home/$IAM/.jupyter/custom; echo \"define(['base/js/namespace'], function(Jupyter){Jupyter._target = '_self';})\" >/home/$IAM/.jupyter/custom/custom.js; ln -s /data /home/$IAM/pd/; true"
-      ],
-      "user-uid": 1000,
-      "fs-gid": 100
-    },
-    {
-      "target-port": 8888,
-      "cpu-limit": "1.0",
-      "memory-limit": "8096Mi",
       "name": "Helium Tensorflow-Pytorch",
       "image": "heliumdatastage/tensorflow-pytorch-ext:1",
       "env": {},
@@ -144,32 +118,7 @@
       ],
       "user-uid": 1000,
       "fs-gid": 100
-    },
-    {
-      "target-port": 8888,
-      "cpu-limit": "1.0",
-      "memory-limit": "8096Mi",
-      "name": "Helium CIP Demo",
-      "image": "heliumdatastage/jup-cip:v1",
-      "env": {},
-      "args": [
-        "--NotebookApp.base_url=/lw-workspace/proxy/",
-        "--NotebookApp.password=''",
-        "--NotebookApp.token=''"
-      ],
-      "command": [
-        "start-notebook.sh"
-      ],
-      "path-rewrite": "/lw-workspace/proxy/",
-      "use-tls": "false",
-      "ready-probe": "/lw-workspace/proxy/",
-      "lifecycle-post-start": [
-        "/bin/sh",
-        "-c",
-        "export IAM=`whoami`; rm -rf /home/$IAM/pd/dockerHome; ln -s $(pwd) /home/$IAM/pd/dockerHome; mkdir -p /home/$IAM/.jupyter/custom; echo \"define(['base/js/namespace'], function(Jupyter){Jupyter._target = '_self';})\" >/home/$IAM/.jupyter/custom/custom.js; ln -s /data /home/$IAM/pd/; true"
-      ],
-      "user-uid": 1000,
-      "fs-gid": 100
     }
+
   ]
 }

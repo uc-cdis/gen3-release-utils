@@ -1,32 +1,23 @@
-from gen3release.filesys import io_processing as py_io
 import pytest
-from gen3release.config import env
 import json
-from ruamel.yaml import YAML
 import hashlib
 import os
 import copy
+
+from ruamel.yaml import YAML
+
+from gen3release.config import env
+from gen3release.filesys import io_processing as py_io
 from tests.helpers import are_dir_trees_equal
-import hashlib
+from tests.conftest import setUp_tearDown, target_env, target_env
 
 ABS_PATH = os.path.abspath(".")
 
 
 @pytest.fixture()
-def setUptearDown():
-    os.system(f"mkdir {ABS_PATH}/data/temp")
-    yield
-    os.system(f"rm -r {ABS_PATH}/data/temp")
+def loaded_target_env():
 
-
-@pytest.fixture()
-def env_obj():
-    return env.Env(ABS_PATH + "/data/test_environment.$$&")
-
-
-@pytest.fixture()
-def loaded_env_obj():
-    obj = env.Env(ABS_PATH + "/data/test_environment.$$&")
+    obj = env.Env(ABS_PATH + "/data/fake_target_env")
     obj.sower_jobs = [
         {
             "name": "pelican-export",
@@ -89,10 +80,10 @@ def loaded_env_obj():
             "name": "ingest-metadata-manifest",
             "action": "ingest-metadata-manifest",
             "activeDeadlineSeconds": 86400,
-            "serviceAccountName": "jobs-preprod-gen3-biodatacatalyst-nhlbi-nih-gov",
+            "serviceAccountName": "jobs-fake_target_env",
             "container": {
                 "name": "job-task",
-                "image": "quay.io/cdis/metadata-manifest-ingestion:1.1.6",
+                "image": "quay.io/cdis/metadata-manifest-ingestion:2.1.6",
                 "pull_policy": "Always",
                 "env": [
                     {
@@ -124,7 +115,7 @@ def loaded_env_obj():
         {
             "name": "get-dbgap-metadata",
             "action": "get-dbgap-metadata",
-            "serviceAccountName": "jobs-preprod-gen3-biodatacatalyst-nhlbi-nih-gov",
+            "serviceAccountName": "jobs-fake_target_env",
             "container": {
                 "name": "job-task",
                 "image": "quay.io/cdis/get-dbgap-metadata:1.1.6",
@@ -146,98 +137,20 @@ def loaded_env_obj():
             ],
             "restart_policy": "Never",
         },
-        {
-            "name": "manifest-indexing",
-            "action": "index-object-manifest",
-            "activeDeadlineSeconds": 86400,
-            "serviceAccountName": "jobs-preprod-gen3-biodatacatalyst-nhlbi-nih-gov",
-            "container": {
-                "name": "job-task",
-                "image": "quay.io/cdis/manifest-indexing:1.1.6",
-                "pull_policy": "Always",
-                "env": [
-                    {
-                        "name": "GEN3_HOSTNAME",
-                        "valueFrom": {
-                            "configMapKeyRef": {
-                                "name": "manifest-global",
-                                "key": "hostname",
-                            }
-                        },
-                    }
-                ],
-                "volumeMounts": [
-                    {
-                        "name": "sower-jobs-creds-volume",
-                        "readOnly": True,
-                        "mountPath": "/creds.json",
-                        "subPath": "creds.json",
-                    }
-                ],
-                "cpu-limit": "1",
-                "memory-limit": "1Gi",
-            },
-            "volumes": [
-                {
-                    "name": "sower-jobs-creds-volume",
-                    "secret": {"secretName": "sower-jobs-g3auto"},
-                }
-            ],
-            "restart_policy": "Never",
-        },
-        {
-            "name": "indexd-manifest",
-            "action": "download-indexd-manifest",
-            "activeDeadlineSeconds": 86400,
-            "serviceAccountName": "jobs-preprod-gen3-biodatacatalyst-nhlbi-nih-gov",
-            "container": {
-                "name": "job-task",
-                "image": "quay.io/cdis/download-indexd-manifest:1.1.6",
-                "pull_policy": "Always",
-                "env": [
-                    {
-                        "name": "GEN3_HOSTNAME",
-                        "valueFrom": {
-                            "configMapKeyRef": {
-                                "name": "manifest-global",
-                                "key": "hostname",
-                            }
-                        },
-                    }
-                ],
-                "volumeMounts": [
-                    {
-                        "name": "sower-jobs-creds-volume",
-                        "readOnly": True,
-                        "mountPath": "/creds.json",
-                        "subPath": "creds.json",
-                    }
-                ],
-                "cpu-limit": "1",
-                "memory-limit": "1Gi",
-            },
-            "volumes": [
-                {
-                    "name": "sower-jobs-creds-volume",
-                    "secret": {"secretName": "sower-jobs-g3auto"},
-                }
-            ],
-            "restart_policy": "Never",
-        },
     ]
-    obj.ENVIRONMENT_SPECIFIC_PARAMS = {
+    obj.environment_specific_params = {
         "manifest.json": {
             "notes": [
-                "This is the internalstaging environment manifest",
+                "This is a fake target environment manifest",
                 "That's all I have to say",
             ],
             "global": {
                 "environment": "stageprod",  # VPC
-                "hostname": "test_environment.$$&",
+                "hostname": "fake_target_env",
                 "revproxy_arn": "arn:aws:acm:us-east-1:895962626746:certificate/a82bb5ed-9ad1-444d-9bfd-5bc314541307",
                 "kube_bucket": "kube-stageprod-gen3",
                 "logs_bucket": "logs-stageprod-gen3",
-                "sync_from_dbgap": "True",
+                "sync_from_dbgap": "true",
                 "useryaml_s3path": "s3://cdis-gen3-users/stageprod/user.yaml",
             },
             "scaling": {
@@ -254,11 +167,11 @@ def loaded_env_obj():
             },
         },
         "hatchery.json": {
-            "user-namespace": "jupyter-pods-internalstaging",
+            "user-namespace": "jupyter-pods-fake_target_env",
             "sidecar": {
                 "env": {
-                    "NAMESPACE": "internalstaging",
-                    "HOSTNAME": "internalstaging.datastage.io",
+                    "NAMESPACE": "fake_target_env",
+                    "HOSTNAME": "fake_target_env.datastage.io",
                 }
             },
         },
@@ -269,7 +182,7 @@ def loaded_env_obj():
 @pytest.fixture()
 def manifest_data():
     data = None
-    with open(ABS_PATH + "/data/test_manifest.json", "r") as f:
+    with open(ABS_PATH + "/data/fake_target_env/manifest.json", "r") as f:
         data = json.loads(f.read())
     return data
 
@@ -277,22 +190,30 @@ def manifest_data():
 @pytest.fixture()
 def etlMapping_data():
     data = None
-    with open(ABS_PATH + "/data/test_etlMapping.yaml") as f:
+    with open(ABS_PATH + "/data/fake_target_env/etlMapping.yaml") as f:
         yaml = YAML(typ="safe")
         data = yaml.load(f)
     return data
 
-    # def test_generate_safe_index_name():
 
+def test_generate_safe_index_name():
+    """
+    Test that created names are valid index names
+    """
     ENV_IN = [
-        r"s\ngen3.b/iodatac\\atalyst.nhlbi.nih\n.go\v\n",
+        # test bad chars
+        r"s\ngen\"3.b/iodatac\\atalyst. |n:<>hlbi.nih\n.go\v\n",
+        # test bad chars in start
         r"\\gen\3.bi\foda\btac\atalyst.nhlbinih.gov",
+        # test bad start chars
         r"--gen3.\/[bi/odatacatalyst].nhlbi.nih.gov",
-        r"+\agen3.biodatacatalyst.nhlbi.nih.gov",
+        # test bad start chars and capital letters
+        r"+\agen3.BIOdatacatalyst.nhlbi.nih.gov",
+        # test 255 byte limit
         r"this_is_number_____________________________________________________________________________________________________________________________________________________________________________________________________________________________0123456789101112",
     ]
     ENV_OUT = [
-        r"s_ngen3.b_iodatac__atalyst.nhlbi.nih_n.go_v_n_testtype",
+        r"s_ngen__3.b_iodatac__atalyst.__n___hlbi.nih_n.go_v_n_testtype",
         r"gen_3.bi_foda_btac_atalyst.nhlbinih.gov_testtype",
         r"gen3.__[bi_odatacatalyst].nhlbi.nih.gov_testtype",
         r"agen3.biodatacatalyst.nhlbi.nih.gov_testtype",
@@ -303,110 +224,123 @@ def etlMapping_data():
         output = py_io.generate_safe_index_name(inp, "testtype")
         print(f"output {output}")
         assert output == oup
+
+    # Must have an environment name
     with pytest.raises(NameError):
         py_io.generate_safe_index_name("", "testtype")
 
 
-def test_process_index_names(env_obj, manifest_data, etlMapping_data):
-    param_guppy = env_obj.PARAMS_TO_SET["manifest.json"].get("guppy")
+def test_process_index_names(target_env, manifest_data, etlMapping_data):
+    """
+    Test that created names are correctly assigned to fields
+    """
+    # test names in manifest
+    param_guppy = target_env.params_to_set["manifest.json"].get("guppy")
     file_guppy = manifest_data.get("guppy")
     py_io.process_index_names(
-        env_obj.name, param_guppy, file_guppy, "indices", "type", "index"
+        target_env.name, param_guppy, file_guppy, "indices", "type", "index"
     )
     expected_guppy = {
         "indices": [
-            {"index": "test_environment.$$&_subject", "type": "subject"},
-            {"index": "test_environment.$$&_file", "type": "file"},
+            {"index": "fake_target_env_subject", "type": "subject"},
+            {"index": "fake_target_env_file", "type": "file"},
         ],
-        "config_index": "internalstaging_array-config",
+        "config_index": "fake_target_env_array-config",
         "auth_filter_field": "auth_resource_path",
     }
     assert file_guppy == expected_guppy
+
+    # test names in etlMapping
     py_io.process_index_names(
-        env_obj.name,
-        env_obj.PARAMS_TO_SET["etlMapping.yaml"],
+        target_env.name,
+        target_env.params_to_set["etlMapping.yaml"],
         etlMapping_data,
         "mappings",
         "doc_type",
         "name",
     )
-    expected_yaml_names = ["test_environment.$$&_subject", "test_environment.$$&_file"]
+    expected_yaml_names = ["fake_target_env_subject", "fake_target_env_file"]
     names = [d["name"] for d in etlMapping_data.get("mappings")]
     assert expected_yaml_names == names
 
 
-def test_create_env_index_name(env_obj, manifest_data, etlMapping_data):
-    mani_data = py_io.create_env_index_name(env_obj, "manifest.json", manifest_data)
+def test_create_env_index_name(target_env, manifest_data, etlMapping_data):
+    """
+    Test that created names have the form <commonsname_type>
+    """
+    mani_data = py_io.create_env_index_name(target_env, "manifest.json", manifest_data)
     guppy = manifest_data.get("guppy")
     expected_guppy = {
         "indices": [
-            {"index": "test_environment.$$&_subject", "type": "subject"},
-            {"index": "test_environment.$$&_file", "type": "file"},
+            {"index": "fake_target_env_subject", "type": "subject"},
+            {"index": "fake_target_env_file", "type": "file"},
         ],
-        "config_index": "test_environment.$$&_array-config",
+        "config_index": "fake_target_env_array-config",
         "auth_filter_field": "auth_resource_path",
     }
     assert guppy == expected_guppy
 
-    yam_names = py_io.create_env_index_name(env_obj, "etlMapping.yaml", etlMapping_data)
-    expected_yaml_names = ["test_environment.$$&_subject", "test_environment.$$&_file"]
+    yam_names = py_io.create_env_index_name(
+        target_env, "etlMapping.yaml", etlMapping_data
+    )
+    expected_yaml_names = ["fake_target_env_subject", "fake_target_env_file"]
     names = [d["name"] for d in etlMapping_data.get("mappings")]
     assert expected_yaml_names == names
 
 
-def test_write_index_names(env_obj, setUptearDown):
+def test_write_index_names(target_env, setUp_tearDown):
+    """
+    Test that the files are updated with modified names
+    """
     os.system(
-        f"cp {ABS_PATH}/data/test_manifest.json {ABS_PATH}/data/temp/manifest.json"
+        f"cp {ABS_PATH}/data/fake_target_env/manifest.json {ABS_PATH}/data/temp_target_env/manifest.json"
     )
     py_io.write_index_names(
-        ABS_PATH + "/data", ABS_PATH + "/data/temp", "manifest.json", env_obj
+        ABS_PATH + "/data",
+        ABS_PATH + "/data/temp_target_env",
+        "manifest.json",
+        target_env,
     )
     os.chdir(ABS_PATH)
-    shahash1 = hashlib.sha1()
-    shahash2 = hashlib.sha1()
-    with open(ABS_PATH + "/data/temp/manifest.json", "r") as f:
-        for l in f:
-            shahash1.update(l.encode("utf-8"))
-    with open(ABS_PATH + "/data/testnaming_manifest.json", "r") as f2:
-        for l in f2:
-            shahash2.update(l.encode("utf-8"))
-
-    os.system(
-        f"diff {ABS_PATH}/data/temp/manifest.json {ABS_PATH}/data/testnaming_manifest.json"
-    )
-    assert shahash1.digest() == shahash2.digest()
+    with open(ABS_PATH + "/data/temp_target_env/manifest.json", "r") as f:
+        with open(
+            ABS_PATH + "/data/test_references/testnaming_manifest.json", "r"
+        ) as f2:
+            assert json.loads(f.read()) == json.loads(f2.read())
 
 
-def test_store_environment_params(env_obj, loaded_env_obj):
+def test_store_environment_params(target_env, loaded_target_env):
+    """
+    Test that environment params are loaded into environment object
+    """
     py_io.store_environment_params(
-        ABS_PATH + "/data/test_environment.$$&", env_obj, "manifest.json"
+        ABS_PATH + "/data/fake_target_env", target_env, "manifest.json"
     )
-    sowers = env_obj.sower_jobs
-    expected_sower = loaded_env_obj.sower_jobs
+    sowers = target_env.sower_jobs
+    expected_sower = loaded_target_env.sower_jobs
     assert expected_sower == sowers
-    env_params = env_obj.ENVIRONMENT_SPECIFIC_PARAMS
-    expected_params = loaded_env_obj.ENVIRONMENT_SPECIFIC_PARAMS
+    env_params = target_env.environment_specific_params
+    expected_params = loaded_target_env.environment_specific_params
     assert (
         expected_params["manifest.json"] == env_params["manifest.json"]
     ), f"Got: {env_params}"
     py_io.store_environment_params(
-        ABS_PATH + "/data/test_environment.$$&/manifests/hatchery/",
-        env_obj,
+        ABS_PATH + "/data/fake_target_env/manifests/hatchery/",
+        target_env,
         "hatchery.json",
     )
     assert expected_params["hatchery.json"] == env_params["hatchery.json"]
 
 
 def test_read_manifest():
-    hash1, json1 = py_io.read_manifest(
-        ABS_PATH + "/data/test_environment.$$&/manifest.json"
-    )
+    """
+    Test that different files have different hashes and same files have same hashes
+    """
+    hash1, json1 = py_io.read_manifest(ABS_PATH + "/data/fake_target_env/manifest.json")
     hash2, json2 = py_io.read_manifest(
-        ABS_PATH + "/data/test_environment.$$&/manifests/hatchery/hatchery.json"
+        ABS_PATH + "/data/fake_target_env/manifests/hatchery/hatchery.json"
     )
-    hash3, json3 = py_io.read_manifest(
-        ABS_PATH + "/data/test_environment.$$&/manifest.json"
-    )
+    hash3, json3 = py_io.read_manifest(ABS_PATH + "/data/fake_target_env/manifest.json")
     assert hash1.digest() != hash2.digest()
     assert json1 != json2
     assert hash1.digest() == hash3.digest()
@@ -414,14 +348,17 @@ def test_read_manifest():
 
 
 def test_merge():
-    dict1 = {
+    """
+    Test that source dictionary is merged into target dictionary
+    """
+    src_dict_example = {
         "scaling": {
             "arborist": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
             "presigned-url-fence": {"strategy": "", "max": 0, "targetCpu": 0,},
         }
     }
-    dict2 = {
+    tgt_dict_example = {
         "scaling": {
             "arborist": {"strategy": "auto", "min": 2, "max": 4, "targetCpu": 40},
             "fence": {"strategy": "auto", "min": 5, "max": 15, "targetCpu": 40},
@@ -433,7 +370,7 @@ def test_merge():
             },
         }
     }
-    dict3 = py_io.merge(dict1, dict2)
+    tgt_merged = py_io.merge(src_dict_example, tgt_dict_example)
     expected_dict = {
         "scaling": {
             "arborist": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
@@ -446,55 +383,68 @@ def test_merge():
             },
         }
     }
-    assert expected_dict == dict3
+    assert expected_dict == tgt_merged
 
 
-def test_write_into_manifest(setUptearDown):
+def test_write_into_manifest(setUp_tearDown):
+    """
+    Test that a write was performed in the correct file
+    """
     os.system(
-        f"cp {ABS_PATH}/data/test_manifest.json {ABS_PATH}/data/testing_manifest.json"
+        f"cp {ABS_PATH}/data/fake_target_env/manifest.json {ABS_PATH}/data/testing_manifest.json"
     )
-    with open(ABS_PATH + "/data/testing_manifest.json", "r") as f:
-        hash1 = hashlib.md5(f.read().encode("utf-8")).digest()
-    hash2 = py_io.write_into_manifest(
-        ABS_PATH + "/data/testing_manifest.json", {}
-    ).digest()
-    assert hash1 != hash2
+    mod_time1 = os.path.getmtime(ABS_PATH + "/data/testing_manifest.json")
+    py_io.write_into_manifest(ABS_PATH + "/data/testing_manifest.json", {})
+    mod_time2 = os.path.getmtime(ABS_PATH + "/data/testing_manifest.json")
     os.system("rm ./data/testing_manifest.json")
+    assert mod_time1 != mod_time2
 
 
-def test_merge_json_file_with_stored_environment_params(env_obj, loaded_env_obj):
-    os.system(f"cp {ABS_PATH}/data/test_manifest.json {ABS_PATH}/data/manifest.json")
-    env_params = env_obj.ENVIRONMENT_SPECIFIC_PARAMS["manifest.json"]
+def test_merge_json_file_with_stored_environment_params(target_env, loaded_target_env):
+    """
+    Test that manifest.json is written with correct enviroment params
+    """
+    os.system(
+        f"cp {ABS_PATH}/data/fake_target_env/manifest.json {ABS_PATH}/data/manifest.json"
+    )
+    env_params = target_env.environment_specific_params["manifest.json"]
     print(env_params)
     py_io.merge_json_file_with_stored_environment_params(
-        ABS_PATH + "/data", "manifest.json", env_params, env_obj, loaded_env_obj
+        ABS_PATH + "/data", "manifest.json", env_params, target_env, loaded_target_env
     )
 
     with open(ABS_PATH + "/data/manifest.json", "r+") as f:
-        with open(ABS_PATH + "/data/testmerge_manifest.json", "r") as f2:
+        with open(
+            ABS_PATH + "/data/test_references/testmerge_manifest.json", "r"
+        ) as f2:
             assert f2.read() == f.read()
     os.system("rm ./data/manifest.json")
 
 
-def test_remove_superfluous_sower_jobs(env_obj, loaded_env_obj):
-    with open(ABS_PATH + "/data/test_manifest.json", "r") as f:
+def test_remove_superfluous_sower_jobs(target_env, loaded_target_env):
+    """
+    Test that sower jobs are not added to target if not already found in target
+    """
+    with open(ABS_PATH + "/data/fake_target_env/manifest.json", "r") as f:
         data = json.loads(f.read())
     assert data["sower"] != []
-    print(env_obj.sower_jobs)
+    print(target_env.sower_jobs)
     py_io.remove_superfluous_sower_jobs(
-        data, env_obj.sower_jobs, loaded_env_obj.sower_jobs
+        data, target_env.sower_jobs, loaded_target_env.sower_jobs
     )
     assert data["sower"] == []
 
 
-def test_recursive_copy(env_obj, setUptearDown):
-
-    temp_env = env.Env(f"{ABS_PATH}/data/temp")
+def test_recursive_copy(source_env, setUp_tearDown):
+    """
+    Test that all files and subfolders are copied from source env to target env
+    """
+    temp_tgt = env.Env(f"{ABS_PATH}/data/temp_target_env")
     files = py_io.recursive_copy(
-        [], env_obj, temp_env, env_obj.full_path, temp_env.full_path
+        [], target_env, temp_tgt, source_env.full_path, temp_tgt.full_path
     )
     os.chdir(ABS_PATH)
     assert len(files) == 9
     assert are_dir_trees_equal(
-        ABS_PATH + "/data/temp", ABS_PATH + "/data/test_environment.$$&"
+        ABS_PATH + "/data/temp_target_env", ABS_PATH + "/data/fake_source_env"
     )

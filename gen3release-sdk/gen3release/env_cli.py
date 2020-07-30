@@ -1,12 +1,13 @@
-from gen3release.gith.git import Git as Gh
-from gen3release.config.env import Env
-from gen3release.filesys import io_processing as py_io
 import argparse
 import os
 from os import path
 import sys
 import logging
 import time
+
+from gen3release.gith.git import Git as Gh
+from gen3release.config.env import Env
+from gen3release.filesys import io_processing as py_io
 
 # Debugging:
 # $ export LOGLEVEL=DEBUG
@@ -169,7 +170,7 @@ def apply(args):
 
 def apply_version_to_environment(version, override, e):
     modified_files = []
-    for manifest_file_name in e.BLOCKS_TO_UPDATE.keys():
+    for manifest_file_name in e.blocks_to_update.keys():
         manifest = "{}/{}/{}".format(e.repo_dir, e.name, manifest_file_name)
         if path.exists(manifest):
             current_md5, current_json = py_io.read_manifest(manifest)

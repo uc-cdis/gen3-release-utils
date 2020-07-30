@@ -1,19 +1,19 @@
 {
   "notes": [
-    "This is the internalstaging environment manifest",
+    "This is a fake target environment manifest",
     "That's all I have to say"
   ],
   "jenkins": {
     "autodeploy": "yes"
   },
   "versions": {
-    "arborist": "quay.io/cdis/arborist:2020.06",
+    "arborist": "quay.io/cdis/arborist:2020.07",
     "aws-es-proxy": "abutaha/aws-es-proxy:0.8",
     "fence": "quay.io/cdis/fence:2020.06",
-    "indexd": "quay.io/cdis/indexd:2020.06",
+    "indexd": "quay.io/cdis/indexd:2020.07",
     "peregrine": "quay.io/cdis/peregrine:2020.06",
     "pidgin": "quay.io/cdis/pidgin:2020.06",
-    "revproxy": "quay.io/cdis/nginx:2020.06",
+    "revproxy": "quay.io/cdis/nginx:2020.07",
     "sheepdog": "quay.io/cdis/sheepdog:2020.06",
     "metadata": "quay.io/cdis/metadata-service:2020.06",
     "portal": "quay.io/cdis/data-portal:2.30.0",
@@ -21,24 +21,13 @@
     "spark": "quay.io/cdis/gen3-spark:2020.06",
     "tube": "quay.io/cdis/tube:2020.06",
     "guppy": "quay.io/cdis/guppy:2020.06",
-    "sower": "quay.io/cdis/sower:2020.06",
+    "sower": "quay.io/cdis/sower:2020.08",
     "hatchery": "quay.io/cdis/hatchery:2020.06",
     "ambassador": "quay.io/datawire/ambassador:1.4.2",
     "wts": "quay.io/cdis/workspace-token-service:2020.06",
     "manifestservice": "quay.io/cdis/manifestservice:2020.06",
     "data-ingestion-pipeline": "quay.io/cdis/bdcat-data-ingestion:1.1",
     "ssjdispatcher": "quay.io/cdis/ssjdispatcher:2020.06"
-  },
-  "google": {
-    "enabled": "yes"
-  },
-  "ssjdispatcher": {
-    "job_images": {
-      "indexing": "quay.io/cdis/indexs3client:2020.06"
-    }
-  },
-  "arborist": {
-    "deployment_version": "2"
   },
   "sower": [
     {
@@ -109,10 +98,10 @@
       "name": "ingest-metadata-manifest",
       "action": "ingest-metadata-manifest",
       "activeDeadlineSeconds": 86400,
-      "serviceAccountName": "jobs-preprod-gen3-biodatacatalyst-nhlbi-nih-gov",
+      "serviceAccountName": "jobs-fake_target_env",
       "container": {
         "name": "job-task",
-        "image": "quay.io/cdis/metadata-manifest-ingestion:1.1.6",
+        "image": "quay.io/cdis/metadata-manifest-ingestion:2.1.6",
         "pull_policy": "Always",
         "env": [
           {
@@ -149,7 +138,7 @@
     {
       "name": "get-dbgap-metadata",
       "action": "get-dbgap-metadata",
-      "serviceAccountName": "jobs-preprod-gen3-biodatacatalyst-nhlbi-nih-gov",
+      "serviceAccountName": "jobs-fake_target_env",
       "container": {
         "name": "job-task",
         "image": "quay.io/cdis/get-dbgap-metadata:1.1.6",
@@ -169,88 +158,6 @@
       "volumes": [
         {
           "name": "creds-volume",
-          "secret": {
-            "secretName": "sower-jobs-g3auto"
-          }
-        }
-      ],
-      "restart_policy": "Never"
-    },
-    {
-      "name": "manifest-indexing",
-      "action": "index-object-manifest",
-      "activeDeadlineSeconds": 86400,
-      "serviceAccountName": "jobs-preprod-gen3-biodatacatalyst-nhlbi-nih-gov",
-      "container": {
-        "name": "job-task",
-        "image": "quay.io/cdis/manifest-indexing:1.1.6",
-        "pull_policy": "Always",
-        "env": [
-          {
-            "name": "GEN3_HOSTNAME",
-            "valueFrom": {
-              "configMapKeyRef": {
-                "name": "manifest-global",
-                "key": "hostname"
-              }
-            }
-          }
-        ],
-        "volumeMounts": [
-          {
-            "name": "sower-jobs-creds-volume",
-            "readOnly": true,
-            "mountPath": "/creds.json",
-            "subPath": "creds.json"
-          }
-        ],
-        "cpu-limit": "1",
-        "memory-limit": "1Gi"
-      },
-      "volumes": [
-        {
-          "name": "sower-jobs-creds-volume",
-          "secret": {
-            "secretName": "sower-jobs-g3auto"
-          }
-        }
-      ],
-      "restart_policy": "Never"
-    },
-    {
-      "name": "indexd-manifest",
-      "action": "download-indexd-manifest",
-      "activeDeadlineSeconds": 86400,
-      "serviceAccountName": "jobs-preprod-gen3-biodatacatalyst-nhlbi-nih-gov",
-      "container": {
-        "name": "job-task",
-        "image": "quay.io/cdis/download-indexd-manifest:1.1.6",
-        "pull_policy": "Always",
-        "env": [
-          {
-            "name": "GEN3_HOSTNAME",
-            "valueFrom": {
-              "configMapKeyRef": {
-                "name": "manifest-global",
-                "key": "hostname"
-              }
-            }
-          }
-        ],
-        "volumeMounts": [
-          {
-            "name": "sower-jobs-creds-volume",
-            "readOnly": true,
-            "mountPath": "/creds.json",
-            "subPath": "creds.json"
-          }
-        ],
-        "cpu-limit": "1",
-        "memory-limit": "1Gi"
-      },
-      "volumes": [
-        {
-          "name": "sower-jobs-creds-volume",
           "secret": {
             "secretName": "sower-jobs-g3auto"
           }
@@ -284,13 +191,13 @@
   },
   "global": {
     "environment": "stageprod",
-    "hostname": "test_environment.$$&",
+    "hostname": "fake_target_env",
     "revproxy_arn": "arn:aws:acm:us-east-1:895962626746:certificate/a82bb5ed-9ad1-444d-9bfd-5bc314541307",
     "dictionary_url": "https://s3.amazonaws.com/dictionary-artifacts/gtexdictionary/3.4.9/schema.json",
     "portal_app": "gitops",
     "kube_bucket": "kube-stageprod-gen3",
     "logs_bucket": "logs-stageprod-gen3",
-    "sync_from_dbgap": "True",
+    "sync_from_dbgap": "true",
     "useryaml_s3path": "s3://cdis-gen3-users/stageprod/user.yaml",
     "public_datasets": true,
     "tier_access_level": "regular",
@@ -304,15 +211,15 @@
   "guppy": {
     "indices": [
       {
-        "index": "test_environment.$$&_subject",
+        "index": "fake_target_env",
         "type": "subject"
       },
       {
-        "index": "test_environment.$$&_file",
+        "index": "fake_target_env",
         "type": "file"
       }
     ],
-    "config_index": "test_environment.$$&_array-config",
+    "config_index": "fake_target_env_array-config",
     "auth_filter_field": "auth_resource_path"
   },
   "scaling": {

@@ -1,6 +1,7 @@
-from github import Github
 import os
 import logging
+
+from github import Github
 from github.GithubException import UnknownObjectException
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
@@ -85,14 +86,7 @@ class Git:
         the_pr.add_to_labels("automerge")
 
     def create_pull_request_copy(
-        self,
-        github_client,
-        srcEnv,
-        tgtEnv,
-        modified_files,
-        pr_title,
-        commit_msg,
-        branch_name,
+        self, github_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name,
     ):
         # add all files to the remote branch
         for f in modified_files:
@@ -105,9 +99,8 @@ class Git:
                 file_contents = github_client.get_contents(
                     "{}/".format(tgtEnv.name) + f, branch_name
                 )
-                error_occurred = False
             except UnknownObjectException as e:
-                logging.DEBUG(
+                logging.debug(
                     "{} has occurred, likely because file not found in remote, creating file..".format(
                         e
                     )
@@ -115,8 +108,7 @@ class Git:
                 github_client.create_file(
                     "{}/".format(tgtEnv.name) + f, copy_commit, data, branch=branch_name
                 )
-                error_occurred = True
-            if not error_occurred:
+            else:
                 github_client.update_file(
                     "{}/".format(tgtEnv.name) + f,
                     copy_commit,
