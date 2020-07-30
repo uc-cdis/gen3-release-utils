@@ -3,6 +3,7 @@ import json
 import hashlib
 import os
 import copy
+import time
 
 from ruamel.yaml import YAML
 
@@ -394,6 +395,7 @@ def test_write_into_manifest(setUp_tearDown):
         f"cp {ABS_PATH}/data/fake_target_env/manifest.json {ABS_PATH}/data/testing_manifest.json"
     )
     mod_time1 = os.path.getmtime(ABS_PATH + "/data/testing_manifest.json")
+    time.sleep(0.001)
     py_io.write_into_manifest(ABS_PATH + "/data/testing_manifest.json", {})
     mod_time2 = os.path.getmtime(ABS_PATH + "/data/testing_manifest.json")
     os.system("rm ./data/testing_manifest.json")
