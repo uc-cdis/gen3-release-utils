@@ -163,7 +163,7 @@ def merge_json_file_with_stored_environment_params(
     with open(full_path_to_file, "r+") as f:
         json_data = json.loads(f.read())
         if the_file == "manifest.json":
-            json_data = remove_superfluous_sower_jobs(
+            json_data = process_sower_jobs(
                 json_data, srcEnc.sower_jobs, tgtEnv.sower_jobs
             )
         merged_json = merge(env_params, json_data)
@@ -173,18 +173,20 @@ def merge_json_file_with_stored_environment_params(
         f.truncate()
 
 
-def remove_superfluous_sower_jobs(mani_json, srcEnv, tgtEnv):
-    """Removes sower jobs added to target environment by source
-    environment if job was not found in original target environment"""
+def process_sower_jobs(mani_json, srcEnv_sowers, tgtEnv_sowers):
+    """
+    Deletes sower jobs added to target environment if wasn't already in
+    target environment. Retains target's service account name.
+    """
     superflous_resources = []
-    if srcEnv == []:
+    if srcEnv_sowers == []:
         mani_json["sower"] = []
         return mani_json
 
-    srcnames = [x.get("name") for x in srcEnv]
-    trgnames = [x.get("name") for x in tgtEnv]
+    srcnames = [x.get("name") for x in srcEnv_sowers]
+    tgtnames = [x.get("name") for x in tgtEnv_sowers]
     for name in srcnames:
-        if name not in trgnames:
+        if name not in tgtnames:
             superflous_resources.append(name)
     logging.debug(
         "Original target environment does not have {}, removing from target".format(
@@ -192,8 +194,13 @@ def remove_superfluous_sower_jobs(mani_json, srcEnv, tgtEnv):
         )
     )
     mani_json["sower"] = [
-        x for x in mani_json["sower"] if x["name"] not in superflous_resources
+        x for x in srcEnv_sowers if x["name"] not in superflous_resources
     ]
+
+    for t_job, s_job in zip(tgtEnv_sowers, mani_json["sower"]):
+        accountname = t_job.get("serviceAccountName")
+        if accountname:
+            s_job["serviceAccountName"] = accountname
     return mani_json
 
 

@@ -421,18 +421,27 @@ def test_merge_json_file_with_stored_environment_params(target_env, loaded_targe
     os.system("rm ./data/manifest.json")
 
 
-def test_remove_superfluous_sower_jobs(target_env, loaded_target_env):
+def test_process_sower_jobs(target_env, loaded_target_env):
     """
     Test that sower jobs are not added to target if not already found in target
     """
+    src = target_env
+    tgt = loaded_target_env
     with open(ABS_PATH + "/data/fake_target_env/manifest.json", "r") as f:
         data = json.loads(f.read())
     assert data["sower"] != []
     print(target_env.sower_jobs)
-    py_io.remove_superfluous_sower_jobs(
-        data, target_env.sower_jobs, loaded_target_env.sower_jobs
-    )
+    data = py_io.process_sower_jobs(data, src.sower_jobs, tgt.sower_jobs)
     assert data["sower"] == []
+
+    # test target account name retained
+
+    source_sower = [{"name": "fakejob", "serviceAccountName": "jobs-fake_source_env"}]
+    tgt_sower = [{"name": "fakejob", "serviceAccountName": "jobs-fake_target_env"}]
+    data = py_io.process_sower_jobs(data, source_sower, tgt_sower)
+    assert data["sower"] == [
+        {"name": "fakejob", "serviceAccountName": "jobs-fake_target_env"}
+    ]
 
 
 def test_recursive_copy(source_env, setUp_tearDown):

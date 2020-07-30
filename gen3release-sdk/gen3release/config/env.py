@@ -45,8 +45,6 @@ class Env:
                     "indexd": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
                     "revproxy": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
                 },
-                # "sower": {
-                # }
             },
             "hatchery.json": {
                 "user-namespace": "",
