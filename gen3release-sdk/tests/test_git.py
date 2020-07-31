@@ -59,7 +59,7 @@ def test_create_pull_request_copy(ghub, target_env, mock_repo):
     # Compare expected args for update_file method
     data1 = open(f"{ABS_PATH}/data/fake_target_env/etlMapping.yaml", "rb")
     data2 = open(f"{ABS_PATH}/data/fake_target_env/manifest.json", "rb")
-    expct_args = [
+    expect_args = [
         call(
             "fake_target_env/etlMapping.yaml",
             "copying etlMapping.yaml to fake_target_env",
@@ -77,8 +77,51 @@ def test_create_pull_request_copy(ghub, target_env, mock_repo):
     ]
     data1.close()
     data2.close()
-    assert expct_args == mock_repo.update_file.call_args_list
+    assert expect_args == mock_repo.update_file.call_args_list
 
     mock_repo.create_pull.assert_called_with(
         title="testpr", body="commit message", head="new_branch_name", base="master"
     )
+
+
+def test_create_pull_request_apply(ghub, mock_repo, target_env):
+    ghub.create_pull_request_apply(
+        mock_repo,
+        "202020",
+        target_env,
+        ["manifest.json", "manifests/hatchery/hatchery.json"],
+        "prtitle",
+        "commit message",
+        "new_branch_name",
+    )
+    expected_args = [
+        call("fake_target_env/manifest.json", "new_branch_name"),
+        call("fake_target_env/manifests/hatchery/hatchery.json", "new_branch_name"),
+    ]
+    assert expected_args == mock_repo.get_contents.call_args_list
+
+    # Compare expected args for update_file method
+    data1 = open(f"{ABS_PATH}/data/fake_target_env/manifest.json", "rb")
+    data2 = open(
+        f"{ABS_PATH}/data/fake_target_env/manifests/hatchery/hatchery.json", "rb"
+    )
+
+    expect_args = [
+        call(
+            "fake_target_env/manifest.json",
+            "apply version 202020 to fake_target_env",
+            data1.read(),
+            mock_repo.get_contents().sha,
+            branch="new_branch_name",
+        ),
+        call(
+            "fake_target_env/manifests/hatchery/hatchery.json",
+            "apply version 202020 to fake_target_env",
+            data2.read(),
+            mock_repo.get_contents().sha,
+            branch="new_branch_name",
+        ),
+    ]
+    data1.close()
+    data2.close()
+    assert expect_args == mock_repo.update_file.call_args_list

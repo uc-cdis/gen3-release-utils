@@ -437,7 +437,6 @@ def test_process_sower_jobs(target_env, loaded_target_env):
     assert data["sower"] == []
 
     # test target account name retained
-
     source_sower = [{"name": "fakejob", "serviceAccountName": "jobs-fake_source_env"}]
     tgt_sower = [{"name": "fakejob", "serviceAccountName": "jobs-fake_target_env"}]
     data = py_io.process_sower_jobs(data, source_sower, tgt_sower)

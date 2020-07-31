@@ -3,6 +3,7 @@ import os
 import logging
 import traceback
 import json
+import ast
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
@@ -69,7 +70,7 @@ class Env:
         self.blocks_to_update = {
             "manifest.json": {
                 "versions": "*",
-                "sower": [{"container": "image"},],
+                "sower": [{"container": "image"}],
                 "jupyterhub": {"root": "sidecar"},
                 "ssjdispatcher": {"job_images": "indexing"},
                 "hatchery": {"sidecar": "image"},
@@ -114,7 +115,7 @@ class Env:
 
     def _replace_all_versions(self, version, override, json_block):
         try:
-            dict_override = eval(override)
+            dict_override = ast.literal_eval(override)
         except:
             logging.debug("Malformed override json string passed - {}".format(override))
             dict_override = {}

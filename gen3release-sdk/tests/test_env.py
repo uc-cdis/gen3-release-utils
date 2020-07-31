@@ -145,3 +145,24 @@ def test_save_blocks(target_env):
 
     target_env.save_blocks("scaling", mockenv_params, data)
     assert mockenv_params["scaling"] == data["scaling"]
+
+
+def test_find_and_replace(target_env, manifest_data):
+    """
+    Tests that versions are updated
+    """
+    target_env.find_and_replace(
+        "2020.20",
+        '{"ambassador":"quay.io/datawire/ambassador:9000"}',
+        "manifest.json",
+        manifest_data,
+    )
+    expect_arb = "quay.io/cdis/arborist:2020.20"
+    expect_aws = "abutaha/aws-es-proxy:0.8"
+    expect_amb = "quay.io/datawire/ambassador:9000"
+    expected_sower = "quay.io/cdis/pelican-export:2020.20"
+
+    assert expect_arb == manifest_data["versions"]["arborist"]
+    assert expect_aws == manifest_data["versions"]["aws-es-proxy"]
+    assert expect_amb == manifest_data["versions"]["ambassador"]
+    assert expected_sower == manifest_data["sower"][0]["container"]["image"]

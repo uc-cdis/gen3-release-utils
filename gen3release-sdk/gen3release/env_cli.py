@@ -13,9 +13,9 @@ from gen3release.filesys import io_processing as py_io
 # $ export LOGLEVEL=DEBUG
 
 # how to run:
-# $ python environments_config_manager.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
+# $ python env_cli.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
 # or
-# $ python environments_config_manager.py copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
+# $ python env_cli.py copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 
 # To delete local garbage / experimental branches:
 # % git branch | cat | grep apply | xargs -I {} git branch -D {}
@@ -171,7 +171,7 @@ def apply(args):
 def apply_version_to_environment(version, override, e):
     modified_files = []
     for manifest_file_name in e.blocks_to_update.keys():
-        manifest = "{}/{}/{}".format(e.repo_dir, e.name, manifest_file_name)
+        manifest = "{}/{}".format(e.full_path, manifest_file_name)
         if path.exists(manifest):
             current_md5, current_json = py_io.read_manifest(manifest)
 
@@ -181,11 +181,12 @@ def apply_version_to_environment(version, override, e):
             )
 
             new_md5 = py_io.write_into_manifest(manifest, json_with_version)
+            logging.debug(f"new{new_md5} old {current_md5}")
 
             if current_md5 != new_md5:
                 modified_files.append(manifest)
         else:
-            logging.warn(
+            logging.warning(
                 "environment [{}] does not contain the manifest file {}".format(
                     e.name, manifest
                 )

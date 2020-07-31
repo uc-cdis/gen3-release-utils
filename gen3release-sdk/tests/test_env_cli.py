@@ -4,13 +4,14 @@ import os
 import argparse
 from argparse import Namespace
 from unittest.mock import Mock, patch, call
+import hashlib
 
 from github.Repository import Repository
 
 from gen3release import env_cli
 from gen3release.config.env import Env
 from tests.helpers import are_dir_trees_equal
-from tests.conftest import setUp_tearDown
+from tests.conftest import setUp_tearDown, target_env
 
 ABS_PATH = os.path.abspath(".")
 
@@ -43,13 +44,13 @@ def test_make_parser():
 @patch("gen3release.env_cli.time")
 @patch("gen3release.env_cli.copy_all_files")
 @patch("gen3release.env_cli.Env")
-def test_copy(mocked_env, copy_files, mocked_time, mocked_Gh, setUp_tearDown):
+def test_copy(mocked_env, copy_files, mocked_time, mocked_Gh):
     """
     Test that pygithub methods are feed with correct arguments
     """
     args_pr = Namespace(
         source=ABS_PATH + "/data/fake_source_env",
-        env=ABS_PATH + "/data/temp_target_env",
+        env=ABS_PATH + "/data/fake_target_env",
         pr_title="A pr title",
     )
     copy_files.return_value = ["file_1", "file_2"]
@@ -93,3 +94,45 @@ def test_copy_all_files(setUp_tearDown):
         "manifests/hatchery/hatchery.json",
     ]
     assert sorted(files) == sorted(expected_files)
+
+
+@patch("gen3release.env_cli.Gh")
+@patch("gen3release.env_cli.time")
+@patch("gen3release.env_cli.apply_version_to_environment")
+@patch("gen3release.env_cli.Env")
+def test_apply(mocked_env, apply_env, mocked_time, mocked_Gh):
+    args_pr = Namespace(
+        version="2020.20",
+        override='{"ambassador":"quay.io/datawire/ambassador:9000"}',
+        env=ABS_PATH + "/data/fake_target_env",
+        pr_title="A pr title",
+    )
+    apply_env.return_value = ["file_1", "file_2"]
+    mocked_time.time.return_value = "10.0"
+    mocked_env.return_value.repo_dir = "./data"
+    mocked_env.return_value.name = "env"
+    env_cli.apply(args_pr)
+    assert mocked_env.call_args_list == [call(args_pr.env)]
+    mocked_Gh.assert_called_with(repo="data")
+    mocked_Gh.return_value.cut_new_branch.assert_called_once()
+    mocked_Gh.return_value.create_pull_request_apply.assert_called_with(
+        mocked_Gh.return_value.get_github_client.return_value,
+        args_pr.version,
+        mocked_env(),
+        ["file_1", "file_2"],
+        args_pr.pr_title,
+        "Applying version 2020.20 to env",
+        "chore/apply_202020_to_env_10",
+    )
+
+
+@patch("gen3release.env_cli.py_io.write_into_manifest")
+def test_apply_version_to_environment(write_mani, target_env):
+    write_mani.side_effect = [
+        hashlib.md5("altered".encode("utf-8")),
+        hashlib.md5("altered_again".encode("utf-8")),
+    ]
+    modified_files = env_cli.apply_version_to_environment(
+        "2020.20", '{"ambassador":"quay.io/datawire/ambassador:9000"}', target_env
+    )
+    assert modified_files == ["manifest.json", "manifests/hatchery/hatchery.json"]
