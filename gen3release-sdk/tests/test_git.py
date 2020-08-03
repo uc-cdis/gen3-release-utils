@@ -22,6 +22,9 @@ def mock_repo():
 
 @patch("gen3release.gith.git.Github")
 def test_get_github_client(mocked_gh, ghub):
+    """
+    Test the Git object is initialized with right values
+    """
     ghub.get_github_client()
     mocked_gh.assert_called_with("MEH-123")
     mocked_gh.return_value.get_organization.assert_called_with("uc-cdis")
@@ -31,6 +34,9 @@ def test_get_github_client(mocked_gh, ghub):
 
 
 def test_cut_new_branch(ghub, mock_repo):
+    """
+    Test pygithub methods recieve proper arguments
+    """
     mock_repo.get_branch = Mock()
     git_ref = ghub.cut_new_branch(mock_repo, "new_branch_name")
     mock_repo.get_branch.assert_called_with("master")
@@ -40,6 +46,9 @@ def test_cut_new_branch(ghub, mock_repo):
 
 
 def test_create_pull_request_copy(ghub, target_env, mock_repo):
+    """
+    Test pygithub methods recieve proper arguments
+    """
     ghub.create_pull_request_copy(
         mock_repo,
         target_env,
@@ -85,6 +94,9 @@ def test_create_pull_request_copy(ghub, target_env, mock_repo):
 
 
 def test_create_pull_request_apply(ghub, mock_repo, target_env):
+    """
+    Test pygithub methods recieve proper arguments
+    """
     ghub.create_pull_request_apply(
         mock_repo,
         "202020",

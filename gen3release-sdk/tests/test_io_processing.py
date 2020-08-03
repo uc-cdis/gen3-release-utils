@@ -181,10 +181,17 @@ def loaded_target_env():
 
 
 @pytest.fixture()
-def manifest_data():
-    data = None
-    with open(ABS_PATH + "/data/fake_target_env/manifest.json", "r") as f:
-        data = json.loads(f.read())
+def manifestnaming_data():
+    data = {
+        "guppy": {
+            "indices": [
+                {"index": "fake_target_env_subject", "type": "subject"},
+                {"index": "fake_target_env_file", "type": "file"},
+            ],
+            "config_index": "fake_target_env_array-config",
+            "auth_filter_field": "auth_resource_path",
+        }
+    }
     return data
 
 
@@ -231,13 +238,13 @@ def test_generate_safe_index_name():
         py_io.generate_safe_index_name("", "testtype")
 
 
-def test_process_index_names(target_env, manifest_data, etlMapping_data):
+def test_process_index_names(target_env, manifestnaming_data, etlMapping_data):
     """
     Test that created names are correctly assigned to fields
     """
     # test names in manifest
     param_guppy = target_env.params_to_set["manifest.json"].get("guppy")
-    file_guppy = manifest_data.get("guppy")
+    file_guppy = manifestnaming_data.get("guppy")
     py_io.process_index_names(
         target_env.name, param_guppy, file_guppy, "indices", "type", "index"
     )
@@ -265,12 +272,14 @@ def test_process_index_names(target_env, manifest_data, etlMapping_data):
     assert expected_yaml_names == names
 
 
-def test_create_env_index_name(target_env, manifest_data, etlMapping_data):
+def test_create_env_index_name(target_env, manifestnaming_data, etlMapping_data):
     """
     Test that created names have the form <commonsname_type>
     """
-    mani_data = py_io.create_env_index_name(target_env, "manifest.json", manifest_data)
-    guppy = manifest_data.get("guppy")
+    mani_data = py_io.create_env_index_name(
+        target_env, "manifest.json", manifestnaming_data
+    )
+    guppy = manifestnaming_data.get("guppy")
     expected_guppy = {
         "indices": [
             {"index": "fake_target_env_subject", "type": "subject"},
@@ -293,11 +302,12 @@ def test_write_index_names(target_env, setUp_tearDown):
     """
     Test that the files are updated with modified names
     """
+    # Test the writing of manifest.json
     os.system(
-        f"cp {ABS_PATH}/data/fake_target_env/manifest.json {ABS_PATH}/data/temp_target_env/manifest.json"
+        f"cp {ABS_PATH}/data/fake_target_env/naming_manifest.json {ABS_PATH}/data/temp_target_env/manifest.json"
     )
     py_io.write_index_names(
-        ABS_PATH + "/data",
+        ABS_PATH + "/data/fake_target_env",
         ABS_PATH + "/data/temp_target_env",
         "manifest.json",
         target_env,
@@ -308,6 +318,24 @@ def test_write_index_names(target_env, setUp_tearDown):
             ABS_PATH + "/data/test_references/testnaming_manifest.json", "r"
         ) as f2:
             assert json.loads(f.read()) == json.loads(f2.read())
+
+    # Test the writing of etlMapping.yaml
+    os.system(
+        f"cp {ABS_PATH}/data/fake_target_env/etlMapping.yaml {ABS_PATH}/data/temp_target_env/etlMapping.yaml"
+    )
+    py_io.write_index_names(
+        ABS_PATH + "/data/fake_target_env",
+        ABS_PATH + "/data/temp_target_env",
+        "etlMapping.yaml",
+        target_env,
+    )
+    os.chdir(ABS_PATH)
+    yaml = YAML(typ="safe")
+    with open(ABS_PATH + "/data/temp_target_env/etlMapping.yaml", "r") as f:
+        with open(
+            ABS_PATH + "/data/test_references/testnaming_etlMapping.yaml", "r"
+        ) as f2:
+            assert yaml.load(f.read()) == yaml.load(f2.read())
 
 
 def test_store_environment_params(target_env, loaded_target_env):
@@ -331,21 +359,6 @@ def test_store_environment_params(target_env, loaded_target_env):
         "hatchery.json",
     )
     assert expected_params["hatchery.json"] == env_params["hatchery.json"]
-
-
-def test_read_manifest():
-    """
-    Test that different files have different hashes and same files have same hashes
-    """
-    hash1, json1 = py_io.read_manifest(ABS_PATH + "/data/fake_target_env/manifest.json")
-    hash2, json2 = py_io.read_manifest(
-        ABS_PATH + "/data/fake_target_env/manifests/hatchery/hatchery.json"
-    )
-    hash3, json3 = py_io.read_manifest(ABS_PATH + "/data/fake_target_env/manifest.json")
-    assert hash1.digest() != hash2.digest()
-    assert json1 != json2
-    assert hash1.digest() == hash3.digest()
-    assert json1 == json3
 
 
 def test_merge():
@@ -392,56 +405,134 @@ def test_write_into_manifest(setUp_tearDown):
     Test that a write was performed in the correct file
     """
     os.system(
-        f"cp {ABS_PATH}/data/fake_target_env/manifest.json {ABS_PATH}/data/testing_manifest.json"
+        f"cp {ABS_PATH}/data/fake_target_env/manifest.json {ABS_PATH}/data/temp_target_env/testing_manifest.json"
     )
-    mod_time1 = os.path.getmtime(ABS_PATH + "/data/testing_manifest.json")
-    time.sleep(0.001)
-    py_io.write_into_manifest(ABS_PATH + "/data/testing_manifest.json", {})
-    mod_time2 = os.path.getmtime(ABS_PATH + "/data/testing_manifest.json")
-    os.system("rm ./data/testing_manifest.json")
+    mod_time1 = os.path.getmtime(
+        ABS_PATH + "/data/temp_target_env/testing_manifest.json"
+    )
+    time.sleep(0.001)  # Delay so time difference can be detected
+    py_io.write_into_manifest(
+        ABS_PATH + "/data/temp_target_env/testing_manifest.json", {}
+    )
+    mod_time2 = os.path.getmtime(
+        ABS_PATH + "/data/temp_target_env/testing_manifest.json"
+    )
     assert mod_time1 != mod_time2
 
 
-def test_merge_json_file_with_stored_environment_params(target_env, loaded_target_env):
+def test_merge_json_file_with_stored_environment_params(
+    target_env, loaded_target_env, setUp_tearDown
+):
     """
     Test that manifest.json is written with correct enviroment params
     """
     os.system(
-        f"cp {ABS_PATH}/data/fake_target_env/manifest.json {ABS_PATH}/data/manifest.json"
+        f"cp {ABS_PATH}/data/fake_target_env/merge_manifest.json {ABS_PATH}/data/temp_target_env/manifest.json"
     )
     env_params = target_env.environment_specific_params["manifest.json"]
     print(env_params)
     py_io.merge_json_file_with_stored_environment_params(
-        ABS_PATH + "/data", "manifest.json", env_params, target_env, loaded_target_env
+        ABS_PATH + "/data/temp_target_env",
+        "manifest.json",
+        env_params,
+        target_env,
+        loaded_target_env,
     )
 
-    with open(ABS_PATH + "/data/manifest.json", "r+") as f:
+    with open(ABS_PATH + "/data/temp_target_env/manifest.json", "r+") as f:
         with open(
             ABS_PATH + "/data/test_references/testmerge_manifest.json", "r"
         ) as f2:
             assert f2.read() == f.read()
-    os.system("rm ./data/manifest.json")
 
 
-def test_process_sower_jobs(target_env, loaded_target_env):
+def test_process_sower_jobs():
     """
-    Test that sower jobs are not added to target if not already found in target
+    Test that sower jobs in target are updated but jobs are not already found in target
+    are not included
     """
-    src = target_env
-    tgt = loaded_target_env
-    with open(ABS_PATH + "/data/fake_target_env/manifest.json", "r") as f:
-        data = json.loads(f.read())
-    assert data["sower"] != []
-    print(target_env.sower_jobs)
-    data = py_io.process_sower_jobs(data, src.sower_jobs, tgt.sower_jobs)
-    assert data["sower"] == []
+    source_sower = [
+        {
+            "name": "fakejob1",
+            "container": {
+                "image": "quay.io/cdis/fancyimage",
+                "pull_policy": "Never",
+                "env": [
+                    {
+                        "name": "DICTIONARY_URL",
+                        "valueFrom": {
+                            "configMapKeyRef": {
+                                "name": "manifest-local",
+                                "key": "dictionary_url",
+                            }
+                        },
+                    }
+                ],
+            },
+        },
+        {
+            "name": "fakejob2",
+            "serviceAccountName": "jobs-fake_source_env",
+            "container": {
+                "image": "quay.io/cdis/fancy",
+                "pull_policy": "Never",
+                "env": [
+                    {
+                        "name": "GEN3_HOSTNAME",
+                        "valueFrom": {
+                            "configMapKeyRef": {
+                                "name": "manifest-local",
+                                "key": "hostname",
+                            }
+                        },
+                    }
+                ],
+            },
+        },
+    ]
+    target_sower = [
+        {
+            "name": "fakejob2",
+            "serviceAccountName": "jobs-fake_target_env",
+            "container": {
+                "image": "quay.io/cdis/NOTfancy",
+                "pull_policy": "Always",
+                "env": [
+                    {
+                        "name": "GEN3_HOSTNAME",
+                        "valueFrom": {
+                            "configMapKeyRef": {
+                                "name": "manifest-global",
+                                "key": "hostname",
+                            }
+                        },
+                    }
+                ],
+            },
+        }
+    ]
 
-    # test target account name retained
-    source_sower = [{"name": "fakejob", "serviceAccountName": "jobs-fake_source_env"}]
-    tgt_sower = [{"name": "fakejob", "serviceAccountName": "jobs-fake_target_env"}]
-    data = py_io.process_sower_jobs(data, source_sower, tgt_sower)
+    data = py_io.process_sower_jobs({}, source_sower, target_sower)
     assert data["sower"] == [
-        {"name": "fakejob", "serviceAccountName": "jobs-fake_target_env"}
+        {
+            "name": "fakejob2",
+            "serviceAccountName": "jobs-fake_target_env",
+            "container": {
+                "image": "quay.io/cdis/fancy",
+                "pull_policy": "Never",
+                "env": [
+                    {
+                        "name": "GEN3_HOSTNAME",
+                        "valueFrom": {
+                            "configMapKeyRef": {
+                                "name": "manifest-local",
+                                "key": "hostname",
+                            }
+                        },
+                    }
+                ],
+            },
+        }
     ]
 
 
@@ -454,7 +545,7 @@ def test_recursive_copy(source_env, setUp_tearDown):
         [], target_env, temp_tgt, source_env.full_path, temp_tgt.full_path
     )
     os.chdir(ABS_PATH)
-    assert len(files) == 9
+    assert len(files) == 10
     assert are_dir_trees_equal(
         ABS_PATH + "/data/temp_target_env", ABS_PATH + "/data/fake_source_env"
     )

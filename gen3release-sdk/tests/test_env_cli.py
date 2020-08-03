@@ -73,7 +73,10 @@ def test_copy(mocked_env, copy_files, mocked_time, mocked_Gh):
 
 
 def test_copy_all_files(setUp_tearDown):
-
+    """
+    Tests files altered in target environment returned and
+    fails if invalid path specified
+    """
     with pytest.raises(NameError):
         s = Env("./fakepath")
         t = Env("./fakepath")
@@ -90,6 +93,7 @@ def test_copy_all_files(setUp_tearDown):
         "portal/gitops.json",
         "etlMapping.yaml",
         "manifest.json",
+        "merge_manifest.json",
         "manifests/fence/fence-config-public.yaml",
         "manifests/hatchery/hatchery.json",
     ]
@@ -101,6 +105,10 @@ def test_copy_all_files(setUp_tearDown):
 @patch("gen3release.env_cli.apply_version_to_environment")
 @patch("gen3release.env_cli.Env")
 def test_apply(mocked_env, apply_env, mocked_time, mocked_Gh):
+    """
+    Tests setup of argparse object and arguments for pygithub
+    methods
+    """
     args_pr = Namespace(
         version="2020.20",
         override='{"ambassador":"quay.io/datawire/ambassador:9000"}',
@@ -128,6 +136,9 @@ def test_apply(mocked_env, apply_env, mocked_time, mocked_Gh):
 
 @patch("gen3release.env_cli.py_io.write_into_manifest")
 def test_apply_version_to_environment(write_mani, target_env):
+    """
+    Tests files updated in target environment are returned
+    """
     write_mani.side_effect = [
         hashlib.md5("altered".encode("utf-8")),
         hashlib.md5("altered_again".encode("utf-8")),

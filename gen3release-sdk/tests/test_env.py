@@ -6,14 +6,6 @@ from gen3release.config import env
 from tests.conftest import target_env
 
 
-@pytest.fixture()
-def manifest_data():
-    data = None
-    with open("./data/fake_source_env/manifest.json", "r") as f:
-        data = json.loads(f.read())
-    return data
-
-
 def test___init___():
     """
     Test that the constructor correctly assigns member variables
@@ -121,7 +113,6 @@ def test_load_sower_jobs(target_env):
     }
     target_env.load_sower_jobs(json_data)
     sowersgot = json_data.get("sower_jobs")
-    print(f"sowers got : {sowersgot}")
     assert target_env.sower_jobs == json_data.get("sower")
 
 
@@ -147,22 +138,71 @@ def test_save_blocks(target_env):
     assert mockenv_params["scaling"] == data["scaling"]
 
 
-def test_find_and_replace(target_env, manifest_data):
+def test_find_and_replace(target_env):
     """
-    Tests that versions are updated
+    Tests that versions are updated and ignored versions are not
     """
+    manifest_data = {
+        "versions": {
+            "arborist": "quay.io/cdis/arborist:2020.07",
+            "aws-es-proxy": "abutaha/aws-es-proxy:0.8",
+            "ambassador": "quay.io/datawire/ambassador:1.4.2",
+        },
+        "sower": [
+            {
+                "name": "fakejob1",
+                "container": {"image": "quay.io/cdis/fakejob1:2020.06"},
+            },
+            {
+                "name": "fakejob2",
+                "container": {"image": "quay.io/cdis/fakejob2:2020.06"},
+            },
+        ],
+        "jupyterhub": {"sidecar": "quay.io/cdis/gen3fuse-sidecar:2020.08"},
+        "ssjdispatcher": {
+            "job_images": {"indexing": "quay.io/cdis/indexs3client:2020.07"}
+        },
+    }
+
+    # Test manifest.json
     target_env.find_and_replace(
         "2020.20",
         '{"ambassador":"quay.io/datawire/ambassador:9000"}',
         "manifest.json",
         manifest_data,
     )
-    expect_arb = "quay.io/cdis/arborist:2020.20"
-    expect_aws = "abutaha/aws-es-proxy:0.8"
-    expect_amb = "quay.io/datawire/ambassador:9000"
-    expected_sower = "quay.io/cdis/pelican-export:2020.20"
+    expected_manifest = {
+        "versions": {
+            "arborist": "quay.io/cdis/arborist:2020.20",
+            "aws-es-proxy": "abutaha/aws-es-proxy:0.8",
+            "ambassador": "quay.io/datawire/ambassador:9000",
+        },
+        "sower": [
+            {
+                "name": "fakejob1",
+                "container": {"image": "quay.io/cdis/fakejob1:2020.20"},
+            },
+            {
+                "name": "fakejob2",
+                "container": {"image": "quay.io/cdis/fakejob2:2020.20"},
+            },
+        ],
+        "jupyterhub": {"sidecar": "quay.io/cdis/gen3fuse-sidecar:2020.20"},
+        "ssjdispatcher": {
+            "job_images": {"indexing": "quay.io/cdis/indexs3client:2020.20"}
+        },
+    }
 
-    assert expect_arb == manifest_data["versions"]["arborist"]
-    assert expect_aws == manifest_data["versions"]["aws-es-proxy"]
-    assert expect_amb == manifest_data["versions"]["ambassador"]
-    assert expected_sower == manifest_data["sower"][0]["container"]["image"]
+    assert manifest_data == expected_manifest
+
+    # Test hatchery.json
+    hatch = {"sidecar": {"image": "quay.io/cdis/gen3fuse-sidecar:0.1.5"}}
+
+    target_env.find_and_replace(
+        "2020.20",
+        '{"ambassador":"quay.io/datawire/ambassador:9000"}',
+        "manifests/hatcery/hatchery.json",
+        hatch,
+    )
+
+    assert hatch == {"sidecar": {"image": "quay.io/cdis/gen3fuse-sidecar:2020:20"}}
