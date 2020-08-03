@@ -17,7 +17,6 @@ from gen3release.filesys import io_processing as py_io
 # or
 # $ python env_cli.py copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 
-
 # To delete local garbage / experimental branches:
 # % git branch | cat | grep apply | xargs -I {} git branch -D {}
 
@@ -35,20 +34,17 @@ Utility to update the version of services or copy all the configuration from one
 The general syntax for this script is:
 
 environments_config_manager <command> <args>
-e.g.: gen3release copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
+e.g.: python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 You can also use optional arg: "-pr" to create pull requests automatically
 
 The most commonly used commands are:
    apply    Applies a given version to all services declared in the environment's manifest.
-            e.g. $ gen3release apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
+            e.g. $ python environments_config_manager.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
             or
-            e.g. $ gen3release apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io -pr \"task(project): Apply Core Gen3 April release\"
+            e.g. $ python environments_config_manager.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io -pr \"task(project): Apply Core Gen3 April release\"
 
    copy     Copies the entire set of configuration artifacts from a source environment to a target environment (keeping the environment-specific settings, e.g., hostname, vpc, k8s namespace, guppy ES index, etc.)
-            e.g. $ gen3release copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
-
-   notes    Creates a pull request against a manifests repo storing release artifacts in a releases/<year>/<month> folder. It should store a general release manifest.json and the monthly release notes / markdown files.
-            e.g. $ gen3release notes -v 2020.08 -f $SOME_FOLDER/gen3_release_notes.md $SOME_FOLDER/manifest.json
+            e.g. $ python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 """,
     )
 
@@ -121,30 +117,6 @@ The most commonly used commands are:
         help="triggers automation that creates a pull request on github and sets a title (e.g., task(dcf): Promote changes from staging to prod - Release q1 2020)",
     )
     parser_copy.set_defaults(func=copy)
-
-    parser_notes = subparsers.add_parser(
-        "notes",
-        description="Creates pull request containing the release notes and manifest.json files",
-    )
-    parser_notes.add_argument(
-        "-v",
-        "--version",
-        dest="version",
-        required=True,
-        type=str,
-        help="Release version (e.g., 2020.08)",
-    )
-    parser_notes.add_argument(
-        "-f",
-        "--files",
-        nargs="+",
-        dest="files",
-        required=True,
-        type=str,
-        help="list of file paths containing the monthly release artifacts to be stored in a manifests repo (e.g., ~/gen3_release_notes.md ~/manifest.json ~/knownbugs.md)",
-    )
-    parser_notes.set_defaults(func=notes)
-
     parser.set_defaults(func=apply)
     return parser
 
@@ -156,35 +128,6 @@ def main():
         parser.print_help(sys.stderr)
         sys.exit(1)
     args.func(args)
-
-
-def notes(args):
-    version = args.version
-    files = args.files
-    logging.debug("version: {}".format(version))
-    logging.debug("files: {}".format(files))
-
-    year = version.split(".")[0]
-    month = version.split(".")[1]
-
-    pr_title = "doc(qa) adding release notes for {}".format(version)
-
-    ts = str(datetime.datetime.now().timestamp()).split(".")[0]
-    branch_name = "doc/release_artifacts_{}".format(ts)
-    repo_name = "cdis-manifest"
-    logging.debug("creating github client obj with repo={}".format(repo_name))
-    gh = Gh(repo=repo_name)
-    gh_client = gh.get_github_client()
-
-    # create new remote branch
-    new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
-
-    # create local branch, commit, push and create pull request
-    commit_msg = "Storing release artifacts for version {}".format(version)
-    gh.create_pull_request_release_notes(
-        gh_client, year, month, files, pr_title, commit_msg, branch_name
-    )
-    logging.info("PR created successfully!")
 
 
 def apply(args):
