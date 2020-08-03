@@ -167,8 +167,6 @@ class Env:
                         )
                     )
                     json_block = json[block] if block != "root" else json
-                    if not isinstance(json_block, dict):
-                        json_block = {block, json_block}
                     json_block = self._replace_on_path(
                         version,
                         json_block,
