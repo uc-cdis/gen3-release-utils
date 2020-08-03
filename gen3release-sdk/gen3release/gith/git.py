@@ -51,6 +51,37 @@ class Git:
         )
         return git_ref
 
+    def create_pull_request_release_notes(
+        self,
+        github_client,
+        year,
+        month,
+        release_files,
+        pr_title,
+        commit_msg,
+        branch_name,
+    ):
+        # add all files to the remote branch
+        for f in release_files:
+            logging.debug("adding {} to branch {}".format(f, branch_name))
+            copy_commit = "adding {} as part of the release artifacts".format(f)
+            input_file = open(f, "rb")
+            data = input_file.read()
+            logging.debug("branch_name: {}".format(branch_name))
+            github_client.create_file(
+                "releases/{}/{}/".format(year, month) + f,
+                copy_commit,
+                data,
+                branch=branch_name,
+            )
+
+        # finally, create Pull Request
+        the_pr = github_client.create_pull(
+            title=pr_title, body=commit_msg, head=branch_name, base="master"
+        )
+        the_pr.add_to_labels("automerge")
+        the_pr.add_to_labels("doc-only")
+
     def create_pull_request_apply(
         self,
         github_client,
