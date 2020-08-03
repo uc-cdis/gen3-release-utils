@@ -129,22 +129,22 @@ class Env:
         return json_block
 
     def _replace_on_path(self, version, json_block, path):
-        if type(path) is list:
-            # Hardcode index 0 for now as we only have a single sower job in the config
-            # TODO: Iterate through indices of sower jobs blocks and replace versions accordingly
-            self._replace_on_path(version, json_block[0], path[0])
+        if type(path) is list and type(json_block) is list:
+            for i in range(len(json_block)):
+                self._replace_on_path(version, json_block[i], path[0])
         else:
             for sub_block, img_ref in path.items():
                 logging.debug("replacing {} in {}".format(img_ref, sub_block))
                 json_block[sub_block][img_ref] = "{}:{}".format(
                     json_block[sub_block][img_ref].split(":")[0], version
                 )
+
         return json_block
 
     def find_and_replace(self, version, override, manifest_file_name, json):
         for block in list(self.blocks_to_update[manifest_file_name].keys()):
             logging.debug("block: {}".format(block))
-            if block in json:
+            if block in json or block == "root":
                 if block == "versions":
                     logging.debug(
                         "updating versions block from {}".format(manifest_file_name)
@@ -153,7 +153,7 @@ class Env:
                         version, override, json[block]
                     )
                 elif (
-                    type(json[block]) != list
+                    type(json.get(block)) == dict
                     and "root"
                     in self.blocks_to_update[manifest_file_name][block].keys()
                 ):
@@ -167,6 +167,8 @@ class Env:
                         )
                     )
                     json_block = json[block] if block != "root" else json
+                    if not isinstance(json_block, dict):
+                        json_block = {block, json_block}
                     json_block = self._replace_on_path(
                         version,
                         json_block,
