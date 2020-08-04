@@ -400,26 +400,6 @@ def test_merge():
     assert expected_dict == tgt_merged
 
 
-def test_write_into_manifest(setUp_tearDown):
-    """
-    Test that a write was performed in the correct file
-    """
-    os.system(
-        f"cp {ABS_PATH}/data/fake_target_env/manifest.json {ABS_PATH}/data/temp_target_env/testing_manifest.json"
-    )
-    mod_time1 = os.path.getmtime(
-        ABS_PATH + "/data/temp_target_env/testing_manifest.json"
-    )
-    time.sleep(0.001)  # Delay so time difference can be detected
-    py_io.write_into_manifest(
-        ABS_PATH + "/data/temp_target_env/testing_manifest.json", {}
-    )
-    mod_time2 = os.path.getmtime(
-        ABS_PATH + "/data/temp_target_env/testing_manifest.json"
-    )
-    assert mod_time1 != mod_time2
-
-
 def test_merge_json_file_with_stored_environment_params(
     target_env, loaded_target_env, setUp_tearDown
 ):
