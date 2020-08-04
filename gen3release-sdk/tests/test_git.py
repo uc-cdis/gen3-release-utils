@@ -35,7 +35,7 @@ def test_get_github_client(mocked_gh, ghub):
 
 def test_cut_new_branch(ghub, mock_repo):
     """
-    Test pygithub methods recieve proper arguments
+    Test pygithub methods receive proper arguments
     """
     mock_repo.get_branch = Mock()
     git_ref = ghub.cut_new_branch(mock_repo, "new_branch_name")
@@ -47,7 +47,7 @@ def test_cut_new_branch(ghub, mock_repo):
 
 def test_create_pull_request_copy(ghub, target_env, mock_repo):
     """
-    Test pygithub methods recieve proper arguments
+    Test pygithub methods receive proper arguments
     """
     ghub.create_pull_request_copy(
         mock_repo,
@@ -95,7 +95,7 @@ def test_create_pull_request_copy(ghub, target_env, mock_repo):
 
 def test_create_pull_request_apply(ghub, mock_repo, target_env):
     """
-    Test pygithub methods recieve proper arguments
+    Test pygithub methods receive proper arguments
     """
     ghub.create_pull_request_apply(
         mock_repo,
