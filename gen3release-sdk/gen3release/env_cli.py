@@ -33,18 +33,18 @@ def make_parser():
 Utility to update the version of services or copy all the configuration from one source environment to a target environment.
 The general syntax for this script is:
 
-environments_config_manager <command> <args>
-e.g.: python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
+env_cli <command> <args>
+e.g.: python env_cli copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 You can also use optional arg: "-pr" to create pull requests automatically
 
 The most commonly used commands are:
    apply    Applies a given version to all services declared in the environment's manifest.
-            e.g. $ python environments_config_manager.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
+            e.g. $ python env_cli.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
             or
-            e.g. $ python environments_config_manager.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io -pr \"task(project): Apply Core Gen3 April release\"
+            e.g. $ python env_cli.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io -pr \"task(project): Apply Core Gen3 April release\"
 
    copy     Copies the entire set of configuration artifacts from a source environment to a target environment (keeping the environment-specific settings, e.g., hostname, vpc, k8s namespace, guppy ES index, etc.)
-            e.g. $ python environments_config_manager copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
+            e.g. $ python env_cli copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 """,
     )
 
