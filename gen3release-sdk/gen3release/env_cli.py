@@ -13,9 +13,9 @@ from gen3release.filesys import io_processing as py_io
 # $ export LOGLEVEL=DEBUG
 
 # how to run:
-# $ python env_cli.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
+# $ gen3release apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
 # or
-# $ python env_cli.py copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
+# $ gen3release copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 
 # To delete local garbage / experimental branches:
 # % git branch | cat | grep apply | xargs -I {} git branch -D {}
@@ -39,12 +39,12 @@ You can also use optional arg: "-pr" to create pull requests automatically
 
 The most commonly used commands are:
    apply    Applies a given version to all services declared in the environment's manifest.
-            e.g. $ python env_cli.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
+            e.g. $ gen3release apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io
             or
-            e.g. $ python env_cli.py apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io -pr \"task(project): Apply Core Gen3 April release\"
+            e.g. $ gen3release apply -v 2020.04 -e ~/workspace/cdis-manifest/gen3.datastage.io -pr \"task(project): Apply Core Gen3 April release\"
 
    copy     Copies the entire set of configuration artifacts from a source environment to a target environment (keeping the environment-specific settings, e.g., hostname, vpc, k8s namespace, guppy ES index, etc.)
-            e.g. $ python env_cli copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
+            e.g. $ gen3release copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 """,
     )
 
