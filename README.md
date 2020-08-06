@@ -7,7 +7,11 @@ This repo hosts the `gen3release-sdk` and a few utility scripts used throughout 
 
 ## Gen3 Release SDK
 
-This solution aims to prevent human intervention / error-prone actions while performing Gen3 Release operations, this is done by automating recurrent tasks, such as tailoring Pull Requests on github to:
+This solution aims to prevent human intervention / error-prone actions while performing Gen3 Release operations.
+
+### Automatically creating Pull Requests for releases
+
+The features of the SDK automate recurrent tasks, such as tailoring Pull Requests on github to:
 - Deploy a given version to a target environment.
 e.g.,
 ```
@@ -20,6 +24,8 @@ gen3release copy -s ~/workspace/cdis-manifest/preprod.gen3.biodatacatalyst.nhlbi
 ```
 
 Theoretically (or perhaps, Utopically), we should eradicate all non-prod/staging:prod parity issues so we can raise confidence that whatever is tested in a pre-prod tier will work fine in PROD tiers. Hence, the solution should just make both set of artifacts across the environments match.
+
+### Cloning environments
 
 Another feature of the SDK tooling is to provide a Developer with the ability to "clone environments" or to make some DEV/QA environment impersonate a target PROD environment.
 
