@@ -7,7 +7,7 @@ This repo hosts the `gen3release-sdk` and a few utility scripts used throughout 
 
 ## Gen3 Release SDK
 
-This solution aims to prevent human intervention / error-prone actions while performing Gen3 Release operations, this is done by automating recurrent tasks, such as: Tailoring Pull Requests on github to:
+This solution aims to prevent human intervention / error-prone actions while performing Gen3 Release operations, this is done by automating recurrent tasks, such as tailoring Pull Requests on github to:
 - Deploy a given version to a target environment.
 e.g.,
 ```
