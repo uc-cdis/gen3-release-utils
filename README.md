@@ -27,7 +27,7 @@ Theoretically (or perhaps, Utopically), we should eradicate all non-prod/staging
 
 ### Cloning environments
 
-Another feature of the SDK tooling is to provide a Developer with the ability to "clone environments" or to make some DEV/QA environment impersonate a target PROD environment.
+Another way in which the SDK tooling can be used is by providing a Developer with the ability to "clone environments" or to make some DEV/QA environment impersonate a target PROD environment.
 
 To better understand the need for such feature, one must be aware of the different types of environments we have and its correponding _tiers_:
 - DEV (environment folders found in: https://github.com/uc-cdis/gitops-dev)
