@@ -33,7 +33,7 @@ def make_parser():
 Utility to update the version of services or copy all the configuration from one source environment to a target environment.
 The general syntax for this script is:
 
-env_cli <command> <args>
+gen3release <command> <args>
 e.g.: python env_cli copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 You can also use optional arg: "-pr" to create pull requests automatically
 
