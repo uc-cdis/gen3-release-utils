@@ -34,7 +34,7 @@ Utility to update the version of services or copy all the configuration from one
 The general syntax for this script is:
 
 gen3release <command> <args>
-e.g.: python env_cli copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
+e.g.: gen3release copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 You can also use optional arg: "-pr" to create pull requests automatically
 
 The most commonly used commands are:
@@ -45,6 +45,9 @@ The most commonly used commands are:
 
    copy     Copies the entire set of configuration artifacts from a source environment to a target environment (keeping the environment-specific settings, e.g., hostname, vpc, k8s namespace, guppy ES index, etc.)
             e.g. $ gen3release copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
+
+   notes    Creates a pull request against a manifests repo storing release artifacts in a releases/<year>/<month> folder. It should store a general release manifest.json and the monthly release notes / markdown files.
+            e.g. $ gen3release notes -v 2020.08 -f $SOME_FOLDER/gen3_release_notes.md $SOME_FOLDER/manifest.json
 """,
     )
 
