@@ -58,6 +58,10 @@ tasks = [
         "title": "10. Pushing monthly release quay images to AWS ECR (as a backup)",
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/push-gen3-monthly-release-images-to-aws-ecr. Also double-check if the repos_list.txt is up-to-date.",
     },
+    {
+        "title": "11. Mark the release as released",
+        "description": "Kick off this job: https://jenkins.planx-pla.net/job/mark-gen3-monthly-release-as-released.",
+    },
 ]
 
 user_ids = os.environ["JIRA_USER_IDS"].split(",")
