@@ -1,15 +1,18 @@
 import hashlib
 import shutil
-from config.env import Env
 from shutil import copytree, Error
 import logging
 import json
 import os
 import traceback
-from ruamel.yaml import YAML
 from os import path
 import re
 from collections import defaultdict
+
+from ruamel.yaml import YAML
+
+from gen3release.config.env import Env
+
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
@@ -22,7 +25,7 @@ def generate_safe_index_name(envname, doctype):
     if not doctype:
         raise NameError("No type given. Environment needs a type")
 
-    BAD_CHARS = '[\\\/*?"<>| ,#:]'  # If errors occur in matching try \\\\/
+    BAD_CHARS = '[\\\\/*?"<>| ,#:]'
     envname = re.sub(BAD_CHARS, "_", envname)
 
     BAD_START_CHARS = "-_+"
@@ -38,7 +41,7 @@ def generate_safe_index_name(envname, doctype):
     return outname.lower()
 
 
-def process_index_names(envname, env_obj, file_data, key, typ, subkey):
+def process_index_names(envname, block, file_data, key, typ, subkey):
     "Assigns index names in the file in the form of <commonsname>_<type>"
     types_seen = defaultdict(int)
     for index in file_data.get(key, []):
@@ -53,14 +56,14 @@ def process_index_names(envname, env_obj, file_data, key, typ, subkey):
         types_seen[inx_type] += 1
         index_name = generate_safe_index_name(envname, typename)
         logging.debug("Adding index name: {} ".format(index_name))
-        env_obj[key].append({subkey: index_name})
+        block[key].append({subkey: index_name})
 
     for i in range(len(file_data[key])):
-        file_data[key][i][subkey] = env_obj[key][i][subkey]
+        file_data[key][i][subkey] = block[key][i][subkey]
 
 
 def create_env_index_name(env_obj, the_file, data):
-    params = env_obj.PARAMS_TO_SET[the_file]
+    params = env_obj.params_to_set[the_file]
     if the_file == "manifest.json":
         param_guppy = params["guppy"]
         file_guppy = data.get("guppy")
@@ -82,7 +85,7 @@ def create_env_index_name(env_obj, the_file, data):
         typ = "doc_type"
         subkey = "name"
         process_index_names(
-            env_obj.name, env_obj.PARAMS_TO_SET[the_file], data, key, typ, subkey
+            env_obj.name, env_obj.params_to_set[the_file], data, key, typ, subkey
         )
     return data
 
@@ -108,6 +111,7 @@ def write_index_names(curr_dir, path, filename, env_obj):
         yaml.dump(data, fd)
     else:
         fd.write(json.dumps(data, indent=2))
+    fd.write("\n")  # add newline standard
     fd.truncate()
     fd.close()
 
@@ -157,27 +161,32 @@ def merge_json_file_with_stored_environment_params(
     )
 
     with open(full_path_to_file, "r+") as f:
-        json_file = json.loads(f.read())
+        json_data = json.loads(f.read())
         if the_file == "manifest.json":
-            json_file = remove_superfluous_sower_jobs(
-                json_file, srcEnc.sower_jobs, tgtEnv.sower_jobs
+            json_data = process_sower_jobs(
+                json_data, srcEnc.sower_jobs, tgtEnv.sower_jobs
             )
-        merged_json = merge(env_params, json_file)
-
+        merged_json = merge(env_params, json_data)
         f.seek(0)
         f.write(json.dumps(merged_json, indent=2))
+        f.write("\n")
         f.truncate()
 
 
-def remove_superfluous_sower_jobs(mani_json, srcEnv, tgtEnv):
-    """Removes sower jobs added to target environment by source
-    environment if job was not found in original target environment"""
+def process_sower_jobs(mani_json, srcEnv_sowers, tgtEnv_sowers):
+    """
+    Deletes sower jobs added to target environment if wasn't already in
+    target environment. Retains target's service account name.
+    """
     superflous_resources = []
+    if srcEnv_sowers == []:
+        mani_json["sower"] = []
+        return mani_json
 
-    srcnames = [x["name"] for x in srcEnv]
-    trgnames = [x["name"] for x in tgtEnv]
+    srcnames = [x.get("name") for x in srcEnv_sowers]
+    tgtnames = [x.get("name") for x in tgtEnv_sowers]
     for name in srcnames:
-        if name not in trgnames:
+        if name not in tgtnames:
             superflous_resources.append(name)
     logging.debug(
         "Original target environment does not have {}, removing from target".format(
@@ -185,8 +194,13 @@ def remove_superfluous_sower_jobs(mani_json, srcEnv, tgtEnv):
         )
     )
     mani_json["sower"] = [
-        x for x in mani_json["sower"] if x["name"] not in superflous_resources
+        x for x in srcEnv_sowers if x["name"] not in superflous_resources
     ]
+
+    for t_job, s_job in zip(tgtEnv_sowers, mani_json["sower"]):
+        accountname = t_job.get("serviceAccountName")
+        if accountname:
+            s_job["serviceAccountName"] = accountname
     return mani_json
 
 
@@ -211,17 +225,18 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                 os.chdir(os.path.abspath(".."))
             else:
                 logging.debug("copying {} into {}".format(a_file, dst))
-                # files mapped in ENVIRONMENT_SPECIFIC_PARAMS need special treatment
+                # files mapped in environment_specific_params need special treatment
                 if not path.exists("{}/{}".format(dst, a_file)):
                     logging.debug(
                         "File [{}] not found in target env, adding from source env".format(
                             src + "/" + a_file
                         )
                     )
+
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
                     copied_files.append("{}/".format(dst) + a_file)
                     continue
-                if a_file in tgtEnv.ENVIRONMENT_SPECIFIC_PARAMS.keys():
+                if a_file in tgtEnv.environment_specific_params.keys():
                     logging.debug(
                         "This file [{}] contains environment-specific parameters that need to be saved.".format(
                             dst + "/" + a_file
@@ -237,7 +252,7 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                     merge_json_file_with_stored_environment_params(
                         dst, a_file, env_params, srcEnv, tgtEnv
                     )
-                if a_file in tgtEnv.PARAMS_TO_SET.keys():
+                if a_file in tgtEnv.params_to_set.keys():
                     logging.debug(
                         "Making sure this file [{}] has correct names.".format(a_file)
                     )

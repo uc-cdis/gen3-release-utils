@@ -1,12 +1,13 @@
-from gith.git import Git as Gh
-from config.env import Env
-from filesys import io
 import argparse
 import os
 from os import path
 import sys
 import logging
-import datetime
+import time
+
+from gen3release.gith.git import Git as Gh
+from gen3release.config.env import Env
+from gen3release.filesys import io_processing as py_io
 
 # Debugging:
 # $ export LOGLEVEL=DEBUG
@@ -32,7 +33,7 @@ def make_parser():
 Utility to update the version of services or copy all the configuration from one source environment to a target environment.
 The general syntax for this script is:
 
-environments_config_manager <command> <args>
+gen3release <command> <args>
 e.g.: gen3release copy -s ~/workspace/cdis-manifest/staging.datastage.io -e ~/workspace/cdis-manifest/gen3.datastage.io
 You can also use optional arg: "-pr" to create pull requests automatically
 
@@ -142,7 +143,6 @@ The most commonly used commands are:
         help="list of file paths containing the monthly release artifacts to be stored in a manifests repo (e.g., ~/gen3_release_notes.md ~/manifest.json ~/knownbugs.md)",
     )
     parser_notes.set_defaults(func=notes)
-
     parser.set_defaults(func=apply)
     return parser
 
@@ -202,7 +202,7 @@ def apply(args):
 
     # Cut a new brach if the --pull-request-title flag is in place
     if pr_title and len(modified_files) > 0:
-        ts = str(datetime.datetime.now().timestamp()).split(".")[0]
+        ts = str(time.time()).split(".")[0]
         branch_name = "chore/apply_{}_to_{}_{}".format(
             version.replace(".", ""), e.name.replace(".", "_"), ts
         )
@@ -225,22 +225,23 @@ def apply(args):
 
 def apply_version_to_environment(version, override, e):
     modified_files = []
-    for manifest_file_name in e.BLOCKS_TO_UPDATE.keys():
-        manifest = "{}/{}/{}".format(e.repo_dir, e.name, manifest_file_name)
+    for manifest_file_name in e.blocks_to_update.keys():
+        manifest = "{}/{}".format(e.full_path, manifest_file_name)
         if path.exists(manifest):
-            current_md5, current_json = io.read_manifest(manifest)
+            current_md5, current_json = py_io.read_manifest(manifest)
 
             logging.debug("looking for versions to be replaced in {}".format(manifest))
             json_with_version = e.find_and_replace(
                 version, override, manifest_file_name, current_json
             )
 
-            new_md5 = io.write_into_manifest(manifest, json_with_version)
+            new_md5 = py_io.write_into_manifest(manifest, json_with_version)
+            logging.debug(f"new{new_md5} old {current_md5}")
 
             if current_md5 != new_md5:
                 modified_files.append(manifest)
         else:
-            logging.warn(
+            logging.warning(
                 "environment [{}] does not contain the manifest file {}".format(
                     e.name, manifest
                 )
@@ -275,21 +276,25 @@ def copy(args):
     logging.debug("num of modified_files: {}".format(len(modified_files)))
     # Cut a new brach if the --pull-request-title flag is in place
     if pr_title and len(modified_files) > 0:
-        ts = str(datetime.datetime.now().timestamp()).split(".")[0]
+        ts = str(time.time()).split(".")[0]
         branch_name = "chore/promote_{}_{}".format(srcEnv.name.replace(".", "_"), ts)
         repo_name = os.path.basename(tgtEnv.repo_dir)
         logging.debug("creating github client obj with repo={}".format(repo_name))
         gh = Gh(repo=repo_name)
         gh_client = gh.get_github_client()
+        logging.info(f"Created a github object {gh_client}")
 
         # create new remote branch
         new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
+        logging.info(f"branch name is {branch_name}")
 
         # create commit, push files to remote branch and create pull request
         commit_msg = "copying files from {} to {}".format(srcEnv.name, tgtEnv.name)
+
         gh.create_pull_request_copy(
             gh_client, srcEnv, tgtEnv, modified_files, pr_title, commit_msg, branch_name
         )
+        logging.info(f"{modified_files}, {commit_msg}")
         logging.info("PR created successfully!")
         # TODO: Switch local branch to master
 
@@ -300,7 +305,7 @@ def copy_all_files(srcEnv, tgtEnv):
         try:
             # copy all the files from the source environment folder
             # and re-apply the environment-specific parameters
-            copied_files = io.recursive_copy(
+            copied_files = py_io.recursive_copy(
                 [], srcEnv, tgtEnv, srcEnv.full_path, tgtEnv.full_path
             )
             # keep only relative paths (base_path = workspace)

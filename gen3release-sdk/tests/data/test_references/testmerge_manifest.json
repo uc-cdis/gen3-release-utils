@@ -1,0 +1,61 @@
+{
+  "notes": [],
+  "sower": [],
+  "global": {
+    "environment": "",
+    "hostname": "",
+    "revproxy_arn": "",
+    "dictionary_url": "https://s3.amazonaws.com/dictionary-artifacts/gtexdictionary/3.4.9/schema.json",
+    "kube_bucket": "",
+    "logs_bucket": "",
+    "sync_from_dbgap": "",
+    "useryaml_s3path": ""
+  },
+  "scaling": {
+    "arborist": {
+      "strategy": "",
+      "min": 0,
+      "max": 0,
+      "targetCpu": 0
+    },
+    "portal": {
+      "strategy": "auto",
+      "min": 2,
+      "max": 4,
+      "targetCpu": 40
+    },
+    "fence": {
+      "strategy": "",
+      "min": 0,
+      "max": 0,
+      "targetCpu": 0
+    },
+    "presigned-url-fence": {
+      "strategy": "",
+      "min": 0,
+      "max": 0,
+      "targetCpu": 0
+    },
+    "indexd": {
+      "strategy": "",
+      "min": 0,
+      "max": 0,
+      "targetCpu": 0
+    },
+    "revproxy": {
+      "strategy": "",
+      "min": 0,
+      "max": 0,
+      "targetCpu": 0
+    }
+  },
+  "hatchery": {
+    "user-namespace": "",
+    "sidecar": {
+      "env": {
+        "NAMESPACE": "",
+        "HOSTNAME": ""
+      }
+    }
+  }
+}

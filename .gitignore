@@ -1,5 +1,5 @@
 .idea
-gen3release-sdk/gen3release/config/__pycache__/
-gen3release-sdk/gen3release/filesys/__pycache__/
-gen3release-sdk/gen3release/gith/__pycache__/
-gen3release-sdk/gen3release.egg-info/
+**/.pytest_cache
+**/__pycache__
+**/gen3release.egg-info
+gen3release-sdk/tests/.coverage

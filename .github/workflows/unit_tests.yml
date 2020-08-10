@@ -1,0 +1,26 @@
+name: Tests
+
+on:
+  pull_request
+
+jobs:
+  runTests:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+        cd gen3release-sdk
+        $HOME/.poetry/bin/poetry install
+    - name: Test with pytest
+      run: |
+        export GITHUB_TOKEN="MEH-123"
+        cd gen3release-sdk/tests
+        $HOME/.poetry/bin/poetry run pytest -vv

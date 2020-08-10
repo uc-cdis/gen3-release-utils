@@ -1,6 +1,7 @@
-from github import Github
 import os
 import logging
+
+from github import Github
 from github.GithubException import UnknownObjectException
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
@@ -39,6 +40,7 @@ class Git:
         source_branch = "master"
         target_branch = branch_name
         sb = github_client.get_branch(source_branch)
+        print(sb)
         git_ref = github_client.create_git_ref(
             ref="refs/heads/" + target_branch, sha=sb.commit.sha
         )
@@ -115,14 +117,7 @@ class Git:
         the_pr.add_to_labels("automerge")
 
     def create_pull_request_copy(
-        self,
-        github_client,
-        srcEnv,
-        tgtEnv,
-        modified_files,
-        pr_title,
-        commit_msg,
-        branch_name,
+        self, github_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name,
     ):
         # add all files to the remote branch
         for f in modified_files:
@@ -135,13 +130,6 @@ class Git:
                 file_contents = github_client.get_contents(
                     "{}/".format(tgtEnv.name) + f, branch_name
                 )
-                github_client.update_file(
-                    "{}/".format(tgtEnv.name) + f,
-                    copy_commit,
-                    data,
-                    file_contents.sha,
-                    branch=branch_name,
-                )
             except UnknownObjectException as e:
                 logging.debug(
                     "{} has occurred, likely because file not found in remote, creating file..".format(
@@ -150,6 +138,14 @@ class Git:
                 )
                 github_client.create_file(
                     "{}/".format(tgtEnv.name) + f, copy_commit, data, branch=branch_name
+                )
+            else:
+                github_client.update_file(
+                    "{}/".format(tgtEnv.name) + f,
+                    copy_commit,
+                    data,
+                    file_contents.sha,
+                    branch=branch_name,
                 )
 
         # finally, create Pull Request
