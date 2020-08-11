@@ -101,6 +101,7 @@ PROJECT_NAME = os.environ["JIRA_PROJECT_NAME"]
 RELEASE_TITLE = "{} {} Gen3 Core Release".format(month, year)
 COMPONENTS = [
     {"name": "Team Catch(Err)"},
+    {"name": "Team WOMBAT"},
 ]
 
 epic_dict = {
@@ -144,9 +145,10 @@ for task in tasks:
     }
     # Shared tasks required one ticket per team member
     if task["title"].split(":")[0] == "SHARED":
+        summary = issue_dict["summary"]
         for i in range(0, len(team_members)):
             issue_dict["summary"] = (
-                issue_dict["summary"] + " - " + team_members[i]["name"]
+                summary + " - " + team_members[i]["name"]
             )
             issue_dict["assignee"] = {"accountId": team_members[i]["id"]}
             jira_id = create_ticket(issue_dict, i)
