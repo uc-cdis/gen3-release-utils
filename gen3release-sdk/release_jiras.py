@@ -99,7 +99,12 @@ if len(query) > 0:
 
 PROJECT_NAME = os.environ["JIRA_PROJECT_NAME"]
 RELEASE_TITLE = "{} {} Gen3 Core Release".format(month, year)
-COMPONENTS = [{"name": "Team Catch(Err)"}, {"name": "Team WOMBAT"}]
+COMPONENTS = [
+    {"name": "Team Catch(Err)"},
+    {"name": "Team WOMBAT"},
+    {"name": "Team HTTP-302"},
+    {"name": "Team JINK"},
+]
 
 epic_dict = {
     "project": PROJECT_NAME,
@@ -137,7 +142,7 @@ for task in tasks:
         "summary": summary,
         "description": task["description"],
         "issuetype": {"name": "Story"},
-        "components": [{"name": COMPONENT}],
+        "components": COMPONENTS,
         "assignee": {"accountId": team_members[team_member_index]["id"]},
     }
     # Shared tasks required one ticket per team member
@@ -147,9 +152,10 @@ for task in tasks:
                 issue_dict["summary"] + " - " + team_members[i]["name"]
             )
             issue_dict["assignee"] = {"accountId": team_members[i]["id"]}
+            jira_id = create_ticket(issue_dict, i)
     else:
         issue_dict["assignee"] = {"accountId": team_members[team_member_index]["id"]}
         team_member_index = (team_member_index + 1) % len(team_members)
-    jira_id = create_ticket(issue_dict, team_member_index)
+        jira_id = create_ticket(issue_dict, team_member_index)
 
 print("done")
