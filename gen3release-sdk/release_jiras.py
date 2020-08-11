@@ -103,7 +103,6 @@ COMPONENTS = [
     {"name": "Team Catch(Err)"},
     {"name": "Team WOMBAT"},
     {"name": "Team HTTP-302"},
-    {"name": "Team JINK"},
 ]
 
 epic_dict = {
