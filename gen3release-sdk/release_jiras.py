@@ -143,7 +143,9 @@ for task in tasks:
     # Shared tasks required one ticket per team member
     if task["title"].split(":")[0] == "SHARED":
         for i in range(0, len(team_members)):
-            issue_dict["summary"] = issue_dict["summary"] + " - " + team_members[i]["name"]
+            issue_dict["summary"] = (
+                issue_dict["summary"] + " - " + team_members[i]["name"]
+            )
             issue_dict["assignee"] = {"accountId": team_members[i]["id"]}
     else:
         issue_dict["assignee"] = {"accountId": team_members[team_member_index]["id"]}
