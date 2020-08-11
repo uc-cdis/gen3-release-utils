@@ -67,9 +67,9 @@ tasks = [
 user_ids = os.environ["JIRA_USER_IDS"].split(",")
 
 team_members = [
-    {"name": "marceloc", "id": user_ids[0]},
-    {"name": "atharvar", "id": user_ids[1]},
     {"name": "haraprasadj", "id": user_ids[2]},
+    {"name": "atharvar", "id": user_ids[1]},
+    {"name": "marceloc", "id": user_ids[0]},
 ]
 
 # set initial team member index based on the number of the month
@@ -98,20 +98,23 @@ if len(query) > 0:
     sys.exit(1)
 
 PROJECT_NAME = os.environ["JIRA_PROJECT_NAME"]
-RELEASE_TITLE = "CREATED BY AUTOMATION - PLEASE IGNORE - {} {} Gen3 Core Release".format(
-    month, year
-)
-COMPONENT = "Team Catch(Err)"
+RELEASE_TITLE = "{} {} Gen3 Core Release".format(month, year)
+COMPONENTS = [
+    {"name": "Team Catch(Err)"},
+    {"name": "Team WOMBAT"},
+    {"name": "Team HTTP-302"},
+    {"name": "Team JINK"},
+]
 
 epic_dict = {
     "project": PROJECT_NAME,
     "customfield_10011": RELEASE_TITLE,
     "summary": RELEASE_TITLE,
-    "description": "This epic comprises all the tasks releated to %s".format(
+    "description": "This epic comprises all the tasks releated to {}".format(
         RELEASE_TITLE
     ),
     "issuetype": {"name": "Epic"},
-    "components": [{"name": COMPONENT}],
+    "components": COMPONENTS,
     "assignee": {"accountId": team_members[team_member_index]["id"]},
 }
 
@@ -129,7 +132,7 @@ def create_ticket(issue_dict, team_member_index):
         + " has been assigned to "
         + task["title"]
     )
-    return (team_member_index + 1) % len(team_members)
+    return new_issue.key
 
 
 for task in tasks:
@@ -138,17 +141,20 @@ for task in tasks:
         "project": PROJECT_NAME,
         "summary": summary,
         "description": task["description"],
-        "issuetype": {"name": "Task"},
-        "components": [{"name": COMPONENT}],
+        "issuetype": {"name": "Story"},
+        "components": COMPONENTS,
         "assignee": {"accountId": team_members[team_member_index]["id"]},
     }
     # Shared tasks required one ticket per team member
     if task["title"].split(":")[0] == "SHARED":
+        summary = issue_dict["summary"]
         for i in range(0, len(team_members)):
-            issue_dict["summary"] = (
-                issue_dict["summary"] + team_members[team_member_index]["name"]
-            )
-            team_member_index = create_ticket(issue_dict, team_member_index)
+            issue_dict["summary"] = summary + " - " + team_members[i]["name"]
+            issue_dict["assignee"] = {"accountId": team_members[i]["id"]}
+            jira_id = create_ticket(issue_dict, i)
     else:
-        team_member_index = create_ticket(issue_dict, team_member_index)
+        issue_dict["assignee"] = {"accountId": team_members[team_member_index]["id"]}
+        team_member_index = (team_member_index + 1) % len(team_members)
+        jira_id = create_ticket(issue_dict, team_member_index)
+
 print("done")
