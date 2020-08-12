@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gen3release"
-version = "0.3.1"
+version = "0.3.2"
 description = "Gen3 Release Management SDK"
 authors = ["CTDS UChicago <cdis@uchicago.edu>"]
 packages = [
@@ -19,7 +19,7 @@ PyGitHub = "^1.47"
 pytest = "^5.2.1"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=1.0.10"]
 build-backend = "poetry.masonry.api"
 
 [tool.poetry.scripts]

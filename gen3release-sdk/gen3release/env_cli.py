@@ -5,9 +5,9 @@ import sys
 import logging
 import time
 
-from gen3release.gith.git import Git as Gh
-from gen3release.config.env import Env
-from gen3release.filesys import io_processing as py_io
+from gith.git import Git as Gh
+from config.env import Env
+from filesys import io_processing as py_io
 
 # Debugging:
 # $ export LOGLEVEL=DEBUG

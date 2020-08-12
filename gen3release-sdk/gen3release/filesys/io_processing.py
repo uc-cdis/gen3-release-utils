@@ -11,7 +11,7 @@ from collections import defaultdict
 
 from ruamel.yaml import YAML
 
-from gen3release.config.env import Env
+from config.env import Env
 
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
