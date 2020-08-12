@@ -263,6 +263,11 @@ def copy(args):
     source_env = args.source
     target_env = args.env
     pr_title = args.pr_title
+    if "uc-cdis" in source_env:
+        spl = source_env.split("/")
+        repo = spl[1]
+        src_env = spl[2]
+        source_env = os.path.expanduser(f"~/prod_manifest/{src_env}")
     logging.debug("source_env: {}".format(source_env))
     logging.debug("target_env: {}".format(target_env))
     logging.debug("pr_title: {}".format(pr_title))
