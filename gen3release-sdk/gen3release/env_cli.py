@@ -4,7 +4,6 @@ from os import path
 import sys
 import logging
 import time
-import re
 
 from gith.git import Git as Gh
 from config.env import Env
