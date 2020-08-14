@@ -95,7 +95,7 @@ class Env:
         self.sower_jobs = []
 
     def load_sower_jobs(self, json_data):
-        self.sower_jobs = json_data.get("sower")
+        self.sower_jobs = json_data.get("sower", [])
 
     def _replace_one(self, version, key, json_block):
         if key in json_block:
