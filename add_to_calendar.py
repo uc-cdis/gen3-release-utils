@@ -6,10 +6,13 @@
 
 import datetime
 import pickle
+import os
 import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+
+os.environ['CalendarID'] = 'uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com'
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
@@ -38,11 +41,12 @@ def main():
         'end': {
             'date': '2020-07-11', 'timeZone': 'America/Chicago'
         },
+
         'attendees': {
-            {'email': 'atharvarr@gmail.com'},
+            {'email': ''},
         },
     }
-    event = service.events().insert(calendarID='uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com', body=event1).execute()
+    event = service.events().insert(calendarID=os.environ.get('CalendarID'), body=event1).execute()
     print('CODE FREEZE event : %s' % (event.get('htmlLink')))
 
     event2 = {
@@ -55,7 +59,7 @@ def main():
             'date': '2020-07-11', 'timeZone': 'America/Chicago'
         },
         'attendees': {
-            {'email': 'atharvarr@gmail.com'},
+            {'email': ''},
         },
     }
     event = service.events().insert(calendarID='uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com', body=event2).execute()
@@ -71,7 +75,7 @@ def main():
             'date': '2020-07-11', 'timeZone': 'America/Chicago'
         },
         'attendees': {
-            {'email': 'atharvarr@gmail.com'},
+            {'email': ''},
         },
     }
     event = service.events().insert(calendarID='uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com', body=event3).execute()
