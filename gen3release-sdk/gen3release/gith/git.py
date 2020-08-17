@@ -17,8 +17,8 @@ class Git:
      Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
     """
         self.org = org
-        self.repo = (os.environ.get("REPO_NAME", "cdis-manifest"),)
-        self.token = (os.environ.get["GITHUB_TOKEN"].strip(),)
+        self.repo = os.environ.get("REPO_NAME", "cdis-manifest")
+        self.token = os.environ.get("GITHUB_TOKEN", "MEH-123").strip()
 
     def get_github_client(self):
         """
