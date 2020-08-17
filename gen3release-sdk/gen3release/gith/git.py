@@ -14,7 +14,7 @@ class Git:
         self,
         org="uc-cdis",
         repo=os.environ.get("REPO_NAME", "cdis-manifest"),
-        token=os.environ("GITHUB_TOKEN", "MEH-123").strip(),
+        token=os.environ.get("GITHUB_TOKEN", "MEH-123").strip(),
     ):
         """
      Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
