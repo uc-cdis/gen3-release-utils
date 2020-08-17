@@ -21,6 +21,5 @@ jobs:
         $HOME/.poetry/bin/poetry install
     - name: Test with pytest
       run: |
-        export GITHUB_TOKEN="MEH-123"
         cd gen3release-sdk/tests
         $HOME/.poetry/bin/poetry run pytest -vv

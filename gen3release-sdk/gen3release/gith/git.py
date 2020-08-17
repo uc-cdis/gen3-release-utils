@@ -11,7 +11,7 @@ logging.getLogger(__name__)
 
 class Git:
     def __init__(
-        self, repo, token, org="uc-cdis",
+        self, repo="cdis-manifest", token="MEH-123", org="uc-cdis",
     ):
         """
      Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
