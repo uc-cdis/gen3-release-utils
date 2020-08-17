@@ -12,75 +12,75 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-os.environ['CalendarID'] = 'uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com'
 
-SCOPES = ['https://www.googleapis.com/auth/calendar']
+
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 def main():
     creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    if os.path.exists("token.pickle"):
+        with open("token.pickle", "rb") as token:
             creds = pickle.load(token)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
             creds = flow.run_local_server(port=0)
-        with open('token.pickle', 'wb') as token:
+        with open("token.pickle", "wb") as token:
             pickle.dump(creds, token)
 
-    service = build('calendar', 'v3', credentials=creds)
+    service = build("calendar", "v3", credentials=creds)
 
     event1 = {
-        'summary': 'Code Freeze',
-        'description': '',
-        'start': {
-            'date': '2020-07-11', 'timeZone': 'America/Chicago'
+        "summary": "Code Freeze",
+        "description": '',
+        "start": {
+            "date": "2020-07-11", "timeZone": "America/Chicago"
         },
-        'end': {
-            'date': '2020-07-11', 'timeZone': 'America/Chicago'
+        "end": {
+            "date": "2020-07-11", "timeZone": "America/Chicago"
         },
 
-        'attendees': {
-            {'email': ''},
+        "attendees": {
+            {"email": " "},
         },
     }
-    event = service.events().insert(calendarID=os.environ.get('CalendarID'), body=event1).execute()
-    print('CODE FREEZE event : %s' % (event.get('htmlLink')))
+    event = (service.events().insert(calendarID="uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com", body=event1).execute())
+    print("CODE FREEZE event : %s" % (event.get("htmlLink")))
 
     event2 = {
-        'summary': 'Feature Freeze',
-        'description': '',
-        'start': {
-            'date': '2020-07-11', 'timeZone': 'America/Chicago'
+        "summary": "Feature Freeze",
+        "description": '',
+        "start": {
+            "date": "2020-07-11", "timeZone": "America/Chicago"
         },
-        'end': {
-            'date': '2020-07-11', 'timeZone': 'America/Chicago'
+        "end": {
+            "date": "2020-07-11", "timeZone": "America/Chicago"
         },
-        'attendees': {
-            {'email': ''},
+        "attendees": {
+            {"email": " "},
         },
     }
-    event = service.events().insert(calendarID='uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com', body=event2).execute()
-    print('FEATURE FREEZE event : %s' % (event.get('htmlLink')))
+    event = (service.events().insert(calendarID="uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com", body=event2).execute())
+    print("FEATURE FREEZE event : %s" % (event.get("htmlLink")))
 
     event3 = {
-        'summary': 'RELEASE PUBLICATION',
-        'description': '',
-        'start': {
-            'date': '2020-07-11', 'timeZone': 'America/Chicago'
+        "summary": "RELEASE PUBLICATION",
+        "description": '',
+        "start": {
+            "date": "2020-07-11", "timeZone": "America/Chicago"
         },
-        'end': {
-            'date': '2020-07-11', 'timeZone': 'America/Chicago'
+        "end": {
+            "date": "2020-07-11", "timeZone": "America/Chicago"
         },
-        'attendees': {
-            {'email': ''},
+        "attendees": {
+            {"email": " "},
         },
     }
-    event = service.events().insert(calendarID='uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com', body=event3).execute()
-    print('RELEASE PUBLICATION event : %s' % (event.get('htmlLink')))
+    event = (service.events().insert(calendarID="uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com", body=event3).execute())
+    print("RELEASE PUBLICATION event : %s" % (event.get("htmlLink")))
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
