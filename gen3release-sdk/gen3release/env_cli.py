@@ -312,10 +312,14 @@ def copy_all_files(srcEnv, tgtEnv):
             base_path = tgtEnv.full_path
             logging.debug("base_path: {}".format(base_path))
             # remove base_path (keep only the files)
-            copied_files = list(
-                map(lambda f: f.replace(base_path, "").strip("/"), copied_files)
-            )
-            logging.debug("copied files: {}".format(copied_files))
+            if copied_files:
+                copied_files = list(
+                    map(lambda f: f.replace(base_path, "").strip("/"), copied_files)
+                )
+                logging.debug("copied files: {}".format(copied_files))
+            else:
+                logging.debug("no files were copied")
+                return []
             return copied_files
         except Exception as err:
             raise Exception(
