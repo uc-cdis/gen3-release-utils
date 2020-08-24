@@ -292,7 +292,7 @@ def copy(args):
         commit_msg = "copying files from {} to {}".format(srcEnv.name, tgtEnv.name)
 
         gh.create_pull_request_copy(
-            gh_client, srcEnv, tgtEnv, modified_files, pr_title, commit_msg, branch_name
+            gh_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name
         )
         logging.info(f"{modified_files}, {commit_msg}")
         logging.info("PR created successfully!")

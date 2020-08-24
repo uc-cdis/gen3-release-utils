@@ -64,7 +64,6 @@ def test_copy(mocked_env, copy_files, mocked_time, mocked_Gh):
     mocked_Gh.return_value.create_pull_request_copy.assert_called_with(
         mocked_Gh.return_value.get_github_client.return_value,
         mocked_env(),
-        mocked_env(),
         ["file_1", "file_2"],
         args_pr.pr_title,
         "copying files from env to env",
