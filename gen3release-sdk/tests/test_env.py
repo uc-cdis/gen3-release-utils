@@ -45,6 +45,38 @@ def test_load_environment_params(target_env):
     assert json_data.get("hatchery") == env_params["manifest.json"].get("hatchery")
     assert not env_params["manifest.json"].get("scaling")
 
+    # Test load yaml data
+    yaml_data = {
+        "BASE_URL": "https://fake_target_env.net/user",
+        "S3_BUCKETS": {
+            "cdis-presigned-url-test-target": {
+                "role-arn": "arn:aws:iam::707767160287:role/bucket_reader_writer_to_cdistest-presigned-url_role",
+                "cred": "target",
+            },
+            "faketarget-data-bucket": {
+                "role-arn": "arn:aws:iam::707767160287:role/bucket_reader_writer_to_qaplanetv1-data-bucket_role",
+                "cred": "target",
+            },
+        },
+        "DATA_UPLOAD_BUCKET": "target-data-bucket",
+        "GOOGLE_GROUP_PREFIX": "target-pre",
+        "GOOGLE_SERVICE_ACCOUNT_PREFIX": "tgt",
+        "LOGIN_REDIRECT_WHITELIST": [
+            "https://target_env.net/",
+            "https://target.fakenet",
+        ],
+    }
+    target_env.load_environment_params("fence-config-public.yaml", yaml_data)
+    assert yaml_data.get("BASE_URL") == env_params["fence-config-public.yaml"].get(
+        "BASE_URL"
+    )
+    assert yaml_data.get("S3_BUCKETS") == env_params["fence-config-public.yaml"].get(
+        "S3_BUCKETS"
+    )
+    assert yaml_data.get("LOGIN_REDIRECT_WHITELIST") == env_params[
+        "fence-config-public.yaml"
+    ].get("LOGIN_REDIRECT_WHITELIST")
+
 
 def test_load_sower_jobs(target_env):
     """

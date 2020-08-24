@@ -106,7 +106,7 @@ def write_index_names(curr_dir, path, filename, env_obj):
     create_env_index_name(env_obj, filename, data)
     fd.seek(0)
     if isyaml:
-        yaml = YAML()
+        yaml = YAML(typ="safe")
         yaml.default_flow_style = False
         yaml.dump(data, fd)
     else:
@@ -116,11 +116,24 @@ def write_index_names(curr_dir, path, filename, env_obj):
     fd.close()
 
 
+def read_in_file(filepath, flag):
+    assert flag in ["r", "r+", "rb"], "must be a read flag"
+    with open(filepath, flag) as fd:
+        data = None
+        if filepath.endswith(".yaml"):
+            yaml = YAML()
+            data = yaml.load(fd)
+        elif filepath.endswith(".json"):
+            data = json.loads(fd.read())
+    if not data:
+        raise NameError(f"Invalid file: {filepath} attempted to be read in")
+    return data
+
+
 def store_environment_params(path, env_obj, filename):
 
-    assert filename.endswith("json"), "Must be a json file"
-    with open("{}/{}".format(path, filename), "r") as j:
-        data = json.loads(j.read())
+    data = read_in_file("{}/{}".format(path, filename), "r")
+    if filename == "manifest.json":
         env_obj.load_sower_jobs(data)
     return env_obj.load_environment_params(filename, data)
 
@@ -132,9 +145,11 @@ def read_manifest(manifest):
 
 
 def merge(source, destination):
-    "Recursively merges dictionary source into dictionary destination" ""
+    "Recursively merges dictionary source into dictionary destination"
     for key, value in source.items():
-        if isinstance(value, dict):
+        if not value:
+            destination[key] = value
+        elif isinstance(value, dict):
             # get node or create one
             node = destination.setdefault(key, {})
             merge(value, node)
@@ -159,17 +174,29 @@ def merge_json_file_with_stored_environment_params(
     logging.debug(
         "merging stored data from [{}] into {}".format(the_file, full_path_to_file)
     )
+    filetype = the_file.split(".")[-1]
 
+    assert filetype in ["json", "yaml"], "Must be a json or yaml file"
     with open(full_path_to_file, "r+") as f:
-        json_data = json.loads(f.read())
-        if the_file == "manifest.json":
-            json_data = process_sower_jobs(
-                json_data, srcEnc.sower_jobs, tgtEnv.sower_jobs
-            )
-        merged_json = merge(env_params, json_data)
+        if full_path_to_file.endswith(".json"):
+            data = json.loads(f.read())
+            if the_file == "manifest.json":
+                data = process_sower_jobs(data, srcEnc.sower_jobs, tgtEnv.sower_jobs)
+        elif full_path_to_file.endswith("yaml"):
+            yaml = YAML()
+            yaml.preserve_quotes = True
+            data = yaml.load(f)
+        merged_json = merge(env_params, data)
+
         f.seek(0)
-        f.write(json.dumps(merged_json, indent=2))
-        f.write("\n")
+        if filetype == "json":
+            f.write(json.dumps(merged_json, indent=2))
+            f.write("\n")
+        elif filetype == "yaml":
+            yaml = YAML()
+            yaml.default_flow_style = False
+            yaml.indent(offset=2, sequence=4, mapping=2)
+            yaml.dump(merged_json, f)
         f.truncate()
 
 
@@ -232,7 +259,6 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                             src + "/" + a_file
                         )
                     )
-
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
                     copied_files.append("{}/".format(dst) + a_file)
                     continue

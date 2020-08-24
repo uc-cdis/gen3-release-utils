@@ -176,6 +176,26 @@ def loaded_target_env():
                 }
             },
         },
+        "fence-config-public.yaml": {
+            "BASE_URL": "https://fake_target_env.net/user",
+            "S3_BUCKETS": {
+                "cdis-presigned-url-test-target": {
+                    "role-arn": "arn:aws:iam::707767160287:role/bucket_reader_writer_to_cdistest-presigned-url_role",
+                    "cred": "target",
+                },
+                "faketarget-data-bucket": {
+                    "role-arn": "arn:aws:iam::707767160287:role/bucket_reader_writer_to_qaplanetv1-data-bucket_role",
+                    "cred": "target",
+                },
+            },
+            "DATA_UPLOAD_BUCKET": "target-data-bucket",
+            "GOOGLE_GROUP_PREFIX": "target-pre",
+            "GOOGLE_SERVICE_ACCOUNT_PREFIX": "tgt",
+            "LOGIN_REDIRECT_WHITELIST": [
+                "https://target_env.net/",
+                "https://target.fakenet",
+            ],
+        },
     }
     return obj
 
@@ -406,11 +426,12 @@ def test_merge_json_file_with_stored_environment_params(
     """
     Test that manifest.json is written with correct enviroment params
     """
+
+    # Test case for json file
     os.system(
         f"cp {ABS_PATH}/data/fake_target_env/merge_manifest.json {ABS_PATH}/data/temp_target_env/manifest.json"
     )
     env_params = target_env.environment_specific_params["manifest.json"]
-    print(env_params)
     py_io.merge_json_file_with_stored_environment_params(
         ABS_PATH + "/data/temp_target_env",
         "manifest.json",
@@ -419,10 +440,28 @@ def test_merge_json_file_with_stored_environment_params(
         loaded_target_env,
     )
 
-    with open(ABS_PATH + "/data/temp_target_env/manifest.json", "r+") as f:
+    with open(ABS_PATH + "/data/temp_target_env/manifest.json", "r") as f:
         with open(
             ABS_PATH + "/data/test_references/testmerge_manifest.json", "r"
         ) as f2:
+            assert f2.read() == f.read()
+
+    # Test case for yaml file
+    os.system(
+        f"cp {ABS_PATH}/data/fake_target_env/manifests/fence/fence-config-public.yaml {ABS_PATH}/data/temp_target_env/fence-config-public.yaml"
+    )
+
+    env_params = target_env.environment_specific_params["fence-config-public.yaml"]
+    py_io.merge_json_file_with_stored_environment_params(
+        ABS_PATH + "/data/temp_target_env",
+        "fence-config-public.yaml",
+        env_params,
+        target_env,
+        loaded_target_env,
+    )
+
+    with open(ABS_PATH + "/data/temp_target_env/fence-config-public.yaml", "r") as f:
+        with open(ABS_PATH + "/data/test_references/testfence_config.yaml", "r") as f2:
             assert f2.read() == f.read()
 
 
