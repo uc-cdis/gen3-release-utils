@@ -120,7 +120,7 @@ def read_in_file(filepath, flag):
     assert flag in ["r", "r+", "rb"], "must be a read flag"
     with open(filepath, flag) as fd:
         data = None
-        if filepath.endswith(".yaml"):
+        if filepath.endswith(".yaml") or filepath.endswith(".yml"):
             yaml = YAML()
             data = yaml.load(fd)
         elif filepath.endswith(".json"):
