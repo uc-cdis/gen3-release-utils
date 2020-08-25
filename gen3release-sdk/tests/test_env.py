@@ -70,9 +70,9 @@ def test_load_environment_params(target_env):
     assert yaml_data.get("BASE_URL") == env_params["fence-config-public.yaml"].get(
         "BASE_URL"
     )
-    assert yaml_data.get("S3_BUCKETS") == env_params["fence-config-public.yaml"].get(
-        "S3_BUCKETS"
-    )
+    assert {"COPY_ALL": yaml_data.get("S3_BUCKETS")} == env_params[
+        "fence-config-public.yaml"
+    ].get("S3_BUCKETS")
     assert yaml_data.get("LOGIN_REDIRECT_WHITELIST") == env_params[
         "fence-config-public.yaml"
     ].get("LOGIN_REDIRECT_WHITELIST")

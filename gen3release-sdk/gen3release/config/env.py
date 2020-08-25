@@ -188,7 +188,12 @@ class Env:
 
     def save_blocks(self, block, env_params, json_block):
 
-        if env_params[block] and isinstance(env_params[block], dict):
+        if not env_params[block] and isinstance(env_params[block], dict):
+            env_params[block]["COPY_ALL"] = json_block[
+                block
+            ]  # set for not recursing on dict when merging
+
+        elif isinstance(env_params[block], dict):
             logging.debug(f"LOOKING AT SUBBLOCK {env_params[block].keys()} ")
             for sub_block in env_params[block].keys():
                 # if the value of a given key is a dict and it is declared in environment_specific_params

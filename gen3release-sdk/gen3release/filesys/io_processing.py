@@ -147,8 +147,8 @@ def read_manifest(manifest):
 def merge(source, destination):
     "Recursively merges dictionary source into dictionary destination"
     for key, value in source.items():
-        if not value:
-            destination[key] = value
+        if isinstance(value, dict) and value.get("COPY_ALL"):
+            destination[key] = value.get("COPY_ALL")
         elif isinstance(value, dict):
             # get node or create one
             node = destination.setdefault(key, {})
@@ -178,11 +178,11 @@ def merge_json_file_with_stored_environment_params(
 
     assert filetype in ["json", "yaml"], "Must be a json or yaml file"
     with open(full_path_to_file, "r+") as f:
-        if full_path_to_file.endswith(".json"):
+        if filetype == "json":
             data = json.loads(f.read())
             if the_file == "manifest.json":
                 data = process_sower_jobs(data, srcEnc.sower_jobs, tgtEnv.sower_jobs)
-        elif full_path_to_file.endswith("yaml"):
+        elif filetype == "yaml":
             yaml = YAML()
             yaml.preserve_quotes = True
             data = yaml.load(f)
@@ -273,6 +273,7 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                     env_params = store_environment_params(dst, tgtEnv, a_file)
                     logging.debug("Stored parameters: {}".format(env_params))
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
+                    copied_files.append("{}/".format(dst) + a_file)
 
                     # re-apply all the stored environment-specific params
                     merge_json_file_with_stored_environment_params(
@@ -283,10 +284,10 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                         "Making sure this file [{}] has correct names.".format(a_file)
                     )
                     write_index_names(curr_dir, dst, a_file, tgtEnv)
-                else:
-                    shutil.copy("{}/".format(curr_dir) + a_file, dst)
 
-                copied_files.append("{}/".format(dst) + a_file)
+                if ("{}/".format(dst) + a_file) not in copied_files:
+                    shutil.copy("{}/".format(curr_dir) + a_file, dst)
+                    copied_files.append("{}/".format(dst) + a_file)
         return copied_files
     except Exception as e:
         logging.error(
