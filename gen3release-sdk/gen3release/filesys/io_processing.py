@@ -176,7 +176,7 @@ def merge_json_file_with_stored_environment_params(
     )
     filetype = the_file.split(".")[-1]
 
-    assert filetype in ["json", "yaml"], "Must be a json or yaml file"
+    assert filetype in ["json", "yaml", "yml"], "Must be a json or yaml file"
     with open(full_path_to_file, "r+") as f:
         if filetype == "json":
             data = json.loads(f.read())
