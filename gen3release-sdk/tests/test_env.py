@@ -45,9 +45,8 @@ def test_load_environment_params(target_env):
     assert json_data.get("hatchery") == env_params["manifest.json"].get("hatchery")
     assert not env_params["manifest.json"].get("scaling")
 
-    # Test load yaml data
+    # Test load nonresursed dict params
     yaml_data = {
-        "BASE_URL": "https://fake_target_env.net/user",
         "S3_BUCKETS": {
             "cdis-presigned-url-test-target": {
                 "role-arn": "arn:aws:iam::707767160287:role/bucket_reader_writer_to_cdistest-presigned-url_role",
@@ -58,13 +57,6 @@ def test_load_environment_params(target_env):
                 "cred": "target",
             },
         },
-        "DATA_UPLOAD_BUCKET": "target-data-bucket",
-        "GOOGLE_GROUP_PREFIX": "target-pre",
-        "GOOGLE_SERVICE_ACCOUNT_PREFIX": "tgt",
-        "LOGIN_REDIRECT_WHITELIST": [
-            "https://target_env.net/",
-            "https://target.fakenet",
-        ],
     }
     target_env.load_environment_params("fence-config-public.yaml", yaml_data)
     assert yaml_data.get("BASE_URL") == env_params["fence-config-public.yaml"].get(

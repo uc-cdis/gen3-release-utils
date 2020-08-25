@@ -444,26 +444,6 @@ def test_merge_json_file_with_stored_environment_params(
         ) as f2:
             assert f2.read() == f.read()
 
-    # Test case for yaml file
-    os.system(
-        f"cp {ABS_PATH}/data/fake_target_env/manifests/fence/fence-config-public.yaml {ABS_PATH}/data/temp_target_env/fence-config-public.yaml"
-    )
-
-    # env_params = loaded_target_env.environment_specific_params["fence-config-public.yaml"]
-    # py_io.merge_json_file_with_stored_environment_params(
-    #     ABS_PATH + "/data/temp_target_env",
-    #     "fence-config-public.yaml",
-    #     env_params,
-    #     target_env,
-    #     loaded_target_env,
-    # )
-    # p =ABS_PATH + "/data/temp_target_env/fence-config-public.yaml"
-    # os.system(f"cp {p} {ABS_PATH}")
-
-    # with open(ABS_PATH + "/data/temp_target_env/fence-config-public.yaml", "r") as f:
-    #     with open(ABS_PATH + "/data/test_references/testfence_config.yaml", "r") as f2:
-    #         assert f2.read() == f.read()
-
 
 def test_process_sower_jobs():
     """
