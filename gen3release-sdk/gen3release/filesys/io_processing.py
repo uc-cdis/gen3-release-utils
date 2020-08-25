@@ -91,7 +91,7 @@ def create_env_index_name(env_obj, the_file, data):
 
 
 def write_index_names(curr_dir, path, filename, env_obj):
-    isyaml = filename.endswith("yaml")
+    isyaml = filename.endswith(".yaml") or filename.endswith(".yml")
     data = None
     full_path_to_target = "{}/{}".format(path, filename)
     if isyaml:
@@ -117,10 +117,10 @@ def write_index_names(curr_dir, path, filename, env_obj):
 
 
 def read_in_file(filepath, flag):
-    assert flag in ["r", "r+", "rb"], "must be a read flag"
+    assert flag in ["r", "rb"], "must be a read only flag"
     with open(filepath, flag) as fd:
         data = None
-        if filepath.endswith(".yaml"):
+        if filepath.endswith(".yaml") or filepath.endswith("yml"):
             yaml = YAML()
             data = yaml.load(fd)
         elif filepath.endswith(".json"):

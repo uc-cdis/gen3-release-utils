@@ -45,7 +45,7 @@ def test_load_environment_params(target_env):
     assert json_data.get("hatchery") == env_params["manifest.json"].get("hatchery")
     assert not env_params["manifest.json"].get("scaling")
 
-    # Test load nonresursed dict params
+    # Test load nonrecursed dict params
     yaml_data = {
         "S3_BUCKETS": {
             "cdis-presigned-url-test-target": {

@@ -187,14 +187,10 @@ class Env:
         return json
 
     def save_blocks(self, block, env_params, json_block):
-
+        # if value is empty dictionary - add copy_all to not recurse on dict when merging
         if not env_params[block] and isinstance(env_params[block], dict):
-            env_params[block]["COPY_ALL"] = json_block[
-                block
-            ]  # set for not recursing on dict when merging
-
+            env_params[block]["COPY_ALL"] = json_block[block]
         elif isinstance(env_params[block], dict):
-            logging.debug(f"LOOKING AT SUBBLOCK {env_params[block].keys()} ")
             for sub_block in env_params[block].keys():
                 # if the value of a given key is a dict and it is declared in environment_specific_params
                 # apply recursion to store these parameters
@@ -214,7 +210,6 @@ class Env:
         try:
             env_params = self.environment_specific_params[file_name]
             for block in dict.fromkeys(env_params.keys(), []).keys():
-                logging.debug(f"LOOKING AT BLOCK {block}")
                 if block in json_data.keys():
                     self.save_blocks(block, env_params, json_data)
 

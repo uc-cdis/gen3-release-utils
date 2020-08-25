@@ -363,7 +363,7 @@ def test_store_environment_params(target_env, loaded_target_env):
 
 def test_merge():
     """
-    Test that source (saved target environment parmams) dictionary is merged into target dictionary
+    Test that source (saved target environment params) dictionary is merged into target dictionary
     """
     src_dict_example = {
         "scaling": {
