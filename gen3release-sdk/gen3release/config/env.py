@@ -52,6 +52,14 @@ class Env:
                 "env": {"NAMESPACE": "", "HOSTNAME": ""},  # KUBE_NAMESPACE
                 "sidecar": {"env": {"NAMESPACE": "", "HOSTNAME": ""}},
             },
+            "fence-config-public.yaml": {
+                "BASE_URL": "",
+                "S3_BUCKETS": {},
+                "DATA_UPLOAD_BUCKET": "",
+                "GOOGLE_GROUP_PREFIX": "",
+                "GOOGLE_SERVICE_ACCOUNT_PREFIX": "",
+                "LOGIN_REDIRECT_WHITELIST": [],
+            },
         }
 
         self.params_to_set = {
@@ -179,7 +187,10 @@ class Env:
         return json
 
     def save_blocks(self, block, env_params, json_block):
-        if type(env_params[block]) is dict:
+        # if value is empty dictionary - add copy_all to not recurse on dict when merging
+        if not env_params[block] and isinstance(env_params[block], dict):
+            env_params[block]["COPY_ALL"] = json_block[block]
+        elif isinstance(env_params[block], dict):
             for sub_block in env_params[block].keys():
                 # if the value of a given key is a dict and it is declared in environment_specific_params
                 # apply recursion to store these parameters

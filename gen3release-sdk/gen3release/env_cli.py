@@ -167,7 +167,7 @@ def notes(args):
 
     pr_title = "doc(qa) adding release notes for {}".format(version)
 
-    ts = str(datetime.datetime.now().timestamp()).split(".")[0]
+    ts = str(time.time()).split(".")[0]
     branch_name = "doc/release_artifacts_{}".format(ts)
     repo_name = "cdis-manifest"
     logging.debug("creating github client obj with repo={}".format(repo_name))

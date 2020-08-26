@@ -363,40 +363,58 @@ def test_store_environment_params(target_env, loaded_target_env):
 
 def test_merge():
     """
-    Test that source dictionary is merged into target dictionary
+    Test that source (saved target environment params) dictionary is merged into target dictionary
     """
     src_dict_example = {
         "scaling": {
-            "arborist": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
-            "fence": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
-            "presigned-url-fence": {"strategy": "", "max": 0, "targetCpu": 0,},
-        }
+            "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
+            "fence": {"min": 0, "max": 0, "targetCpu": 0},
+            "presigned-url-fence": {"strategy": "slow", "max": 15, "targetCpu": 4},
+        },
+        "S3_BUCKETS": {
+            "COPY_ALL": {
+                "cdis-presigned-url-test-target": {
+                    "role-arn": "arn:aws:iam::707767160287:role/bucket_reader_writer_to_cdistest-presigned-url_role",
+                    "cred": "target",
+                }
+            }
+        },
     }
     tgt_dict_example = {
+        "global": {"environment": "testenv", "hostname": "testenv.net",},
         "scaling": {
-            "arborist": {"strategy": "auto", "min": 2, "max": 4, "targetCpu": 40},
-            "fence": {"strategy": "auto", "min": 5, "max": 15, "targetCpu": 40},
+            "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
+            "fence": {"strategy": "auto", "min": 5, "max": 15, "targetCpu": 4},
             "presigned-url-fence": {
-                "strategy": "auto",
+                "strategy": "slow",
                 "min": 2,
                 "max": 5,
                 "targetCpu": 40,
             },
-        }
+        },
+        "S3_BUCKETS": {"This should not exist": {"role-arn": "Not to be in output",}},
     }
     tgt_merged = py_io.merge(src_dict_example, tgt_dict_example)
     expected_dict = {
+        "global": {"environment": "testenv", "hostname": "testenv.net",},
         "scaling": {
-            "arborist": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
-            "fence": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
+            "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
+            "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
             "presigned-url-fence": {
-                "strategy": "",
+                "strategy": "slow",
                 "min": 2,
-                "max": 0,
-                "targetCpu": 0,
+                "max": 15,
+                "targetCpu": 4,
             },
-        }
+        },
+        "S3_BUCKETS": {
+            "cdis-presigned-url-test-target": {
+                "role-arn": "arn:aws:iam::707767160287:role/bucket_reader_writer_to_cdistest-presigned-url_role",
+                "cred": "target",
+            }
+        },
     }
+
     assert expected_dict == tgt_merged
 
 
@@ -406,11 +424,12 @@ def test_merge_json_file_with_stored_environment_params(
     """
     Test that manifest.json is written with correct enviroment params
     """
+
+    # Test case for json file
     os.system(
         f"cp {ABS_PATH}/data/fake_target_env/merge_manifest.json {ABS_PATH}/data/temp_target_env/manifest.json"
     )
     env_params = target_env.environment_specific_params["manifest.json"]
-    print(env_params)
     py_io.merge_json_file_with_stored_environment_params(
         ABS_PATH + "/data/temp_target_env",
         "manifest.json",
@@ -419,7 +438,7 @@ def test_merge_json_file_with_stored_environment_params(
         loaded_target_env,
     )
 
-    with open(ABS_PATH + "/data/temp_target_env/manifest.json", "r+") as f:
+    with open(ABS_PATH + "/data/temp_target_env/manifest.json", "r") as f:
         with open(
             ABS_PATH + "/data/test_references/testmerge_manifest.json", "r"
         ) as f2:
