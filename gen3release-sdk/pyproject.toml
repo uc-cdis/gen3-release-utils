@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gen3release"
-version = "0.3.2"
+version = "1.0"
 description = "Gen3 Release Management SDK"
 authors = ["CTDS UChicago <cdis@uchicago.edu>"]
 packages = [
@@ -14,13 +14,14 @@ packages = [
 python = "^3.6"
 PyGitHub = "^1.47"
 'ruamel.yaml' = "^0.16.10"
+pytest-cov = "^2.10.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2.1"
-
-[build-system]
-requires = ["poetry>=1.0.10"]
-build-backend = "poetry.masonry.api"
+pytest-cov = "^2.10.1"
 
 [tool.poetry.scripts]
 gen3release = 'gen3release.env_cli:main'
+[build-system]
+requires = ["poetry>=1.0.10"]
+build-backend = "poetry.masonry.api"
