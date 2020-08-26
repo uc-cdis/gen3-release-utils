@@ -93,12 +93,14 @@ def create_env_index_name(env_obj, the_file, data):
 def write_index_names(curr_dir, path, filename, env_obj):
     isyaml = filename.endswith(".yaml") or filename.endswith(".yml")
     data = None
+    copied_file = None
     full_path_to_target = "{}/{}".format(path, filename)
     if isyaml:
         shutil.copy("{}/".format(curr_dir) + filename, full_path_to_target)
+        copied_file = "{}/".format(curr_dir) + filename
         logging.debug("Opening yaml file [{}]".format(full_path_to_target))
         fd = open(full_path_to_target, "r+")
-        yaml = YAML(typ="safe")
+        yaml = YAML()
         data = yaml.load(fd)
     else:
         fd = open(full_path_to_target, "r+")
@@ -106,14 +108,16 @@ def write_index_names(curr_dir, path, filename, env_obj):
     create_env_index_name(env_obj, filename, data)
     fd.seek(0)
     if isyaml:
-        yaml = YAML(typ="safe")
+        yaml = YAML()
         yaml.default_flow_style = False
+        yaml.indent(offset=2, sequence=4, mapping=2)
         yaml.dump(data, fd)
     else:
         fd.write(json.dumps(data, indent=2))
-    fd.write("\n")  # add newline standard
+        fd.write("\n")  # add newline standard
     fd.truncate()
     fd.close()
+    return copied_file
 
 
 def read_in_file(filepath, flag):
@@ -283,7 +287,9 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                     logging.debug(
                         "Making sure this file [{}] has correct names.".format(a_file)
                     )
-                    write_index_names(curr_dir, dst, a_file, tgtEnv)
+                    copied_file = write_index_names(curr_dir, dst, a_file, tgtEnv)
+                    if copied_file:
+                        copied_files.append("{}/".format(dst) + a_file)
 
                 if ("{}/".format(dst) + a_file) not in copied_files:
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
