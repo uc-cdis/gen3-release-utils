@@ -298,53 +298,16 @@ def test_create_env_index_name(target_env, manifestnaming_data, etlMapping_data)
     assert expected_yaml_names == names
 
 
-def test_write_index_names(target_env, setUp_tearDown):
-    """
-    Test that the files are updated with modified names
-    """
-    # Test the writing of manifest.json
-    os.system(
-        f"cp {ABS_PATH}/data/fake_target_env/naming_manifest.json {ABS_PATH}/data/temp_target_env/manifest.json"
-    )
-    py_io.write_index_names(
-        ABS_PATH + "/data/fake_target_env",
-        ABS_PATH + "/data/temp_target_env",
-        "manifest.json",
-        target_env,
-    )
-    os.chdir(ABS_PATH)
-    with open(ABS_PATH + "/data/temp_target_env/manifest.json", "r") as f:
-        with open(
-            ABS_PATH + "/data/test_references/testnaming_manifest.json", "r"
-        ) as f2:
-            assert json.loads(f.read()) == json.loads(f2.read())
-
-    # Test the writing of etlMapping.yaml
-    os.system(
-        f"cp {ABS_PATH}/data/fake_target_env/etlMapping.yaml {ABS_PATH}/data/temp_target_env/etlMapping.yaml"
-    )
-    py_io.write_index_names(
-        ABS_PATH + "/data/fake_target_env",
-        ABS_PATH + "/data/temp_target_env",
-        "etlMapping.yaml",
-        target_env,
-    )
-    os.chdir(ABS_PATH)
-    yaml = YAML(typ="safe")
-    with open(ABS_PATH + "/data/temp_target_env/etlMapping.yaml", "r") as f:
-        with open(
-            ABS_PATH + "/data/test_references/testnaming_etlMapping.yaml", "r"
-        ) as f2:
-            assert yaml.load(f.read()) == yaml.load(f2.read())
-
-
 def test_store_environment_params(target_env, loaded_target_env):
     """
-    Test that environment params are loaded into environment object
+Test that environment params are loaded into environment object
     """
-    py_io.store_environment_params(
-        ABS_PATH + "/data/fake_target_env", target_env, "manifest.json"
-    )
+
+    # test loading of manifest env params
+    with open(ABS_PATH + "/data/fake_target_env/manifest.json", "r") as f:
+        mdata = json.loads(f.read())
+
+    py_io.store_environment_params(mdata, target_env, "manifest.json")
     sowers = target_env.sower_jobs
     expected_sower = loaded_target_env.sower_jobs
     assert expected_sower == sowers
@@ -353,10 +316,15 @@ def test_store_environment_params(target_env, loaded_target_env):
     assert (
         expected_params["manifest.json"] == env_params["manifest.json"]
     ), f"Got: {env_params}"
+
+    # Test loading of hatchery env params
+    with open(
+        ABS_PATH + "/data/fake_target_env/manifests/hatchery/hatchery.json", "r"
+    ) as f:
+        hdata = json.loads(f.read())
+
     py_io.store_environment_params(
-        ABS_PATH + "/data/fake_target_env/manifests/hatchery/",
-        target_env,
-        "hatchery.json",
+        hdata, target_env, "hatchery.json",
     )
     assert expected_params["hatchery.json"] == env_params["hatchery.json"]
 
@@ -416,33 +384,6 @@ def test_merge():
     }
 
     assert expected_dict == tgt_merged
-
-
-def test_merge_json_file_with_stored_environment_params(
-    target_env, loaded_target_env, setUp_tearDown
-):
-    """
-    Test that manifest.json is written with correct enviroment params
-    """
-
-    # Test case for json file
-    os.system(
-        f"cp {ABS_PATH}/data/fake_target_env/merge_manifest.json {ABS_PATH}/data/temp_target_env/manifest.json"
-    )
-    env_params = target_env.environment_specific_params["manifest.json"]
-    py_io.merge_json_file_with_stored_environment_params(
-        ABS_PATH + "/data/temp_target_env",
-        "manifest.json",
-        env_params,
-        target_env,
-        loaded_target_env,
-    )
-
-    with open(ABS_PATH + "/data/temp_target_env/manifest.json", "r") as f:
-        with open(
-            ABS_PATH + "/data/test_references/testmerge_manifest.json", "r"
-        ) as f2:
-            assert f2.read() == f.read()
 
 
 def test_process_sower_jobs():
@@ -541,7 +482,7 @@ def test_recursive_copy(source_env, setUp_tearDown):
     """
     temp_tgt = env.Env(f"{ABS_PATH}/data/temp_target_env")
     files = py_io.recursive_copy(
-        [], target_env, temp_tgt, source_env.full_path, temp_tgt.full_path
+        target_env, temp_tgt, source_env.full_path, temp_tgt.full_path
     )
     os.chdir(ABS_PATH)
     assert len(files) == 10
