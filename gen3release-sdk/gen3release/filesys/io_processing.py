@@ -163,15 +163,6 @@ def write_into_manifest(manifest, json_with_changes):
         return hashlib.md5(m.read().encode("utf-8"))
 
 
-def merge_json_file_with_stored_environment_params(data, the_file, srcEnc, tgtEnv):
-
-    if the_file == "manifest.json":
-        data = process_sower_jobs(data, srcEnc.sower_jobs, tgtEnv.sower_jobs)
-
-    merged_data = merge(tgtEnv.environment_specific_params[the_file], data)
-    return merged_data
-
-
 def process_sower_jobs(mani_json, srcEnv_sowers, tgtEnv_sowers):
     """
     Deletes sower jobs added to target environment if wasn't already in
