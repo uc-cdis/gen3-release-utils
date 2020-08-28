@@ -93,7 +93,6 @@ def create_env_index_name(tgtenv_obj, the_file, srcdata):
             typ,
             subkey,
         )
-    return srcdata
 
 
 def read_in_file(filepath, flag):
@@ -279,7 +278,7 @@ def recursive_copy(srcEnv, tgtEnv, src, dst):
                                     a_file
                                 )
                             )
-                            src_data = create_env_index_name(tgtEnv, a_file, src_data)
+                            create_env_index_name(tgtEnv, a_file, src_data)
                             modified_file = True
 
                         if modified_file:

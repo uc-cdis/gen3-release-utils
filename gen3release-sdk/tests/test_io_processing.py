@@ -276,9 +276,7 @@ def test_create_env_index_name(target_env, manifestnaming_data, etlMapping_data)
     """
     Test that created names have the form <commonsname_type>
     """
-    mani_data = py_io.create_env_index_name(
-        target_env, "manifest.json", manifestnaming_data
-    )
+    py_io.create_env_index_name(target_env, "manifest.json", manifestnaming_data)
     guppy = manifestnaming_data.get("guppy")
     expected_guppy = {
         "indices": [
@@ -290,9 +288,7 @@ def test_create_env_index_name(target_env, manifestnaming_data, etlMapping_data)
     }
     assert guppy == expected_guppy
 
-    yam_names = py_io.create_env_index_name(
-        target_env, "etlMapping.yaml", etlMapping_data
-    )
+    py_io.create_env_index_name(target_env, "etlMapping.yaml", etlMapping_data)
     expected_yaml_names = ["fake_target_env_subject", "fake_target_env_file"]
     names = [d["name"] for d in etlMapping_data.get("mappings")]
     assert expected_yaml_names == names
