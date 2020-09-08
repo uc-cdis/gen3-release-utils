@@ -227,7 +227,10 @@ def test_generate_safe_index_name():
         r"agen3.biodatacatalyst.nhlbi.nih.gov_testtype",
         r"this_is_number_____________________________________________________________________________________________________________________________________________________________________________________________________________________________01234567891_testtype",
     ]
-    for inp, oup, in zip(ENV_IN, ENV_OUT):
+    for (
+        inp,
+        oup,
+    ) in zip(ENV_IN, ENV_OUT):
         print(f"input {inp}")
         output = py_io.generate_safe_index_name(inp, "testtype")
         print(f"output {output}")
@@ -296,7 +299,7 @@ def test_create_env_index_name(target_env, manifestnaming_data, etlMapping_data)
 
 def test_store_environment_params(target_env, loaded_target_env):
     """
-Test that environment params are loaded into environment object
+    Test that environment params are loaded into environment object
     """
 
     # test loading of manifest env params
@@ -320,7 +323,9 @@ Test that environment params are loaded into environment object
         hdata = json.loads(f.read())
 
     py_io.store_environment_params(
-        hdata, target_env, "hatchery.json",
+        hdata,
+        target_env,
+        "hatchery.json",
     )
     assert expected_params["hatchery.json"] == env_params["hatchery.json"]
 
@@ -345,7 +350,10 @@ def test_merge():
         },
     }
     tgt_dict_example = {
-        "global": {"environment": "testenv", "hostname": "testenv.net",},
+        "global": {
+            "environment": "testenv",
+            "hostname": "testenv.net",
+        },
         "scaling": {
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"strategy": "auto", "min": 5, "max": 15, "targetCpu": 4},
@@ -356,11 +364,18 @@ def test_merge():
                 "targetCpu": 40,
             },
         },
-        "S3_BUCKETS": {"This should not exist": {"role-arn": "Not to be in output",}},
+        "S3_BUCKETS": {
+            "This should not exist": {
+                "role-arn": "Not to be in output",
+            }
+        },
     }
     tgt_merged = py_io.merge(src_dict_example, tgt_dict_example)
     expected_dict = {
-        "global": {"environment": "testenv", "hostname": "testenv.net",},
+        "global": {
+            "environment": "testenv",
+            "hostname": "testenv.net",
+        },
         "scaling": {
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
@@ -480,6 +495,7 @@ def test_recursive_copy(source_env, setUp_tearDown):
     files = py_io.recursive_copy(
         target_env, temp_tgt, source_env.full_path, temp_tgt.full_path
     )
+
     os.chdir(ABS_PATH)
     assert len(files) == 10
     assert are_dir_trees_equal(
