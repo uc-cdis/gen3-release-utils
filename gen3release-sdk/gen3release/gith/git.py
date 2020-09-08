@@ -11,19 +11,22 @@ logging.getLogger(__name__)
 
 class Git:
     def __init__(
-        self, repo="cdis-manifest", token="MEH-123", org="uc-cdis",
+        self,
+        repo="cdis-manifest",
+        token="MEH-123",
+        org="uc-cdis",
     ):
         """
-     Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
-    """
+        Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
+        """
         self.org = org
         self.repo = os.environ.get("REPO_NAME", "cdis-manifest")
         self.token = os.environ.get("GITHUB_TOKEN", "MEH-123").strip()
 
     def get_github_client(self):
         """
-     return a github client object that can instrument a given repo
-    """
+        return a github client object that can instrument a given repo
+        """
         g = Github(self.token)
         org = g.get_organization(self.org)
         try:
@@ -113,7 +116,13 @@ class Git:
         the_pr.add_to_labels("automerge")
 
     def create_pull_request_copy(
-        self, github_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name,
+        self,
+        github_client,
+        tgtEnv,
+        modified_files,
+        pr_title,
+        commit_msg,
+        branch_name,
     ):
         # add all files to the remote branch
         for f in modified_files:

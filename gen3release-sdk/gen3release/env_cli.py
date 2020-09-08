@@ -54,7 +54,8 @@ The most commonly used commands are:
     subparsers = parser.add_subparsers()
 
     parser_apply = subparsers.add_parser(
-        "apply", description="Applies an arbitrary version to all services",
+        "apply",
+        description="Applies an arbitrary version to all services",
     )
     parser_apply.add_argument(
         "-v",
