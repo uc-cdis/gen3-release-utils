@@ -188,7 +188,7 @@ def users(args):
     logging.debug("srcUsrYaml: {}".format(srcUsrYaml))
     logging.debug("tgtUsrYaml: {}".format(srcUsrYaml))
 
-    workspace = os.path.dirname(os.path.realpath(__file__))
+    workspace = os.getcwd()
     path_to_source_user_yaml_folder = os.path.abspath(srcUsrYaml)
     path_to_target_user_yaml_folder = os.path.abspath(tgtUsrYaml)
 
