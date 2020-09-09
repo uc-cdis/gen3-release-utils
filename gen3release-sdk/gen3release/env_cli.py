@@ -48,6 +48,9 @@ The most commonly used commands are:
 
    notes    Creates a pull request against a manifests repo storing release artifacts in a releases/<year>/<month> folder. It should store a general release manifest.json and the monthly release notes / markdown files.
             e.g. $ gen3release notes -v 2020.08 -f $SOME_FOLDER/gen3_release_notes.md $SOME_FOLDER/manifest.json
+
+   users    Creates a pull request in a users repo to replicate all permissions (roles, policies, users, etc.) from the user.yaml configured against internalstaging or preprod environments to their correspondent prod user.yaml files. That should avoid discrepancies between preprod and prod environments and prevent issues related to lack of permissions.
+            e.g. $ gen3release users -s commons-users/users/anvilinternalstaging/user.yaml -t commons-users/users/anvil/user.yaml
 """,
     )
 
@@ -143,6 +146,29 @@ The most commonly used commands are:
         help="list of file paths containing the monthly release artifacts to be stored in a manifests repo (e.g., ~/gen3_release_notes.md ~/manifest.json ~/knownbugs.md)",
     )
     parser_notes.set_defaults(func=notes)
+
+    parser_users = subparsers.add_parser(
+        "users",
+        description="Creates pull request to replica the contents of a preprod user.yaml to its corresponding prod user.yaml",
+    )
+    parser_users.add_argument(
+        "-s",
+        "--source",
+        dest="source",
+        required=True,
+        type=str,
+        help="Source path to preprod user.yaml (e.g., commons-users/users/datastageinternalstaging/user.yaml)",
+    )
+    parser_users.add_argument(
+        "-t",
+        "--target",
+        dest="target",
+        required=True,
+        type=str,
+        help="Target path to the prod user.yaml (e.g., datastage-users/blob/master/users/stageprod/user.yaml)",
+    )
+    parser_users.set_defaults(func=users)
+
     parser.set_defaults(func=apply)
     return parser
 
@@ -154,6 +180,52 @@ def main():
         parser.print_help(sys.stderr)
         sys.exit(1)
     args.func(args)
+
+
+def users(args):
+    srcUsrYaml = args.source
+    tgtUsrYaml = args.target
+    logging.debug("srcUsrYaml: {}".format(srcUsrYaml))
+    logging.debug("tgtUsrYaml: {}".format(srcUsrYaml))
+
+    path_to_source_user_yaml_folder = os.path.abspath(srcUsrYaml)
+
+    if "/" == path_to_source_user_yaml_folder[-1]:
+        path_to_source_user_yaml_folder = path_to_env_folder[:-1]
+
+        logging.debug(
+            "identifying repo directory and name for the source user yaml: {}".format(
+                str(path_to_source_user_yaml_folder)
+            )
+        )
+        pathsplits = path_to_source_user_yaml_folder.split("/")
+        repo_dir = pathsplits[-2]
+
+    logging.info("repo_dir: {}".format(repo_dir))
+
+
+"""
+    ts = str(time.time()).split(".")[0]
+    branch_name = "chore/replicate_user_yaml_from_{}_{}".format(srcEnv.name.replace(".", "_"), ts)
+    repo_name = os.path.basename(tgtEnv.repo_dir)
+    logging.debug("creating github client obj with repo={}".format(repo_name))
+    gh = Gh(repo=repo_name)
+    gh_client = gh.get_github_client()
+    logging.info(f"Created a github object {gh_client}")
+
+    # create new remote branch
+    new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
+    logging.info(f"branch name is {branch_name}")
+
+    # create commit, push user.yaml file to remote branch and create pull request
+    commit_msg = "copying files from {} to {}".format(srcEnv.name, tgtEnv.name)
+
+    gh.create_pull_request_user_yaml(
+        gh_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name
+    )
+    logging.info(f"{commit_msg}")
+    logging.info("PR created successfully!")
+"""
 
 
 def notes(args):

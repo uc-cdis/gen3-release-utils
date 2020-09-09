@@ -296,3 +296,13 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
             )
         )
         traceback.print_exc()
+
+
+def single_file_copy(src, dst):
+    try:
+        shutil.copy(src, dst)
+    except Exception as e:
+        logging.error(
+            "something went wrong while copying [{}] into [{}]".format(src, tgt)
+        )
+        traceback.print_exc()
