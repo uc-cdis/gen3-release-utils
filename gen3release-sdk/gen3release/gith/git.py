@@ -3,6 +3,7 @@ import logging
 
 from github import Github
 from github.GithubException import UnknownObjectException
+import pygit2
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
@@ -32,6 +33,15 @@ class Git:
             raise Exception("Could not get remote repositiory {}: {}".format(repo, e))
 
         return repo
+
+    def clone_repo(self, github_client, repo_name, workspace):
+        """
+     clone a repo into the local workspace
+    """
+        cloned_repo = pygit2.clone_repository(
+            github_client.clone_url, workspace + "/{}".format(repo_name)
+        )
+        return cloned_repo
 
     def cut_new_branch(self, github_client, branch_name):
         source_branch = "master"

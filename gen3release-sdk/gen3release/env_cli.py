@@ -165,7 +165,7 @@ The most commonly used commands are:
         dest="target",
         required=True,
         type=str,
-        help="Target path to the prod user.yaml (e.g., datastage-users/blob/master/users/stageprod/user.yaml)",
+        help="Target path to the prod user.yaml (e.g., datastage-users/users/stageprod/user.yaml)",
     )
     parser_users.set_defaults(func=users)
 
@@ -188,20 +188,29 @@ def users(args):
     logging.debug("srcUsrYaml: {}".format(srcUsrYaml))
     logging.debug("tgtUsrYaml: {}".format(srcUsrYaml))
 
+    workspace = os.path.dirname(os.path.realpath(__file__))
     path_to_source_user_yaml_folder = os.path.abspath(srcUsrYaml)
+    path_to_target_user_yaml_folder = os.path.abspath(tgtUsrYaml)
 
-    if "/" == path_to_source_user_yaml_folder[-1]:
-        path_to_source_user_yaml_folder = path_to_env_folder[:-1]
+    srcpathsplits = path_to_source_user_yaml_folder.split("/")
+    tgtpathsplits = path_to_target_user_yaml_folder.split("/")
+    src_repo_dir = srcpathsplits[-4]
+    tgt_repo_dir = tgtpathsplits[-4]
 
-        logging.debug(
-            "identifying repo directory and name for the source user yaml: {}".format(
-                str(path_to_source_user_yaml_folder)
-            )
-        )
-        pathsplits = path_to_source_user_yaml_folder.split("/")
-        repo_dir = pathsplits[-2]
+    logging.info("src_repo_dir: {}".format(src_repo_dir))
+    logging.info("tgt_repo_dir: {}".format(tgt_repo_dir))
 
-    logging.info("repo_dir: {}".format(repo_dir))
+    srcgh = Gh(repo=src_repo_dir)
+    src_gh_client = srcgh.get_github_client()
+    tgtgh = Gh(repo=tgt_repo_dir)
+    tgt_gh_client = tgtgh.get_github_client()
+
+    try:
+        src_user_yaml_repo = srcgh.clone_repo(src_gh_client, src_repo_dir, workspace)
+        tgt_user_yaml_repo = tgtgh.clone_repo(tgt_gh_client, tgt_repo_dir, workspace)
+    except GitCo as git_error:
+        print("Something went wrong: {}".format(git_error))
+        pass
 
 
 """
