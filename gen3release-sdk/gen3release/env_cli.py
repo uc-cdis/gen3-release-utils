@@ -183,14 +183,14 @@ def main():
 
 
 def users(args):
-    srcUsrYaml = args.source
-    tgtUsrYaml = args.target
-    logging.debug("srcUsrYaml: {}".format(srcUsrYaml))
-    logging.debug("tgtUsrYaml: {}".format(srcUsrYaml))
+    src_user_yaml = args.source
+    tgt_user_yaml = args.target
+    logging.debug("src_user_yaml: {}".format(src_user_yaml))
+    logging.debug("tgt_user_yaml: {}".format(src_user_yaml))
 
     workspace = os.getcwd()
-    path_to_source_user_yaml_folder = os.path.abspath(srcUsrYaml)
-    path_to_target_user_yaml_folder = os.path.abspath(tgtUsrYaml)
+    path_to_source_user_yaml_folder = os.path.abspath(src_user_yaml)
+    path_to_target_user_yaml_folder = os.path.abspath(tgt_user_yaml)
 
     srcpathsplits = path_to_source_user_yaml_folder.split("/")
     tgtpathsplits = path_to_target_user_yaml_folder.split("/")
@@ -206,11 +206,38 @@ def users(args):
     tgt_gh_client = tgtgh.get_github_client()
 
     try:
+        logging.debug("cloning src repo: {}".format(src_gh_client.clone_url))
         src_user_yaml_repo = srcgh.clone_repo(src_gh_client, src_repo_dir, workspace)
+        logging.debug("cloning tgt repo: {}".format(tgt_gh_client.clone_url))
         tgt_user_yaml_repo = tgtgh.clone_repo(tgt_gh_client, tgt_repo_dir, workspace)
-    except GitCo as git_error:
+    except Exception as git_error:
         print("Something went wrong: {}".format(git_error))
         pass
+
+    target_user_yaml_path = "{}/{}".format(tgtpathsplits[-3], tgtpathsplits[-2])
+    logging.debug("target_user_yaml_path: {}".format(target_user_yaml_path))
+    replicating_msg = "Replicating user.yaml from {}/{}/{} to {}/{}/{}".format(
+        srcpathsplits[-4],
+        srcpathsplits[-3],
+        srcpathsplits[-2],
+        tgtpathsplits[-4],
+        tgtpathsplits[-3],
+        tgtpathsplits[-2],
+    )
+    logging.debug(replicating_msg)
+    pr_title = "chore(release): {}".format(replicating_msg)
+    ts = str(time.time()).split(".")[0]
+    branch_name = "chore/replicate_user_yaml_from_{}_{}".format(
+        src_user_yaml.replace("/", "_"), ts
+    )
+
+    # create new remote branch
+    new_branch_ref = tgtgh.cut_new_branch(tgt_gh_client, branch_name)
+    logging.info(f"branch name is {branch_name}")
+
+    tgtgh.create_pull_request_user_yaml(
+        tgt_gh_client, src_user_yaml, target_user_yaml_path, pr_title, branch_name
+    )
 
 
 """
