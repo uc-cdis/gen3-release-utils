@@ -233,6 +233,7 @@ def users(args):
     tgtgh.create_pull_request_user_yaml(
         tgt_gh_client, src_user_yaml, target_user_yaml_path, pr_title, branch_name
     )
+    logging.info("PR created successfully!")
 
 
 def notes(args):
