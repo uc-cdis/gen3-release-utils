@@ -57,7 +57,7 @@ The most commonly used commands are:
     subparsers = parser.add_subparsers()
 
     parser_apply = subparsers.add_parser(
-        "apply", description="Applies an arbitrary version to all services",
+        "apply", description="Applies an arbitrary version to all services"
     )
     parser_apply.add_argument(
         "-v",
@@ -217,7 +217,7 @@ def users(args):
     target_user_yaml_path = "{}/{}".format(tgtpathsplits[-3], tgtpathsplits[-2])
     logging.debug("target_user_yaml_path: {}".format(target_user_yaml_path))
     replicating_msg = "Replicating user.yaml from {} to {}".format(
-        path_to_source_user_yaml_folder, path_to_target_user_yaml_folder,
+        path_to_source_user_yaml_folder, path_to_target_user_yaml_folder
     )
     logging.debug(replicating_msg)
     pr_title = "chore(release): {}".format(replicating_msg)

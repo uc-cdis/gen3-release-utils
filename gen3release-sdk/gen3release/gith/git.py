@@ -13,7 +13,7 @@ logging.getLogger(__name__)
 
 class Git:
     def __init__(
-        self, repo=None, username="PlanXCyborg", token="MEH-123", org="uc-cdis",
+        self, repo=None, username="PlanXCyborg", token="MEH-123", org="uc-cdis"
     ):
         """
      Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
@@ -69,7 +69,7 @@ class Git:
         return git_ref
 
     def create_pull_request_user_yaml(
-        self, github_client, user_yaml, target_user_yaml_path, pr_title, branch_name,
+        self, github_client, user_yaml, target_user_yaml_path, pr_title, branch_name
     ):
         # add user.yaml file to the remote branch
         logging.debug("adding {} to branch {}".format(user_yaml, branch_name))
@@ -160,7 +160,7 @@ class Git:
         the_pr.add_to_labels("automerge")
 
     def create_pull_request_copy(
-        self, github_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name,
+        self, github_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name
     ):
         # add all files to the remote branch
         for f in modified_files:
