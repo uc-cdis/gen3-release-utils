@@ -214,13 +214,16 @@ def users(args):
         print("Something went wrong: {}".format(git_error))
         sys.exit(1)
 
+    source_user_yaml_path = "{}/{}".format(srcpathsplits[-4], srcpathsplits[-2])
     target_user_yaml_path = "{}/{}".format(tgtpathsplits[-3], tgtpathsplits[-2])
     logging.debug("target_user_yaml_path: {}".format(target_user_yaml_path))
     replicating_msg = "Replicating user.yaml from {} to {}".format(
         path_to_source_user_yaml_folder, path_to_target_user_yaml_folder
     )
     logging.debug(replicating_msg)
-    pr_title = "chore(release): {}".format(replicating_msg)
+    pr_title = "chore(release): Replicating user.yaml from {}".format(
+        source_user_yaml_path
+    )
     ts = str(time.time()).split(".")[0]
     branch_name = "chore/replicate_user_yaml_from_{}_{}".format(
         src_user_yaml.replace("/", "_"), ts
