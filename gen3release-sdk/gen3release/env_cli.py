@@ -186,7 +186,7 @@ def users(args):
     src_user_yaml = args.source
     tgt_user_yaml = args.target
     logging.debug("src_user_yaml: {}".format(src_user_yaml))
-    logging.debug("tgt_user_yaml: {}".format(src_user_yaml))
+    logging.debug("tgt_user_yaml: {}".format(tgt_user_yaml))
 
     workspace = os.getcwd()
     path_to_source_user_yaml_folder = os.path.abspath(src_user_yaml)
@@ -212,17 +212,12 @@ def users(args):
         tgt_user_yaml_repo = tgtgh.clone_repo(tgt_gh_client, tgt_repo_dir, workspace)
     except Exception as git_error:
         print("Something went wrong: {}".format(git_error))
-        pass
+        sys.exit(1)
 
     target_user_yaml_path = "{}/{}".format(tgtpathsplits[-3], tgtpathsplits[-2])
     logging.debug("target_user_yaml_path: {}".format(target_user_yaml_path))
-    replicating_msg = "Replicating user.yaml from {}/{}/{} to {}/{}/{}".format(
-        srcpathsplits[-4],
-        srcpathsplits[-3],
-        srcpathsplits[-2],
-        tgtpathsplits[-4],
-        tgtpathsplits[-3],
-        tgtpathsplits[-2],
+    replicating_msg = "Replicating user.yaml from {} to {}".format(
+        path_to_source_user_yaml_folder, path_to_target_user_yaml_folder,
     )
     logging.debug(replicating_msg)
     pr_title = "chore(release): {}".format(replicating_msg)
@@ -238,30 +233,6 @@ def users(args):
     tgtgh.create_pull_request_user_yaml(
         tgt_gh_client, src_user_yaml, target_user_yaml_path, pr_title, branch_name
     )
-
-
-"""
-    ts = str(time.time()).split(".")[0]
-    branch_name = "chore/replicate_user_yaml_from_{}_{}".format(srcEnv.name.replace(".", "_"), ts)
-    repo_name = os.path.basename(tgtEnv.repo_dir)
-    logging.debug("creating github client obj with repo={}".format(repo_name))
-    gh = Gh(repo=repo_name)
-    gh_client = gh.get_github_client()
-    logging.info(f"Created a github object {gh_client}")
-
-    # create new remote branch
-    new_branch_ref = gh.cut_new_branch(gh_client, branch_name)
-    logging.info(f"branch name is {branch_name}")
-
-    # create commit, push user.yaml file to remote branch and create pull request
-    commit_msg = "copying files from {} to {}".format(srcEnv.name, tgtEnv.name)
-
-    gh.create_pull_request_user_yaml(
-        gh_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name
-    )
-    logging.info(f"{commit_msg}")
-    logging.info("PR created successfully!")
-"""
 
 
 def notes(args):
