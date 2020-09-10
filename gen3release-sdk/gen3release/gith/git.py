@@ -16,8 +16,8 @@ class Git:
         self, repo=None, username="PlanXCyborg", token="MEH-123", org="uc-cdis"
     ):
         """
-     Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
-    """
+        Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
+        """
         self.org = org
         self.username = username
         self.repo = (
@@ -27,8 +27,8 @@ class Git:
 
     def get_github_client(self):
         """
-     return a github client object that can instrument a given repo
-    """
+        return a github client object that can instrument a given repo
+        """
         g = Github(self.token)
         org = g.get_organization(self.org)
         try:
@@ -42,8 +42,8 @@ class Git:
 
     def clone_repo(self, github_client, repo_name, workspace):
         """
-     clone a repo into the local workspace
-    """
+        clone a repo into the local workspace
+        """
         creds = pygit2.UserPass(self.username, self.token)
         callbacks = RemoteCallbacks(creds, None)
         cloned_repo = pygit2.clone_repository(
