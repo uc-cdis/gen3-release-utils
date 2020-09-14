@@ -501,3 +501,18 @@ def test_recursive_copy(source_env, setUp_tearDown):
     assert are_dir_trees_equal(
         ABS_PATH + "/data/temp_target_env", ABS_PATH + "/data/fake_source_env"
     )
+
+
+def test_write_out_file(setUp_tearDown):
+    path = f"{ABS_PATH}/data/temp_target_env/tempfile.txt"
+    data = {"data": "fakedata"}
+
+    with pytest.raises(AssertionError):
+        py_io.write_out_file(path, data, "r")
+
+
+def test_read_in_file():
+    path = f"{ABS_PATH}/data/test_references/testmerge_manifest.json"
+
+    with pytest.raises(AssertionError):
+        py_io.read_in_file(path, "r+")

@@ -106,8 +106,6 @@ def read_in_file(filepath, flag):
             data = yaml.load(fd)
         elif filepath.endswith(".json"):
             data = json.loads(fd.read())
-    if not data:
-        raise NameError(f"Invalid file: {filepath} attempted to be read in")
     return data
 
 
