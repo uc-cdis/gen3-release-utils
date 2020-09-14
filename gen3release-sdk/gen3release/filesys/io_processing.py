@@ -122,7 +122,6 @@ def write_out_file(filepath, data, flag):
         elif filepath.endswith(".json"):
             fd.write(json.dumps(data, indent=2))
             fd.write("\n")
-        fd.truncate()
     logging.debug("Wrote file {}".format(filepath))
 
 
@@ -200,104 +199,102 @@ def recursive_copy(srcEnv, tgtEnv, src, dst):
         os.chdir(src)
         curr_dir = os.getcwd()
         logging.debug("current_dir: {}".format(curr_dir))
-        try:
-            for a_file in os.listdir():
-                if a_file == "README.md":
-                    continue
+        for a_file in os.listdir():
+            if a_file == "README.md":
+                continue
+            logging.debug("copying file: {}".format(("{}/".format(curr_dir) + a_file)))
+            if os.path.isdir("{}/".format(os.getcwd()) + a_file):
                 logging.debug(
-                    "copying file: {}".format(("{}/".format(curr_dir) + a_file))
+                    "this file {} is a directory. Stepping into it".format(a_file)
                 )
-                if os.path.isdir("{}/".format(os.getcwd()) + a_file):
+                a_folder = a_file
+                new_dst = os.path.join(dst, a_folder)
+                os.makedirs(new_dst, exist_ok=True)
+                curr_src = os.path.abspath(a_folder)
+                recurse(srcEnv, tgtEnv, curr_src, new_dst)
+                logging.debug("finished recursion on folder: {}".format(a_folder))
+                os.chdir(os.path.abspath(".."))
+            else:
+                logging.debug("copying {} into {}".format(a_file, dst))
+                src_filepath = "{}/".format(curr_dir) + a_file
+                tgt_filepath = "{}/".format(dst) + a_file
+                files_copied[src_filepath] = False
+                modified_file = False
+                if not path.exists("{}/{}".format(dst, a_file)):
                     logging.debug(
-                        "this file {} is a directory. Stepping into it".format(a_file)
+                        "File [{}] not found in target env, adding from source env".format(
+                            src + "/" + a_file
+                        )
                     )
-                    a_folder = a_file
-                    new_dst = os.path.join(dst, a_folder)
-                    os.makedirs(new_dst, exist_ok=True)
-                    curr_src = os.path.abspath(a_folder)
-                    recurse(srcEnv, tgtEnv, curr_src, new_dst)
-                    logging.debug("finished recursion on folder: {}".format(a_folder))
-                    os.chdir(os.path.abspath(".."))
-                else:
-                    logging.debug("copying {} into {}".format(a_file, dst))
-                    src_filepath = "{}/".format(curr_dir) + a_file
-                    tgt_filepath = "{}/".format(dst) + a_file
-                    files_copied[src_filepath] = False
-                    modified_file = False
-                    if not path.exists("{}/{}".format(dst, a_file)):
+                    shutil.copy("{}/".format(curr_dir) + a_file, dst)
+                    files_copied[src_filepath] = True
+                    continue
+
+                # files mapped in environment_specific_params need special treatment
+                params_template = tgtEnv.environment_specific_params.get(a_file)
+                names_template = tgtEnv.params_to_set.get(a_file)
+                if params_template or names_template:
+                    src_data = read_in_file(src_filepath, "r")
+                    tgt_data = read_in_file(tgt_filepath, "r")
+
+                    if params_template:
                         logging.debug(
-                            "File [{}] not found in target env, adding from source env".format(
-                                src + "/" + a_file
+                            "This file [{}] contains environment-specific parameters that need to be saved.".format(
+                                dst + "/" + a_file
                             )
                         )
-                        shutil.copy("{}/".format(curr_dir) + a_file, dst)
+                        # remember environment-specific information
+                        src_envparmas = store_environment_params(
+                            src_data, srcEnv, a_file
+                        )
+                        logging.debug(
+                            "Stored source parameters: {}".format(src_envparmas)
+                        )
+
+                        tgt_envparams = store_environment_params(
+                            tgt_data, tgtEnv, a_file
+                        )
+                        logging.debug(
+                            "Stored target parameters: {}".format(tgt_envparams)
+                        )
+
+                        if a_file == "manifest.json":
+                            src_data = process_sower_jobs(
+                                src_data, srcEnv.sower_jobs, tgtEnv.sower_jobs
+                            )
+
+                        src_data = merge(
+                            tgtEnv.environment_specific_params[a_file], src_data
+                        )
+                        modified_file = True
+
+                    if names_template:
+                        logging.debug(
+                            "Making sure this file [{}] has correct names.".format(
+                                a_file
+                            )
+                        )
+                        create_env_index_name(tgtEnv, a_file, src_data)
+                        modified_file = True
+
+                    if modified_file:
+                        write_out_file(tgt_filepath, src_data, "w")
                         files_copied[src_filepath] = True
-                        continue
+                else:
+                    assert not files_copied.get(
+                        src_filepath
+                    ), "Attempting to copy file that's already copied"
+                    shutil.copy(src_filepath, tgt_filepath)
+                    files_copied[src_filepath] = True
 
-                    # files mapped in environment_specific_params need special treatment
-                    params_template = tgtEnv.environment_specific_params.get(a_file)
-                    names_template = tgtEnv.params_to_set.get(a_file)
-                    if params_template or names_template:
-                        src_data = read_in_file(src_filepath, "r")
-                        tgt_data = read_in_file(tgt_filepath, "r")
+        return files_copied
 
-                        if params_template:
-                            logging.debug(
-                                "This file [{}] contains environment-specific parameters that need to be saved.".format(
-                                    dst + "/" + a_file
-                                )
-                            )
-                            # remember environment-specific information
-                            src_envparmas = store_environment_params(
-                                src_data, srcEnv, a_file
-                            )
-                            logging.debug(
-                                "Stored source parameters: {}".format(src_envparmas)
-                            )
-
-                            tgt_envparams = store_environment_params(
-                                tgt_data, tgtEnv, a_file
-                            )
-                            logging.debug(
-                                "Stored target parameters: {}".format(tgt_envparams)
-                            )
-
-                            if a_file == "manifest.json":
-                                src_data = process_sower_jobs(
-                                    src_data, srcEnv.sower_jobs, tgtEnv.sower_jobs
-                                )
-
-                            src_data = merge(
-                                tgtEnv.environment_specific_params[a_file], src_data
-                            )
-                            modified_file = True
-
-                        if names_template:
-                            logging.debug(
-                                "Making sure this file [{}] has correct names.".format(
-                                    a_file
-                                )
-                            )
-                            create_env_index_name(tgtEnv, a_file, src_data)
-                            modified_file = True
-
-                        if modified_file:
-                            write_out_file(tgt_filepath, src_data, "w")
-                            files_copied[src_filepath] = True
-                    else:
-                        assert not files_copied.get(
-                            src_filepath
-                        ), "Attempting to copy file that's already copied"
-                        shutil.copy(src_filepath, tgt_filepath)
-                        files_copied[src_filepath] = True
-
-            return files_copied
-        except Exception as e:
-            logging.error(
-                "something went wrong during the recursive copy of [{}] into [{}]".format(
-                    srcEnv.name, tgtEnv.name
-                )
+    try:
+        return recurse(srcEnv, tgtEnv, src, dst)
+    except Exception as e:
+        logging.error(
+            "something went wrong during the recursive copy of [{}] into [{}]".format(
+                srcEnv.name, tgtEnv.name
             )
-            traceback.print_exc()
-
-    return recurse(srcEnv, tgtEnv, src, dst)
+        )
+        traceback.print_exc()
