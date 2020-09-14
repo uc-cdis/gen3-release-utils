@@ -112,7 +112,7 @@ def read_in_file(filepath, flag):
 
 
 def write_out_file(filepath, data, flag):
-    assert flag in ["w", "w+", "wb"], "must being a write flag"
+    assert flag in ["w", "w+", "wb"], "must be a write flag"
     with open(filepath, flag) as fd:
         if filepath.endswith(".yaml") or filepath.endswith("yml"):
             yaml = YAML()
