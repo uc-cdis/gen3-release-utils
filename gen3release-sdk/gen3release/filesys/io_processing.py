@@ -102,10 +102,11 @@ def read_in_file(filepath, flag):
         if filepath.endswith(".yaml") or filepath.endswith("yml"):
             yaml = YAML()
             yaml.preserve_quotes = True
-
             data = yaml.load(fd)
         elif filepath.endswith(".json"):
             data = json.loads(fd.read())
+    if not data:
+        raise NameError(f"Failed to read in {filepath}, file must be yaml or json")
     return data
 
 
@@ -295,4 +296,5 @@ def recursive_copy(srcEnv, tgtEnv, src, dst):
                 srcEnv.name, tgtEnv.name
             )
         )
-        traceback.print_exc()
+        traceback.print_exc(e)
+        return {}
