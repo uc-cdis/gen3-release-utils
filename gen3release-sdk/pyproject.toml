@@ -13,6 +13,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.6"
 PyGitHub = "^1.47"
+pygit2 = "^1.2.1"
 'ruamel.yaml' = "^0.16.10"
 
 [tool.poetry.dev-dependencies]

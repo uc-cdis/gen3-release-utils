@@ -48,14 +48,16 @@ The most commonly used commands are:
 
    notes    Creates a pull request against a manifests repo storing release artifacts in a releases/<year>/<month> folder. It should store a general release manifest.json and the monthly release notes / markdown files.
             e.g. $ gen3release notes -v 2020.08 -f $SOME_FOLDER/gen3_release_notes.md $SOME_FOLDER/manifest.json
+
+   users    Creates a pull request in a users repo to replicate all permissions (roles, policies, users, etc.) from the user.yaml configured against internalstaging or preprod environments to their correspondent prod user.yaml files. That should avoid discrepancies between preprod and prod environments and prevent issues related to lack of permissions.
+            e.g. $ gen3release users -s commons-users/users/anvilinternalstaging/user.yaml -t commons-users/users/anvil/user.yaml
 """,
     )
 
     subparsers = parser.add_subparsers()
 
     parser_apply = subparsers.add_parser(
-        "apply",
-        description="Applies an arbitrary version to all services",
+        "apply", description="Applies an arbitrary version to all services"
     )
     parser_apply.add_argument(
         "-v",
@@ -144,6 +146,29 @@ The most commonly used commands are:
         help="list of file paths containing the monthly release artifacts to be stored in a manifests repo (e.g., ~/gen3_release_notes.md ~/manifest.json ~/knownbugs.md)",
     )
     parser_notes.set_defaults(func=notes)
+
+    parser_users = subparsers.add_parser(
+        "users",
+        description="Creates pull request to replica the contents of a preprod user.yaml to its corresponding prod user.yaml",
+    )
+    parser_users.add_argument(
+        "-s",
+        "--source",
+        dest="source",
+        required=True,
+        type=str,
+        help="Source path to preprod user.yaml (e.g., commons-users/users/datastageinternalstaging/user.yaml)",
+    )
+    parser_users.add_argument(
+        "-t",
+        "--target",
+        dest="target",
+        required=True,
+        type=str,
+        help="Target path to the prod user.yaml (e.g., datastage-users/users/stageprod/user.yaml)",
+    )
+    parser_users.set_defaults(func=users)
+
     parser.set_defaults(func=apply)
     return parser
 
@@ -155,6 +180,63 @@ def main():
         parser.print_help(sys.stderr)
         sys.exit(1)
     args.func(args)
+
+
+def users(args):
+    src_user_yaml = args.source
+    tgt_user_yaml = args.target
+    logging.debug("src_user_yaml: {}".format(src_user_yaml))
+    logging.debug("tgt_user_yaml: {}".format(tgt_user_yaml))
+
+    workspace = os.getcwd()
+    path_to_source_user_yaml_folder = os.path.abspath(src_user_yaml)
+    path_to_target_user_yaml_folder = os.path.abspath(tgt_user_yaml)
+
+    srcpathsplits = path_to_source_user_yaml_folder.split("/")
+    tgtpathsplits = path_to_target_user_yaml_folder.split("/")
+    src_repo_dir = srcpathsplits[-4]
+    tgt_repo_dir = tgtpathsplits[-4]
+
+    logging.info("src_repo_dir: {}".format(src_repo_dir))
+    logging.info("tgt_repo_dir: {}".format(tgt_repo_dir))
+
+    srcgh = Gh(repo=src_repo_dir)
+    src_gh_client = srcgh.get_github_client()
+    tgtgh = Gh(repo=tgt_repo_dir)
+    tgt_gh_client = tgtgh.get_github_client()
+
+    try:
+        logging.debug("cloning src repo: {}".format(src_gh_client.clone_url))
+        src_user_yaml_repo = srcgh.clone_repo(src_gh_client, src_repo_dir, workspace)
+        logging.debug("cloning tgt repo: {}".format(tgt_gh_client.clone_url))
+        tgt_user_yaml_repo = tgtgh.clone_repo(tgt_gh_client, tgt_repo_dir, workspace)
+    except Exception as git_error:
+        print("Something went wrong: {}".format(git_error))
+        sys.exit(1)
+
+    source_user_yaml_path = "{}/{}".format(srcpathsplits[-4], srcpathsplits[-2])
+    target_user_yaml_path = "{}/{}".format(tgtpathsplits[-3], tgtpathsplits[-2])
+    logging.debug("target_user_yaml_path: {}".format(target_user_yaml_path))
+    replicating_msg = "Replicating user.yaml from {} to {}".format(
+        path_to_source_user_yaml_folder, path_to_target_user_yaml_folder
+    )
+    logging.debug(replicating_msg)
+    pr_title = "chore(release): Replicating user.yaml from {}".format(
+        source_user_yaml_path
+    )
+    ts = str(time.time()).split(".")[0]
+    branch_name = "chore/replicate_user_yaml_from_{}_{}".format(
+        src_user_yaml.replace("/", "_"), ts
+    )
+
+    # create new remote branch
+    new_branch_ref = tgtgh.cut_new_branch(tgt_gh_client, branch_name)
+    logging.info(f"branch name is {branch_name}")
+
+    tgtgh.create_pull_request_user_yaml(
+        tgt_gh_client, src_user_yaml, target_user_yaml_path, pr_title, branch_name
+    )
+    logging.info("PR created successfully!")
 
 
 def notes(args):
