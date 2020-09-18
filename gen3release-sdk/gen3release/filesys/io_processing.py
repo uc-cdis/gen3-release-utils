@@ -62,21 +62,22 @@ def process_index_names(envname, block, file_data, key, typ, subkey):
         file_data[key][i][subkey] = block[key][i][subkey]
 
 
-def create_env_index_name(env_obj, the_file, data):
-    params = env_obj.params_to_set[the_file]
+def create_env_index_name(tgtenv_obj, the_file, srcdata):
+
+    params = tgtenv_obj.params_to_set[the_file]
     if the_file == "manifest.json":
         param_guppy = params["guppy"]
-        file_guppy = data.get("guppy")
+        file_guppy = srcdata.get("guppy")
         if not file_guppy:
             return
         key = "indices"
         typ = "type"
         subkey = "index"
-        process_index_names(env_obj.name, param_guppy, file_guppy, key, typ, subkey)
+        process_index_names(tgtenv_obj.name, param_guppy, file_guppy, key, typ, subkey)
 
         config_index = file_guppy.get("config_index")
         if config_index:
-            param_guppy["config_index"] = env_obj.name + "_" + "array-config"
+            param_guppy["config_index"] = tgtenv_obj.name + "_" + "array-config"
         if param_guppy.get("config_index"):
             file_guppy["config_index"] = param_guppy["config_index"]
 
@@ -85,35 +86,13 @@ def create_env_index_name(env_obj, the_file, data):
         typ = "doc_type"
         subkey = "name"
         process_index_names(
-            env_obj.name, env_obj.params_to_set[the_file], data, key, typ, subkey
+            tgtenv_obj.name,
+            tgtenv_obj.params_to_set[the_file],
+            srcdata,
+            key,
+            typ,
+            subkey,
         )
-    return data
-
-
-def write_index_names(curr_dir, path, filename, env_obj):
-    isyaml = filename.endswith(".yaml") or filename.endswith(".yml")
-    data = None
-    full_path_to_target = "{}/{}".format(path, filename)
-    if isyaml:
-        shutil.copy("{}/".format(curr_dir) + filename, full_path_to_target)
-        logging.debug("Opening yaml file [{}]".format(full_path_to_target))
-        fd = open(full_path_to_target, "r+")
-        yaml = YAML(typ="safe")
-        data = yaml.load(fd)
-    else:
-        fd = open(full_path_to_target, "r+")
-        data = json.loads(fd.read())
-    create_env_index_name(env_obj, filename, data)
-    fd.seek(0)
-    if isyaml:
-        yaml = YAML(typ="safe")
-        yaml.default_flow_style = False
-        yaml.dump(data, fd)
-    else:
-        fd.write(json.dumps(data, indent=2))
-    fd.write("\n")  # add newline standard
-    fd.truncate()
-    fd.close()
 
 
 def read_in_file(filepath, flag):
@@ -122,17 +101,31 @@ def read_in_file(filepath, flag):
         data = None
         if filepath.endswith(".yaml") or filepath.endswith("yml"):
             yaml = YAML()
+            yaml.preserve_quotes = True
             data = yaml.load(fd)
         elif filepath.endswith(".json"):
             data = json.loads(fd.read())
     if not data:
-        raise NameError(f"Invalid file: {filepath} attempted to be read in")
+        raise NameError(f"Failed to read in {filepath}, file must be yaml or json")
     return data
 
 
-def store_environment_params(path, env_obj, filename):
+def write_out_file(filepath, data, flag):
+    assert flag in ["w", "w+", "wb"], "must be a write flag"
+    with open(filepath, flag) as fd:
+        if filepath.endswith(".yaml") or filepath.endswith("yml"):
+            yaml = YAML()
+            yaml.default_flow_style = False
+            yaml.indent(offset=2, sequence=4, mapping=2)
+            yaml.dump(data, fd)
+        elif filepath.endswith(".json"):
+            fd.write(json.dumps(data, indent=2))
+            fd.write("\n")
+    logging.debug("Wrote file {}".format(filepath))
 
-    data = read_in_file("{}/{}".format(path, filename), "r")
+
+def store_environment_params(data, env_obj, filename):
+
     if filename == "manifest.json":
         env_obj.load_sower_jobs(data)
     return env_obj.load_environment_params(filename, data)
@@ -167,39 +160,6 @@ def write_into_manifest(manifest, json_with_changes):
         return hashlib.md5(m.read().encode("utf-8"))
 
 
-def merge_json_file_with_stored_environment_params(
-    dst_path, the_file, env_params, srcEnc, tgtEnv
-):
-    full_path_to_file = "{}/{}".format(dst_path, the_file)
-    logging.debug(
-        "merging stored data from [{}] into {}".format(the_file, full_path_to_file)
-    )
-    filetype = the_file.split(".")[-1]
-
-    assert filetype in ["json", "yaml", "yml"], "Must be a json or yaml file"
-    with open(full_path_to_file, "r+") as f:
-        if filetype == "json":
-            data = json.loads(f.read())
-            if the_file == "manifest.json":
-                data = process_sower_jobs(data, srcEnc.sower_jobs, tgtEnv.sower_jobs)
-        elif filetype == "yaml":
-            yaml = YAML()
-            yaml.preserve_quotes = True
-            data = yaml.load(f)
-        merged_json = merge(env_params, data)
-
-        f.seek(0)
-        if filetype == "json":
-            f.write(json.dumps(merged_json, indent=2))
-            f.write("\n")
-        elif filetype == "yaml":
-            yaml = YAML()
-            yaml.default_flow_style = False
-            yaml.indent(offset=2, sequence=4, mapping=2)
-            yaml.dump(merged_json, f)
-        f.truncate()
-
-
 def process_sower_jobs(mani_json, srcEnv_sowers, tgtEnv_sowers):
     """
     Deletes sower jobs added to target environment if wasn't already in
@@ -231,11 +191,13 @@ def process_sower_jobs(mani_json, srcEnv_sowers, tgtEnv_sowers):
     return mani_json
 
 
-def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
-    os.chdir(src)
-    curr_dir = os.getcwd()
-    logging.debug("current_dir: {}".format(curr_dir))
-    try:
+def recursive_copy(srcEnv, tgtEnv, src, dst):
+    files_copied = {}
+
+    def recurse(srcEnv, tgtEnv, src, dst):
+        os.chdir(src)
+        curr_dir = os.getcwd()
+        logging.debug("current_dir: {}".format(curr_dir))
         for a_file in os.listdir():
             if a_file == "README.md":
                 continue
@@ -244,15 +206,19 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                 logging.debug(
                     "this file {} is a directory. Stepping into it".format(a_file)
                 )
-                new_dst = os.path.join(dst, a_file)
+                a_folder = a_file
+                new_dst = os.path.join(dst, a_folder)
                 os.makedirs(new_dst, exist_ok=True)
-                curr_src = os.path.abspath(a_file)
-                recursive_copy(copied_files, srcEnv, tgtEnv, curr_src, new_dst)
-                logging.debug("finished recursion on folder: {}".format(a_file))
+                curr_src = os.path.abspath(a_folder)
+                recurse(srcEnv, tgtEnv, curr_src, new_dst)
+                logging.debug("finished recursion on folder: {}".format(a_folder))
                 os.chdir(os.path.abspath(".."))
             else:
                 logging.debug("copying {} into {}".format(a_file, dst))
-                # files mapped in environment_specific_params need special treatment
+                src_filepath = "{}/".format(curr_dir) + a_file
+                tgt_filepath = "{}/".format(dst) + a_file
+                files_copied[src_filepath] = False
+                modified_file = False
                 if not path.exists("{}/{}".format(dst, a_file)):
                     logging.debug(
                         "File [{}] not found in target env, adding from source env".format(
@@ -260,39 +226,75 @@ def recursive_copy(copied_files, srcEnv, tgtEnv, src, dst):
                         )
                     )
                     shutil.copy("{}/".format(curr_dir) + a_file, dst)
-                    copied_files.append("{}/".format(dst) + a_file)
+                    files_copied[src_filepath] = True
                     continue
-                if a_file in tgtEnv.environment_specific_params.keys():
-                    logging.debug(
-                        "This file [{}] contains environment-specific parameters that need to be saved.".format(
-                            dst + "/" + a_file
+
+                # files mapped in environment_specific_params need special treatment
+                params_template = tgtEnv.environment_specific_params.get(a_file)
+                names_template = tgtEnv.params_to_set.get(a_file)
+                if params_template or names_template:
+                    src_data = read_in_file(src_filepath, "r")
+                    tgt_data = read_in_file(tgt_filepath, "r")
+
+                    if params_template:
+                        logging.debug(
+                            "This file [{}] contains environment-specific parameters that need to be saved.".format(
+                                dst + "/" + a_file
+                            )
                         )
-                    )
-                    # remember environment-specific information
-                    store_environment_params(src, srcEnv, a_file)
-                    env_params = store_environment_params(dst, tgtEnv, a_file)
-                    logging.debug("Stored parameters: {}".format(env_params))
-                    shutil.copy("{}/".format(curr_dir) + a_file, dst)
-                    copied_files.append("{}/".format(dst) + a_file)
+                        # remember environment-specific information
+                        src_envparmas = store_environment_params(
+                            src_data, srcEnv, a_file
+                        )
+                        logging.debug(
+                            "Stored source parameters: {}".format(src_envparmas)
+                        )
 
-                    # re-apply all the stored environment-specific params
-                    merge_json_file_with_stored_environment_params(
-                        dst, a_file, env_params, srcEnv, tgtEnv
-                    )
-                if a_file in tgtEnv.params_to_set.keys():
-                    logging.debug(
-                        "Making sure this file [{}] has correct names.".format(a_file)
-                    )
-                    write_index_names(curr_dir, dst, a_file, tgtEnv)
+                        tgt_envparams = store_environment_params(
+                            tgt_data, tgtEnv, a_file
+                        )
+                        logging.debug(
+                            "Stored target parameters: {}".format(tgt_envparams)
+                        )
 
-                if ("{}/".format(dst) + a_file) not in copied_files:
-                    shutil.copy("{}/".format(curr_dir) + a_file, dst)
-                    copied_files.append("{}/".format(dst) + a_file)
-        return copied_files
+                        if a_file == "manifest.json":
+                            src_data = process_sower_jobs(
+                                src_data, srcEnv.sower_jobs, tgtEnv.sower_jobs
+                            )
+
+                        src_data = merge(
+                            tgtEnv.environment_specific_params[a_file], src_data
+                        )
+                        modified_file = True
+
+                    if names_template:
+                        logging.debug(
+                            "Making sure this file [{}] has correct names.".format(
+                                a_file
+                            )
+                        )
+                        create_env_index_name(tgtEnv, a_file, src_data)
+                        modified_file = True
+
+                    if modified_file:
+                        write_out_file(tgt_filepath, src_data, "w")
+                        files_copied[src_filepath] = True
+                else:
+                    assert not files_copied.get(
+                        src_filepath
+                    ), "Attempting to copy file that's already copied"
+                    shutil.copy(src_filepath, tgt_filepath)
+                    files_copied[src_filepath] = True
+
+        return files_copied
+
+    try:
+        return recurse(srcEnv, tgtEnv, src, dst)
     except Exception as e:
         logging.error(
             "something went wrong during the recursive copy of [{}] into [{}]".format(
                 srcEnv.name, tgtEnv.name
             )
         )
-        traceback.print_exc()
+        traceback.print_exc(e)
+        return {}

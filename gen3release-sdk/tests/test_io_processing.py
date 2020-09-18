@@ -227,7 +227,10 @@ def test_generate_safe_index_name():
         r"agen3.biodatacatalyst.nhlbi.nih.gov_testtype",
         r"this_is_number_____________________________________________________________________________________________________________________________________________________________________________________________________________________________01234567891_testtype",
     ]
-    for inp, oup, in zip(ENV_IN, ENV_OUT):
+    for (
+        inp,
+        oup,
+    ) in zip(ENV_IN, ENV_OUT):
         print(f"input {inp}")
         output = py_io.generate_safe_index_name(inp, "testtype")
         print(f"output {output}")
@@ -276,9 +279,7 @@ def test_create_env_index_name(target_env, manifestnaming_data, etlMapping_data)
     """
     Test that created names have the form <commonsname_type>
     """
-    mani_data = py_io.create_env_index_name(
-        target_env, "manifest.json", manifestnaming_data
-    )
+    py_io.create_env_index_name(target_env, "manifest.json", manifestnaming_data)
     guppy = manifestnaming_data.get("guppy")
     expected_guppy = {
         "indices": [
@@ -290,61 +291,22 @@ def test_create_env_index_name(target_env, manifestnaming_data, etlMapping_data)
     }
     assert guppy == expected_guppy
 
-    yam_names = py_io.create_env_index_name(
-        target_env, "etlMapping.yaml", etlMapping_data
-    )
+    py_io.create_env_index_name(target_env, "etlMapping.yaml", etlMapping_data)
     expected_yaml_names = ["fake_target_env_subject", "fake_target_env_file"]
     names = [d["name"] for d in etlMapping_data.get("mappings")]
     assert expected_yaml_names == names
-
-
-def test_write_index_names(target_env, setUp_tearDown):
-    """
-    Test that the files are updated with modified names
-    """
-    # Test the writing of manifest.json
-    os.system(
-        f"cp {ABS_PATH}/data/fake_target_env/naming_manifest.json {ABS_PATH}/data/temp_target_env/manifest.json"
-    )
-    py_io.write_index_names(
-        ABS_PATH + "/data/fake_target_env",
-        ABS_PATH + "/data/temp_target_env",
-        "manifest.json",
-        target_env,
-    )
-    os.chdir(ABS_PATH)
-    with open(ABS_PATH + "/data/temp_target_env/manifest.json", "r") as f:
-        with open(
-            ABS_PATH + "/data/test_references/testnaming_manifest.json", "r"
-        ) as f2:
-            assert json.loads(f.read()) == json.loads(f2.read())
-
-    # Test the writing of etlMapping.yaml
-    os.system(
-        f"cp {ABS_PATH}/data/fake_target_env/etlMapping.yaml {ABS_PATH}/data/temp_target_env/etlMapping.yaml"
-    )
-    py_io.write_index_names(
-        ABS_PATH + "/data/fake_target_env",
-        ABS_PATH + "/data/temp_target_env",
-        "etlMapping.yaml",
-        target_env,
-    )
-    os.chdir(ABS_PATH)
-    yaml = YAML(typ="safe")
-    with open(ABS_PATH + "/data/temp_target_env/etlMapping.yaml", "r") as f:
-        with open(
-            ABS_PATH + "/data/test_references/testnaming_etlMapping.yaml", "r"
-        ) as f2:
-            assert yaml.load(f.read()) == yaml.load(f2.read())
 
 
 def test_store_environment_params(target_env, loaded_target_env):
     """
     Test that environment params are loaded into environment object
     """
-    py_io.store_environment_params(
-        ABS_PATH + "/data/fake_target_env", target_env, "manifest.json"
-    )
+
+    # test loading of manifest env params
+    with open(ABS_PATH + "/data/fake_target_env/manifest.json", "r") as f:
+        mdata = json.loads(f.read())
+
+    py_io.store_environment_params(mdata, target_env, "manifest.json")
     sowers = target_env.sower_jobs
     expected_sower = loaded_target_env.sower_jobs
     assert expected_sower == sowers
@@ -353,8 +315,15 @@ def test_store_environment_params(target_env, loaded_target_env):
     assert (
         expected_params["manifest.json"] == env_params["manifest.json"]
     ), f"Got: {env_params}"
+
+    # Test loading of hatchery env params
+    with open(
+        ABS_PATH + "/data/fake_target_env/manifests/hatchery/hatchery.json", "r"
+    ) as f:
+        hdata = json.loads(f.read())
+
     py_io.store_environment_params(
-        ABS_PATH + "/data/fake_target_env/manifests/hatchery/",
+        hdata,
         target_env,
         "hatchery.json",
     )
@@ -381,7 +350,10 @@ def test_merge():
         },
     }
     tgt_dict_example = {
-        "global": {"environment": "testenv", "hostname": "testenv.net",},
+        "global": {
+            "environment": "testenv",
+            "hostname": "testenv.net",
+        },
         "scaling": {
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"strategy": "auto", "min": 5, "max": 15, "targetCpu": 4},
@@ -392,11 +364,18 @@ def test_merge():
                 "targetCpu": 40,
             },
         },
-        "S3_BUCKETS": {"This should not exist": {"role-arn": "Not to be in output",}},
+        "S3_BUCKETS": {
+            "This should not exist": {
+                "role-arn": "Not to be in output",
+            }
+        },
     }
     tgt_merged = py_io.merge(src_dict_example, tgt_dict_example)
     expected_dict = {
-        "global": {"environment": "testenv", "hostname": "testenv.net",},
+        "global": {
+            "environment": "testenv",
+            "hostname": "testenv.net",
+        },
         "scaling": {
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
@@ -416,33 +395,6 @@ def test_merge():
     }
 
     assert expected_dict == tgt_merged
-
-
-def test_merge_json_file_with_stored_environment_params(
-    target_env, loaded_target_env, setUp_tearDown
-):
-    """
-    Test that manifest.json is written with correct enviroment params
-    """
-
-    # Test case for json file
-    os.system(
-        f"cp {ABS_PATH}/data/fake_target_env/merge_manifest.json {ABS_PATH}/data/temp_target_env/manifest.json"
-    )
-    env_params = target_env.environment_specific_params["manifest.json"]
-    py_io.merge_json_file_with_stored_environment_params(
-        ABS_PATH + "/data/temp_target_env",
-        "manifest.json",
-        env_params,
-        target_env,
-        loaded_target_env,
-    )
-
-    with open(ABS_PATH + "/data/temp_target_env/manifest.json", "r") as f:
-        with open(
-            ABS_PATH + "/data/test_references/testmerge_manifest.json", "r"
-        ) as f2:
-            assert f2.read() == f.read()
 
 
 def test_process_sower_jobs():
@@ -541,10 +493,30 @@ def test_recursive_copy(source_env, setUp_tearDown):
     """
     temp_tgt = env.Env(f"{ABS_PATH}/data/temp_target_env")
     files = py_io.recursive_copy(
-        [], target_env, temp_tgt, source_env.full_path, temp_tgt.full_path
+        target_env, temp_tgt, source_env.full_path, temp_tgt.full_path
     )
+
     os.chdir(ABS_PATH)
     assert len(files) == 10
     assert are_dir_trees_equal(
         ABS_PATH + "/data/temp_target_env", ABS_PATH + "/data/fake_source_env"
     )
+
+
+def test_write_out_file(setUp_tearDown):
+    path = f"{ABS_PATH}/data/temp_target_env/tempfile.txt"
+    data = {"data": "fakedata"}
+    # catch improper flags
+    with pytest.raises(AssertionError):
+        py_io.write_out_file(path, data, "r")
+
+
+def test_read_in_file():
+    path = f"{ABS_PATH}/data/test_references/testmerge_manifest.json"
+    # catch imporper flags
+    with pytest.raises(AssertionError):
+        py_io.read_in_file(path, "r+")
+
+    # must be yaml or json
+    with pytest.raises(NameError):
+        py_io.read_in_file(f"{ABS_PATH}/__init__.py", "r")

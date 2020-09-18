@@ -57,7 +57,6 @@ class Git:
         source_branch = "master"
         target_branch = branch_name
         sb = github_client.get_branch(source_branch)
-        print(sb)
         git_ref = github_client.create_git_ref(
             ref="refs/heads/" + target_branch, sha=sb.commit.sha
         )

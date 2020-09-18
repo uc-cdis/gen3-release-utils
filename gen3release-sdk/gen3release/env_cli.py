@@ -388,22 +388,22 @@ def copy_all_files(srcEnv, tgtEnv):
         try:
             # copy all the files from the source environment folder
             # and re-apply the environment-specific parameters
-            copied_files = py_io.recursive_copy(
-                [], srcEnv, tgtEnv, srcEnv.full_path, tgtEnv.full_path
+            files_copied = py_io.recursive_copy(
+                srcEnv, tgtEnv, srcEnv.full_path, tgtEnv.full_path
             )
             # keep only relative paths (base_path = workspace)
-            base_path = tgtEnv.full_path
+            base_path = srcEnv.full_path
             logging.debug("base_path: {}".format(base_path))
             # remove base_path (keep only the files)
-            if copied_files:
-                copied_files = list(
-                    map(lambda f: f.replace(base_path, "").strip("/"), copied_files)
-                )
-                logging.debug("copied files: {}".format(copied_files))
-            else:
-                logging.debug("no files were copied")
-                return []
+            copied_files = [
+                f.replace(base_path, "").strip("/")
+                for f, v in files_copied.items()
+                if v
+            ]
+
+            logging.debug("copied files: {}".format(copied_files))
             return copied_files
+
         except Exception as err:
             raise Exception(
                 "something went wrong while trying to copy the environment folder: {}".format(
