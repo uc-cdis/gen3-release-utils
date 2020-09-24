@@ -4,7 +4,6 @@ import logging
 from github import Github
 from github.GithubException import UnknownObjectException
 import pygit2
-from pygit2 import RemoteCallbacks
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 logging.basicConfig(level=LOGLEVEL, format="%(asctime)-15s [%(levelname)s] %(message)s")
@@ -45,7 +44,7 @@ class Git:
         clone a repo into the local workspace
         """
         creds = pygit2.UserPass(self.username, self.token)
-        callbacks = RemoteCallbacks(creds, None)
+        callbacks = pygit2.RemoteCallbacks(creds, None)
         cloned_repo = pygit2.clone_repository(
             github_client.clone_url,
             workspace + "/{}".format(repo_name),
