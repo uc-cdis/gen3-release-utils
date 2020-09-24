@@ -104,7 +104,8 @@ def read_in_file(filepath, flag):
             yaml.preserve_quotes = True
             data = yaml.load(fd)
         elif filepath.endswith(".json"):
-            data = json.loads(fd.read())
+            contents = fd.read()
+            data = json.loads(contents)
     if not data:
         raise NameError(f"Failed to read in {filepath}, file must be yaml or json")
     return data
