@@ -13,9 +13,9 @@ logging.getLogger(__name__)
 class Env:
     def __init__(self, path_to_env_folder):
         """
-     Creates an EnvironmentConfig object to store information related to its folder path and the name of the environment.
-     This class also contains helper methods to facilitate the manipulation of config data.
-    """
+        Creates an EnvironmentConfig object to store information related to its folder path and the name of the environment.
+        This class also contains helper methods to facilitate the manipulation of config data.
+        """
         self.environment_specific_params = {
             "manifest.json": {
                 "notes": [],
@@ -52,6 +52,7 @@ class Env:
                 "env": {"NAMESPACE": "", "HOSTNAME": ""},  # KUBE_NAMESPACE
                 "sidecar": {"env": {"NAMESPACE": "", "HOSTNAME": ""}},
             },
+            "gitops.json": {"gaTrackingId": ""},
             "fence-config-public.yaml": {
                 "BASE_URL": "",
                 "S3_BUCKETS": {},
@@ -187,25 +188,27 @@ class Env:
         return json
 
     def save_blocks(self, block, env_params, json_block):
+        if not json_block:
+            return
         # if value is empty dictionary - add copy_all to not recurse on dict when merging
         if not env_params[block] and isinstance(env_params[block], dict):
-            env_params[block]["COPY_ALL"] = json_block[block]
+            env_params[block]["COPY_ALL"] = json_block.get(block)
         elif isinstance(env_params[block], dict):
             for sub_block in env_params[block].keys():
                 # if the value of a given key is a dict and it is declared in environment_specific_params
                 # apply recursion to store these parameters
-                self.save_blocks(sub_block, env_params[block], json_block[block])
+                self.save_blocks(sub_block, env_params[block], json_block.get(block))
         else:
             logging.debug(
                 "saving block [{}]. Here is the value from the file: {}".format(
-                    block, json_block[block]
+                    block, json_block.get(block)
                 )
             )
-            env_params[block] = json_block[block]
+            env_params[block] = json_block.get(block)
 
     def load_environment_params(self, file_name, json_data):
         """Places environment specific values from target environment into  env object,
-    removes fields from object not found in target and returns the dictionary with fields"""
+        removes fields from object not found in target and returns the dictionary with fields"""
         logging.debug("storing info from: " + file_name)
         try:
             env_params = self.environment_specific_params[file_name]

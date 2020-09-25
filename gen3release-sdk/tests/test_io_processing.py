@@ -370,6 +370,7 @@ def test_merge():
             }
         },
     }
+
     tgt_merged = py_io.merge(src_dict_example, tgt_dict_example)
     expected_dict = {
         "global": {
@@ -485,6 +486,24 @@ def test_process_sower_jobs():
             },
         }
     ]
+
+
+def test_clean_dictionary():
+    nestedempty = {
+        "scaling": {
+            "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
+            "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
+            "presigned-url-fence": {},
+        }
+    }
+    expected = {
+        "scaling": {
+            "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
+            "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
+        }
+    }
+
+    assert nestedempty == expected
 
 
 def test_recursive_copy(source_env, setUp_tearDown):
