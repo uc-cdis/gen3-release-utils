@@ -510,8 +510,9 @@ def test_clean_dictionary():
             "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
         }
     }
+    outdict = py_io.clean_dictionary(nestedempty)
 
-    assert nestedempty == expected
+    assert outdict == expected
 
 
 def test_recursive_copy(source_env, setUp_tearDown):

@@ -147,7 +147,7 @@ def merge(source, destination):
             node = destination.setdefault(key, {})
             merge(value, node)
         else:
-            if value:
+            if value or value == 0:
                 destination[key] = value
             else:
                 destination.pop(key, None)
@@ -262,10 +262,12 @@ def recursive_copy(srcEnv, tgtEnv, src, dst):
                                 dst + "/" + a_file
                             )
                         )
+                        if a_file == "manifest.json":
+                            srcEnv.load_sower_jobs(src_data)
+                            tgtEnv.load_sower_jobs(tgt_data)
 
-                        tgt_envparams = store_environment_params(
-                            tgt_data, tgtEnv, a_file
-                        )
+                        tgt_envparams = tgtEnv.load_environment_params(a_file, tgt_data)
+
                         logging.debug(
                             "Stored target parameters: {}".format(tgt_envparams)
                         )
