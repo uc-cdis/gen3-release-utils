@@ -487,18 +487,26 @@ def test_process_sower_jobs():
         }
     ]
 
+    # Don't write sowers if none exist
+    target_sower = []
+    data = py_io.process_sower_jobs({}, source_sower, target_sower)
+    assert not data.get("sower")
+
 
 def test_clean_dictionary():
+    """
+    Test that keys with null values are removed
+    """
     nestedempty = {
         "scaling": {
-            "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
+            "arborist": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
             "presigned-url-fence": {},
         }
     }
     expected = {
         "scaling": {
-            "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
+            "arborist": {"min": 0, "max": 0, "targetCpu": 0},
             "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
         }
     }
