@@ -204,11 +204,7 @@ def clean_dictionary(dic):
         return dic
     if isinstance(dic, list):
         return [v for v in (clean_dictionary(v) for v in dic) if v or v == 0]
-    return {
-        k: v
-        for k, v in ((k, clean_dictionary(v)) for k, v in dic.items())
-        if v or v == 0
-    }
+    return {k: v for k, v in ((k, clean_dictionary(v)) for k, v in dic.items()) if v}
 
 
 def recursive_copy(srcEnv, tgtEnv, src, dst):
