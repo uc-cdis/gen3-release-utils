@@ -499,7 +499,7 @@ def test_clean_dictionary():
     """
     nestedempty = {
         "scaling": {
-            "arborist": {"strategy": "", "min": -1, "max": -1, "targetCpu": -1},
+            "arborist": {"strategy": "", "min": "", "max": "", "targetCpu": ""},
             "fence": {"strategy": "auto", "min": 32, "max": 10, "targetCpu": 10},
             "presigned-url-fence": {},
         }

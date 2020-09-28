@@ -35,16 +35,16 @@ class Env:
                     },  # KUBE_NAMESPACE
                 },
                 "scaling": {
-                    "arborist": {"strategy": "", "min": -1, "max": -1, "targetCpu": -1},
-                    "fence": {"strategy": "", "min": -1, "max": -1, "targetCpu": -1},
+                    "arborist": {"strategy": "", "min": "", "max": "", "targetCpu": ""},
+                    "fence": {"strategy": "", "min": "", "max": "", "targetCpu": ""},
                     "presigned-url-fence": {
                         "strategy": "",
-                        "min": -1,
-                        "max": -1,
-                        "targetCpu": -1,
+                        "min": "",
+                        "max": "",
+                        "targetCpu": "",
                     },
-                    "indexd": {"strategy": "", "min": -1, "max": -1, "targetCpu": -1},
-                    "revproxy": {"strategy": "", "min": -1, "max": -1, "targetCpu": -1},
+                    "indexd": {"strategy": "", "min": "", "max": "", "targetCpu": ""},
+                    "revproxy": {"strategy": "", "min": "", "max": "", "targetCpu": ""},
                 },
             },
             "hatchery.json": {
