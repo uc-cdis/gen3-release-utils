@@ -207,7 +207,7 @@ def clean_dictionary(dic):
     return {
         k: v
         for k, v in ((k, clean_dictionary(v)) for k, v in dic.items())
-        if v and v != -1
+        if v or v == 0
     }
 
 

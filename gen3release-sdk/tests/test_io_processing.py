@@ -336,6 +336,7 @@ def test_merge():
     """
     src_dict_example = {
         "scaling": {
+            "indexd": {"strategy": "auto", "min": "", "max": ""},
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"min": 0, "max": 0, "targetCpu": 0},
             "presigned-url-fence": {"strategy": "slow", "max": 15, "targetCpu": 4},
@@ -355,6 +356,7 @@ def test_merge():
             "hostname": "testenv.net",
         },
         "scaling": {
+            "indexd": {"strategy": "", "min": "", "max": ""},
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"strategy": "auto", "min": 5, "max": 15, "targetCpu": 4},
             "presigned-url-fence": {
@@ -378,6 +380,7 @@ def test_merge():
             "hostname": "testenv.net",
         },
         "scaling": {
+            "indexd": {"strategy": "auto"},
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
             "presigned-url-fence": {
@@ -499,13 +502,20 @@ def test_clean_dictionary():
     """
     nestedempty = {
         "scaling": {
-            "arborist": {"strategy": "", "min": "", "max": "", "targetCpu": ""},
+            "indexd": {
+                "strategy": "",
+                "min": "",
+                "max": "",
+                "targetCpu": "",
+            },  # main usecase
+            "arborist": {"strategy": "auto", "min": 0, "max": "", "targetCpu": ""},
             "fence": {"strategy": "auto", "min": 32, "max": 10, "targetCpu": 10},
             "presigned-url-fence": {},
         }
     }
     expected = {
         "scaling": {
+            "arborist": {"strategy": "auto", "min": 0},
             "fence": {"strategy": "auto", "min": 32, "max": 10, "targetCpu": 10},
         }
     }
