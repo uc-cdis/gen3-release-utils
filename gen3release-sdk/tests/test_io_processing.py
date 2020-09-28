@@ -499,15 +499,14 @@ def test_clean_dictionary():
     """
     nestedempty = {
         "scaling": {
-            "arborist": {"strategy": "", "min": 0, "max": 0, "targetCpu": 0},
-            "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
+            "arborist": {"strategy": "", "min": -1, "max": -1, "targetCpu": -1},
+            "fence": {"strategy": "auto", "min": 32, "max": 10, "targetCpu": 10},
             "presigned-url-fence": {},
         }
     }
     expected = {
         "scaling": {
-            "arborist": {"min": 0, "max": 0, "targetCpu": 0},
-            "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
+            "fence": {"strategy": "auto", "min": 32, "max": 10, "targetCpu": 10},
         }
     }
     outdict = py_io.clean_dictionary(nestedempty)
