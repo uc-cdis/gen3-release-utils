@@ -336,6 +336,7 @@ def test_merge():
     """
     src_dict_example = {
         "scaling": {
+            "indexd": {"strategy": "auto", "min": "", "max": ""},
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"min": 0, "max": 0, "targetCpu": 0},
             "presigned-url-fence": {"strategy": "slow", "max": 15, "targetCpu": 4},
@@ -355,6 +356,7 @@ def test_merge():
             "hostname": "testenv.net",
         },
         "scaling": {
+            "indexd": {"strategy": "", "min": "", "max": ""},
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"strategy": "auto", "min": 5, "max": 15, "targetCpu": 4},
             "presigned-url-fence": {
@@ -370,6 +372,7 @@ def test_merge():
             }
         },
     }
+
     tgt_merged = py_io.merge(src_dict_example, tgt_dict_example)
     expected_dict = {
         "global": {
@@ -377,6 +380,7 @@ def test_merge():
             "hostname": "testenv.net",
         },
         "scaling": {
+            "indexd": {"strategy": "auto"},
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
             "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
             "presigned-url-fence": {
@@ -485,6 +489,39 @@ def test_process_sower_jobs():
             },
         }
     ]
+
+    # Don't write sowers if none exist
+    target_sower = []
+    data = py_io.process_sower_jobs({}, source_sower, target_sower)
+    assert not data.get("sower")
+
+
+def test_clean_dictionary():
+    """
+    Test that keys with null values are removed
+    """
+    nestedempty = {
+        "scaling": {
+            "indexd": {
+                "strategy": "",
+                "min": "",
+                "max": "",
+                "targetCpu": "",
+            },  # main usecase
+            "arborist": {"strategy": "auto", "min": 0, "max": "", "targetCpu": ""},
+            "fence": {"strategy": "auto", "min": 32, "max": 10, "targetCpu": 10},
+            "presigned-url-fence": {},
+        }
+    }
+    expected = {
+        "scaling": {
+            "arborist": {"strategy": "auto", "min": 0},
+            "fence": {"strategy": "auto", "min": 32, "max": 10, "targetCpu": 10},
+        }
+    }
+    outdict = py_io.clean_dictionary(nestedempty)
+
+    assert outdict == expected
 
 
 def test_recursive_copy(source_env, setUp_tearDown):
