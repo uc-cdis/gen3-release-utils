@@ -147,7 +147,7 @@ def merge(source, destination):
             node = destination.setdefault(key, {})
             merge(value, node)
         else:
-            if value or value == 0:
+            if str(value) != "GEN3_RELEASE_SDK_PLACEHOLDER":
                 destination[key] = value
             else:
                 destination.pop(key, None)

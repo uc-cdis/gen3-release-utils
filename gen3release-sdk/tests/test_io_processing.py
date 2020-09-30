@@ -297,49 +297,22 @@ def test_create_env_index_name(target_env, manifestnaming_data, etlMapping_data)
     assert expected_yaml_names == names
 
 
-def test_store_environment_params(target_env, loaded_target_env):
-    """
-    Test that environment params are loaded into environment object
-    """
-
-    # test loading of manifest env params
-    with open(ABS_PATH + "/data/fake_target_env/manifest.json", "r") as f:
-        mdata = json.loads(f.read())
-
-    py_io.store_environment_params(mdata, target_env, "manifest.json")
-    sowers = target_env.sower_jobs
-    expected_sower = loaded_target_env.sower_jobs
-    assert expected_sower == sowers
-    env_params = target_env.environment_specific_params
-    expected_params = loaded_target_env.environment_specific_params
-    assert (
-        expected_params["manifest.json"] == env_params["manifest.json"]
-    ), f"Got: {env_params}"
-
-    # Test loading of hatchery env params
-    with open(
-        ABS_PATH + "/data/fake_target_env/manifests/hatchery/hatchery.json", "r"
-    ) as f:
-        hdata = json.loads(f.read())
-
-    py_io.store_environment_params(
-        hdata,
-        target_env,
-        "hatchery.json",
-    )
-    assert expected_params["hatchery.json"] == env_params["hatchery.json"]
-
-
 def test_merge():
     """
     Test that source (saved target environment params) dictionary is merged into target dictionary
     """
     src_dict_example = {
+        "global": {
+            "environment": "GEN3_RELEASE_SDK_PLACEHOLDER",
+            "hostname": "faketarget.org",
+            "revproxy_arn": "acm",
+        },
         "scaling": {
-            "indexd": {"strategy": "auto", "min": "", "max": ""},
-            "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
-            "fence": {"min": 0, "max": 0, "targetCpu": 0},
-            "presigned-url-fence": {"strategy": "slow", "max": 15, "targetCpu": 4},
+            "COPY_ALL": {
+                "indexd": {"strategy": "fullauto", "min": 1, "max": 1000},
+                "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
+                "fence": {"strategy": "auto", "min": 50, "max": 105, "targetCpu": 4},
+            }
         },
         "S3_BUCKETS": {
             "COPY_ALL": {
@@ -350,15 +323,16 @@ def test_merge():
             }
         },
     }
-    tgt_dict_example = {
+    destination_dict_example = {
         "global": {
-            "environment": "testenv",
-            "hostname": "testenv.net",
+            "environment": "peeps",
+            "hostname": "sourceenv.org",
+            "revproxy_arn": "acm",
         },
         "scaling": {
-            "indexd": {"strategy": "", "min": "", "max": ""},
+            "indexd": {"strategy": "", "min": 1, "max": 1},
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
-            "fence": {"strategy": "auto", "min": 5, "max": 15, "targetCpu": 4},
+            "fence": {"strategy": "auto", "min": 5, "max": 10, "targetCpu": 4},
             "presigned-url-fence": {
                 "strategy": "slow",
                 "min": 2,
@@ -373,22 +347,13 @@ def test_merge():
         },
     }
 
-    tgt_merged = py_io.merge(src_dict_example, tgt_dict_example)
+    dest_merged = py_io.merge(src_dict_example, destination_dict_example)
     expected_dict = {
-        "global": {
-            "environment": "testenv",
-            "hostname": "testenv.net",
-        },
+        "global": {"hostname": "faketarget.org", "revproxy_arn": "acm"},
         "scaling": {
-            "indexd": {"strategy": "auto"},
+            "indexd": {"strategy": "fullauto", "min": 1, "max": 1000},
             "arborist": {"strategy": "fast", "min": 0, "max": 0, "targetCpu": 0},
-            "fence": {"strategy": "auto", "min": 0, "max": 0, "targetCpu": 0},
-            "presigned-url-fence": {
-                "strategy": "slow",
-                "min": 2,
-                "max": 15,
-                "targetCpu": 4,
-            },
+            "fence": {"strategy": "auto", "min": 50, "max": 105, "targetCpu": 4},
         },
         "S3_BUCKETS": {
             "cdis-presigned-url-test-target": {
@@ -398,7 +363,7 @@ def test_merge():
         },
     }
 
-    assert expected_dict == tgt_merged
+    assert expected_dict == dest_merged
 
 
 def test_process_sower_jobs():
@@ -494,34 +459,6 @@ def test_process_sower_jobs():
     target_sower = []
     data = py_io.process_sower_jobs({}, source_sower, target_sower)
     assert not data.get("sower")
-
-
-def test_clean_dictionary():
-    """
-    Test that keys with null values are removed
-    """
-    nestedempty = {
-        "scaling": {
-            "indexd": {
-                "strategy": "",
-                "min": "",
-                "max": "",
-                "targetCpu": "",
-            },  # main usecase
-            "arborist": {"strategy": "auto", "min": 0, "max": "", "targetCpu": ""},
-            "fence": {"strategy": "auto", "min": 32, "max": 10, "targetCpu": 10},
-            "presigned-url-fence": {},
-        }
-    }
-    expected = {
-        "scaling": {
-            "arborist": {"strategy": "auto", "min": 0},
-            "fence": {"strategy": "auto", "min": 32, "max": 10, "targetCpu": 10},
-        }
-    }
-    outdict = py_io.clean_dictionary(nestedempty)
-
-    assert outdict == expected
 
 
 def test_recursive_copy(source_env, setUp_tearDown):
