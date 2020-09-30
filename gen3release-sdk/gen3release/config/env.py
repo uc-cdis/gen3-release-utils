@@ -17,49 +17,50 @@ class Env:
         This class also contains helper methods to facilitate the manipulation of config data.
         """
         self.environment_specific_params = {
+            # We use dummy values in case one of the env-specifc params in target is empty
             "manifest.json": {
-                "notes": [],
+                "notes": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 "global": {
-                    "environment": "",  # VPC
-                    "hostname": "",
-                    "revproxy_arn": "",
-                    "kube_bucket": "",
-                    "logs_bucket": "",
-                    "sync_from_dbgap": "",
-                    "useryaml_s3path": "",
+                    "environment": "GEN3_RELEASE_SDK_PLACEHOLDER",  # VPC
+                    "hostname": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    "revproxy_arn": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    "kube_bucket": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    "logs_bucket": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    "sync_from_dbgap": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    "useryaml_s3path": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 },
                 "hatchery": {
-                    "user-namespace": "",
+                    "user-namespace": "GEN3_RELEASE_SDK_PLACEHOLDER",
                     "sidecar": {
-                        "env": {"NAMESPACE": "", "HOSTNAME": ""}
+                        "env": {
+                            "NAMESPACE": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                            "HOSTNAME": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                        }
                     },  # KUBE_NAMESPACE
                 },
-                "scaling": {
-                    "arborist": {"strategy": "", "min": "", "max": "", "targetCpu": ""},
-                    "fence": {"strategy": "", "min": "", "max": "", "targetCpu": ""},
-                    "presigned-url-fence": {
-                        "strategy": "",
-                        "min": "",
-                        "max": "",
-                        "targetCpu": "",
-                    },
-                    "indexd": {"strategy": "", "min": "", "max": "", "targetCpu": ""},
-                    "revproxy": {"strategy": "", "min": "", "max": "", "targetCpu": ""},
-                },
+                "scaling": {},
             },
             "hatchery.json": {
-                "user-namespace": "",
-                "env": {"NAMESPACE": "", "HOSTNAME": ""},  # KUBE_NAMESPACE
-                "sidecar": {"env": {"NAMESPACE": "", "HOSTNAME": ""}},
+                "user-namespace": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                "env": {
+                    "NAMESPACE": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    "HOSTNAME": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                },  # KUBE_NAMESPACE
+                "sidecar": {
+                    "env": {
+                        "NAMESPACE": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                        "HOSTNAME": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    }
+                },
             },
-            "gitops.json": {"gaTrackingId": ""},
+            "gitops.json": {"gaTrackingId": "GEN3_RELEASE_SDK_PLACEHOLDER"},
             "fence-config-public.yaml": {
-                "BASE_URL": "",
+                "BASE_URL": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 "S3_BUCKETS": {},
-                "DATA_UPLOAD_BUCKET": "",
-                "GOOGLE_GROUP_PREFIX": "",
-                "GOOGLE_SERVICE_ACCOUNT_PREFIX": "",
-                "LOGIN_REDIRECT_WHITELIST": [],
+                "DATA_UPLOAD_BUCKET": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                "GOOGLE_GROUP_PREFIX": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                "GOOGLE_SERVICE_ACCOUNT_PREFIX": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                "LOGIN_REDIRECT_WHITELIST": "GEN3_RELEASE_SDK_PLACEHOLDER",
             },
         }
 

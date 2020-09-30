@@ -125,13 +125,6 @@ def write_out_file(filepath, data, flag):
     logging.debug("Wrote file {}".format(filepath))
 
 
-def store_environment_params(data, env_obj, filename):
-
-    if filename == "manifest.json":
-        env_obj.load_sower_jobs(data)
-    return env_obj.load_environment_params(filename, data)
-
-
 def read_manifest(manifest):
     with open(manifest, "r") as m:
         contents = m.read()
@@ -148,7 +141,7 @@ def merge(source, destination):
             node = destination.setdefault(key, {})
             merge(value, node)
         else:
-            if value or value == 0:
+            if str(value) != "GEN3_RELEASE_SDK_PLACEHOLDER":
                 destination[key] = value
             else:
                 destination.pop(key, None)
@@ -195,21 +188,6 @@ def process_sower_jobs(mani_json, srcEnv_sowers, tgtEnv_sowers):
         if accountname:
             s_job["serviceAccountName"] = accountname
     return mani_json
-
-
-def clean_dictionary(dic):
-    """
-    Removes all keys in a nested dictionary that have null values
-    """
-    if not isinstance(dic, (dict, list)):
-        return dic
-    if isinstance(dic, list):
-        return [v for v in (clean_dictionary(v) for v in dic) if v or v == 0]
-    return {
-        k: v
-        for k, v in ((k, clean_dictionary(v)) for k, v in dic.items())
-        if v or v == 0
-    }
 
 
 def recursive_copy(srcEnv, tgtEnv, src, dst):
@@ -281,8 +259,6 @@ def recursive_copy(srcEnv, tgtEnv, src, dst):
                         src_data = merge(
                             tgtEnv.environment_specific_params[a_file], src_data
                         )
-                        # Remove any fields with no data
-                        src_data = clean_dictionary(src_data)
 
                         # Assure no keys without values
                         modified_file = True

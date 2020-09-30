@@ -159,7 +159,7 @@ def test_save_blocks(target_env):
     mockenv_params = target_env.environment_specific_params["manifest.json"]
 
     target_env.save_blocks("scaling", mockenv_params, data)
-    assert mockenv_params["scaling"] == data["scaling"]
+    assert mockenv_params["scaling"]["COPY_ALL"] == data["scaling"]
 
 
 def test_find_and_replace(target_env):
