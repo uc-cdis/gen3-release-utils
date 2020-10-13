@@ -70,6 +70,9 @@ class Env:
         }
 
         self.svcs_to_ignore = [
+            "arranger",
+            "arranger-dashboard",
+            "arranger-adminapi",
             "aws-es-proxy",
             "fluentd",
             "ambassador",
