@@ -207,9 +207,15 @@ def users(args):
 
     try:
         logging.debug("cloning src repo: {}".format(src_gh_client.clone_url))
-        src_user_yaml_repo = srcgh.clone_repo(src_gh_client, src_repo_dir, workspace)
+        os.mkdir(workspace + "/source")
+        src_user_yaml_repo = srcgh.clone_repo(
+            src_gh_client, src_repo_dir, workspace + "/source"
+        )
         logging.debug("cloning tgt repo: {}".format(tgt_gh_client.clone_url))
-        tgt_user_yaml_repo = tgtgh.clone_repo(tgt_gh_client, tgt_repo_dir, workspace)
+        os.mkdir(workspace + "/target")
+        tgt_user_yaml_repo = tgtgh.clone_repo(
+            tgt_gh_client, tgt_repo_dir, workspace + "/target"
+        )
     except Exception as git_error:
         print("Something went wrong: {}".format(git_error))
         sys.exit(1)
@@ -234,7 +240,11 @@ def users(args):
     logging.info(f"branch name is {branch_name}")
 
     tgtgh.create_pull_request_user_yaml(
-        tgt_gh_client, src_user_yaml, target_user_yaml_path, pr_title, branch_name
+        tgt_gh_client,
+        "source/" + src_user_yaml,
+        target_user_yaml_path,
+        pr_title,
+        branch_name,
     )
     logging.info("PR created successfully!")
 
