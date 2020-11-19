@@ -36,7 +36,7 @@ tasks = [
     },
     {
         "title": "SHARED: 5. Release testing round: automated tests and manual tests against qa envs",
-        "description": 'Full list of tests tracked in the "Test Plan - Gen3 Releases" spreadsheet',
+        "description": 'The release manager will pick critical manual user flows and delegate to the other SDETs. The full list of tests tracked in the "Test Plan - Gen3 Releases" spreadsheet',
     },
     {
         "title": "6. Run load tests on qa-dcp and store json files with results for benchmarking purposes",
