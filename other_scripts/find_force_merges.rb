@@ -60,7 +60,7 @@ force_merges.each { |fm|
 }
 qabot_msg += '```'
 
-uri = URI.parse("https://slack.com/api/chat.postMessage?token=#{ENV['QABOT_SLACK_API_TOKEN'].chomp}&channel=CPG3R0R9Q&icon_url=https://avatars.slack-edge.com/2019-11-23/846894374304_3adeb13422453e142051_192.png&username=qa-bot&text=#{CGI.escape(qabot_msg)}")
+uri = URI.parse("https://slack.com/api/chat.postMessage?token=#{ENV['QABOT_SLACK_API_TOKEN'].chomp}&channel=#{ENV['REPORT_TO_CHANNEL']&icon_url=https://avatars.slack-edge.com/2019-11-23/846894374304_3adeb13422453e142051_192.png&username=qa-bot&text=#{CGI.escape(qabot_msg)}")
 header = {'Content-Type': 'text/json'}
 
 # Create the HTTP objects
