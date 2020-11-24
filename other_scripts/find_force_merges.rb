@@ -41,7 +41,7 @@ listOfClosedPRs.each { |pr|
     if prStatuses[0]['state'] != 'success'
       total_failures = total_failures + 1
       if prMetadata['merged']
-        force_merges.append("PR ##{pr['number']} -> Merged by: #{prMetadata['user']['login']}")
+        force_merges.append("PR ##{pr['number']} Author: #{prMetadata['user']['login']} ->  Merged by: #{prMetadata['merged_by']['login']}")
       end
     end
   end
