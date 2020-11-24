@@ -17,7 +17,7 @@ def httpGetter(url_str)
 end
 
 server = "https://api.github.com"
-repo = "cdis-manifest"
+repo = ENV['TARGET_REPO'] || "cdis-manifest"
 
 listOfClosedPRs = httpGetter("#{server}/repos/uc-cdis/#{repo}/pulls\?state\=closed")
 
@@ -40,8 +40,8 @@ listOfClosedPRs.each { |pr|
     puts("state: #{prStatuses[0]['state']}")
     if prStatuses[0]['state'] != 'success'
       total_failures = total_failures + 1
-      if prMetadata['merged']
-        force_merges.append("PR ##{pr['number']} -> Merged by: #{prMetadata['user']['login']}")
+      if prMetadata['merged'] && prMetadata['merged_by']['login'] != "emalinowski"
+        force_merges.append("PR ##{pr['number']} -> Merged by: #{prMetadata['merged_by']['login']}")
       end
     end
   end
