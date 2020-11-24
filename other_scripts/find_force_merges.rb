@@ -17,7 +17,7 @@ def httpGetter(url_str)
 end
 
 server = "https://api.github.com"
-repo = "cdis-manifest"
+repo = ENV['TARGET_REPO'].chomp
 
 listOfClosedPRs = httpGetter("#{server}/repos/uc-cdis/#{repo}/pulls\?state\=closed")
 
