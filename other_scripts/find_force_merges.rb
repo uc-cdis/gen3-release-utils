@@ -17,7 +17,7 @@ def httpGetter(url_str)
 end
 
 server = "https://api.github.com"
-repo = "cdis-manifest"
+repo = ENV['TARGET_REPO'].chomp
 
 listOfClosedPRs = httpGetter("#{server}/repos/uc-cdis/#{repo}/pulls\?state\=closed")
 
@@ -41,7 +41,7 @@ listOfClosedPRs.each { |pr|
     if prStatuses[0]['state'] != 'success'
       total_failures = total_failures + 1
       if prMetadata['merged']
-        force_merges.append("PR ##{pr['number']} -> Merged by: #{prMetadata['user']['login']}")
+        force_merges.append("PR ##{pr['number']} Author: #{prMetadata['user']['login']} ->  Merged by: #{prMetadata['merged_by']['login']}")
       end
     end
   end
@@ -53,12 +53,17 @@ stats['force_merges'] = { label: 'force merges', value: "#{force_merges}" }
 
 # puts JSON.pretty_generate(stats)
 
-qabot_msg = "oh nous :oof: looks like we have some force-merges in `cdis-manifest`..."
-qabot_msg += '```'
-force_merges.each { |fm|
-  qabot_msg += fm + "\n"
-}
-qabot_msg += '```'
+qabot_msg = ""
+if force_merges.empty?
+  qabot_msg += ":tada: :relieved: No force-merges have been found in this repo (at least not in the last 7 days)"
+else
+  qabot_msg += "oh nous :oof: looks like we have some force-merges in `cdis-manifest`..."
+  qabot_msg += '```'
+  force_merges.each { |fm|
+    qabot_msg += fm + "\n"
+  }
+  qabot_msg += '```'
+end
 
 uri = URI.parse("https://cdis.slack.com/api/chat.postMessage?token=#{ENV['QABOT_SLACK_API_TOKEN'].chomp}&channel=#{ENV['REPORT_TO_CHANNEL']}&icon_url=https://avatars.slack-edge.com/2019-11-23/846894374304_3adeb13422453e142051_192.png&username=qa-bot&text=#{CGI.escape(qabot_msg)}")
 header = {'Content-Type': 'text/json'}
