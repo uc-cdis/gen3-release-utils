@@ -57,6 +57,11 @@ class Env:
                 "gaTrackingId": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 "dataExplorerConfig": {
                     "terraExportURL": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    "sevenBridgesExportURL": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                },
+                "fileExplorerConfig": {
+                    "terraExportURL": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    "sevenBridgesExportURL": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 },
             },
             "fence-config-public.yaml": {
