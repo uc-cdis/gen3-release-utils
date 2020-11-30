@@ -53,7 +53,12 @@ class Env:
                     }
                 },
             },
-            "gitops.json": {"gaTrackingId": "GEN3_RELEASE_SDK_PLACEHOLDER"},
+            "gitops.json": {
+                "gaTrackingId": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                "dataExplorerConfig": {
+                    "terraExportURL": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                },
+            },
             "fence-config-public.yaml": {
                 "BASE_URL": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 "S3_BUCKETS": {},
