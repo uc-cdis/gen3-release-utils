@@ -55,9 +55,9 @@ stats['force_merges'] = { label: 'force merges', value: "#{force_merges}" }
 
 qabot_msg = ""
 if force_merges.empty?
-  qabot_msg += ":tada: :relieved: No force-merges have been found in this repo (at least not in the last 7 days)"
+  qabot_msg += ":tada: :relieved: No force-merges have been found in repo #{repo} (at least not in the last 7 days)"
 else
-  qabot_msg += "oh nous :oof: looks like we have some force-merges in `cdis-manifest`..."
+  qabot_msg += "oh nous :oof: looks like we have some force-merges in `#{repo}`..."
   qabot_msg += '```'
   force_merges.each { |fm|
     qabot_msg += fm + "\n"
