@@ -63,6 +63,16 @@ class Env:
                     "terraExportURL": "GEN3_RELEASE_SDK_PLACEHOLDER",
                     "sevenBridgesExportURL": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 },
+                "components": {
+                "login": {
+                    "title": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                },
+                "footerLogos": [
+                    {
+                        "src": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    }
+                ]
+            }
             },
             "fence-config-public.yaml": {
                 "BASE_URL": "GEN3_RELEASE_SDK_PLACEHOLDER",
