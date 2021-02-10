@@ -63,14 +63,14 @@ class Env:
                     "terraExportURL": "GEN3_RELEASE_SDK_PLACEHOLDER",
                     "sevenBridgesExportURL": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 },
-                "components: {
+                "components": {
                 "login": {
                     "title": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 },
                 "footerLogos": [
                     {
                         "src": "GEN3_RELEASE_SDK_PLACEHOLDER",
-                },
+                    }
                 ]
             }
             },
