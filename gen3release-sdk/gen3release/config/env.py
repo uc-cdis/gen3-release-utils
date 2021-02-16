@@ -64,15 +64,15 @@ class Env:
                     "sevenBridgesExportURL": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 },
                 "components": {
-                "login": {
-                    "title": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    "login": {
+                        "title": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    },
+                    "footerLogos": [
+                        {
+                            "src": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                        }
+                    ],
                 },
-                "footerLogos": [
-                    {
-                        "src": "GEN3_RELEASE_SDK_PLACEHOLDER",
-                    }
-                ]
-            }
             },
             "fence-config-public.yaml": {
                 "BASE_URL": "GEN3_RELEASE_SDK_PLACEHOLDER",
@@ -83,6 +83,8 @@ class Env:
                 "LOGIN_REDIRECT_WHITELIST": "GEN3_RELEASE_SDK_PLACEHOLDER",
             },
         }
+
+        self.files_to_ignore = ["fence-config-public.yaml"]
 
         self.params_to_set = {
             "manifest.json": {"guppy": {"indices": [], "config_index": ""}},
