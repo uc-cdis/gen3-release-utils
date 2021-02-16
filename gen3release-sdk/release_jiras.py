@@ -27,43 +27,39 @@ tasks = [
         "description": "Run the folling command to apply the integration branch images against the target QA environment: python gen3release/env_cli.py apply -v integration2020<nn> -e ~/workspace/gitops-qa/qa-<environment>.planx-pla.net",
     },
     {
-        "title": "3. Create release retro wiki page",
-        "description": "Clone an existing page, e.g., https://ctds-planx.atlassian.net/wiki/spaces/PLA/pages/466321418/RELEASE+200205+-+Retrospective",
-    },
-    {
-        "title": "4. Generate spreadsheet for the monthly testing rounds",
+        "title": "3. Generate spreadsheet for the monthly testing rounds",
         "description": "Instructions: Run this command `node generate-test-plan.js` from the `gen3-qa` repo. Once the spreadsheet is generated, copy and paste its contents into the main google Sheet containing all the monthly-separated tabs.",
     },
     {
-        "title": "SHARED: 5. Release testing round: automated tests and manual tests against qa envs",
+        "title": "SHARED: 4. Release testing round: automated tests and manual tests against qa envs",
         "description": 'Full list of tests tracked in the "Test Plan - Gen3 Releases" spreadsheet',
     },
     {
-        "title": "6. Run load tests on qa-dcp and store json files with results for benchmarking purposes",
+        "title": "5. Run load tests on qa-dcp and store json files with results for benchmarking purposes",
         "description": "Run the following load scenarios: fence-presigned-url, sheepdog-import-clinical-metada, metadata-service-create-and-query and metadata-service-filter-large-database. Just kick off this job https://jenkins.planx-pla.net/job/gen3-run-load-tests/ and store the result.json files accordingly.",
     },
     {
-        "title": "7. Merge the integration branch into stable and tag the release",
+        "title": "6. Merge the integration branch into stable and tag the release",
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/merge-integration-branch-into-stable-and-tag/. Once the tag-based images are built in Quay, sanity check the images by creating a `gitops-qa` PR to deploy them against one of the QA environments.",
     },
     {
-        "title": "8. Generate release notes and publish release manifest into `cdis-manifest/<year>/<month>` folder",
+        "title": "7. Generate release notes and publish release manifest into `cdis-manifest/<year>/<month>` folder",
         "description": "Generate the release notes with this Jenkins job: https://jenkins.planx-pla.net/job/gen3-qa-monthly-release-notes-generator. The cdis-manifest PR is tailored manually and it should include release notes and known bugs files (the PR must be labeled with `doc-only`).",
     },
     {
-        "title": "9. Pushing monthly release quay images to AWS ECR (as a backup)",
+        "title": "8. Pushing monthly release quay images to AWS ECR (as a backup)",
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/push-gen3-monthly-release-images-to-aws-ecr. Also double-check if the repos_list.txt is up-to-date.",
     },
     {
-        "title": "10. Create cdis-manifest PRs for {}".format(release),
+        "title": "9. Create cdis-manifest PRs for {}".format(release),
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/create-prs-for-all-monthly-release-envs/",
     },
     {
-        "title": "SHARED: 11. Follow up with PMs to merge the PRs of respective commons",
+        "title": "SHARED: 10. Follow up with PMs to merge the PRs of respective commons",
         "description": "The `automerge` label is applied automatically to all PRs, once the PM approves it, the changes will be automatically merged and deployed to the environment. The QA engineers should monitor the PRs in case of any CI check failures.",
     },
     {
-        "title": "12. Mark the release as released",
+        "title": "11. Mark the release as released",
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/mark-gen3-monthly-release-as-released.",
     },
 ]
@@ -71,7 +67,8 @@ tasks = [
 user_ids = os.environ["JIRA_USER_IDS"].split(",")
 
 team_members = [
-    {"name": "haraprasadj", "id": user_ids[2]},
+    # {"name": "haraprasadj", "id": user_ids[3]},
+    {"name": "jingh8", "id": user_ids[2]},
     {"name": "atharvar", "id": user_ids[1]},
     {"name": "marceloc", "id": user_ids[0]},
 ]
