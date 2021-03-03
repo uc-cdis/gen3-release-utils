@@ -47,15 +47,11 @@ tasks = [
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/push-gen3-monthly-release-images-to-aws-ecr. Also double-check if the repos_list.txt is up-to-date.",
     },
     {
-        "title": "8. Create cdis-manifest PRs for {}".format(release),
-        "description": "Kick off this job: https://jenkins.planx-pla.net/job/create-prs-for-all-monthly-release-envs/",
-    },
-    {
-        "title": "SHARED: 9. Follow up with PMs to merge the PRs of respective commons",
+        "title": "SHARED: 8. Follow up with PMs to merge the PRs of respective commons",
         "description": "The `automerge` label is applied automatically to all PRs, once the PM approves it, the changes will be automatically merged and deployed to the environment. The QA engineers should monitor the PRs in case of any CI check failures.",
     },
     {
-        "title": "10. Mark the release as released",
+        "title": "9. Mark the release as released",
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/mark-gen3-monthly-release-as-released.",
     },
 ]
