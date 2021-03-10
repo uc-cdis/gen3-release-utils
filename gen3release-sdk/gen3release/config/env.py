@@ -64,15 +64,15 @@ class Env:
                     "sevenBridgesExportURL": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 },
                 "components": {
-                "login": {
-                    "title": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    "login": {
+                        "title": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    },
+                    "footerLogos": [
+                        {
+                            "src": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                        }
+                    ],
                 },
-                "footerLogos": [
-                    {
-                        "src": "GEN3_RELEASE_SDK_PLACEHOLDER",
-                    }
-                ]
-            }
             },
             "fence-config-public.yaml": {
                 "BASE_URL": "GEN3_RELEASE_SDK_PLACEHOLDER",
@@ -94,6 +94,7 @@ class Env:
             "arranger-dashboard",
             "arranger-adminapi",
             "aws-es-proxy",
+            "dashboard",
             "fluentd",
             "ambassador",
             "nb2",
