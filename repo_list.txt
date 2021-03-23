@@ -25,3 +25,4 @@ dcf-dataservice
 mariner
 ws-storage
 ACCESS-backend
+cloud-automation
