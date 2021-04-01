@@ -202,6 +202,19 @@ def recursive_copy(srcEnv, tgtEnv, src, dst):
                 continue
             logging.debug("copying file: {}".format(("{}/".format(curr_dir) + a_file)))
             if os.path.isdir("{}/".format(os.getcwd()) + a_file):
+
+                # TODO: qa-covid19 has some humongous files
+                # that should not be under version control.
+                # this temporary patch should unblock the gitops-qa -> cdis-manifest code promotion
+                if (
+                    "/".join(curr_dir.split("/")[-2::])
+                    == "qa-covid19.planx-pla.net/dashboard"
+                ):
+                    logging.warn(
+                        "skipping the whole qa-covid19.planx-pla.net/dashboard directory..."
+                    )
+                    continue
+
                 logging.debug(
                     "this file {} is a directory. Stepping into it".format(a_file)
                 )
