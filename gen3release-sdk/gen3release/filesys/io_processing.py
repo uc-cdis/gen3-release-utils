@@ -210,7 +210,9 @@ def recursive_copy(srcEnv, tgtEnv, src, dst):
                     "/".join(curr_dir.split("/")[-2::])
                     == "qa-covid19.planx-pla.net/dashboard"
                 ):
-                    # skip this whole directory
+                    logging.warn(
+                        "skipping the whole qa-covid19.planx-pla.net/dashboard directory..."
+                    )
                     continue
 
                 logging.debug(
