@@ -13,7 +13,9 @@ fi;
 
 repoOwner="uc-cdis"
 startDate="$START_DATE"
+echo "### startDate is ${startDate} ###"
 endDate="$END_DATE"
+echo "### endDate is ${endDate} ###"
 githubAccessToken=$GITHUB_TOKEN
 
 if find . -name "release_notes.md" -type f; then
@@ -35,6 +37,7 @@ while IFS= read -r repo; do
     exit 1
   fi
   if [[ $(wc -l < release_notes.md) -ge 3 ]]; then
+    cat release_notes.md
     cat release_notes.md >> gen3_release_notes.md
   fi
 done < "$repo_list"
