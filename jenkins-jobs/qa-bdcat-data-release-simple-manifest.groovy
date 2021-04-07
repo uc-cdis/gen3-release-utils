@@ -46,7 +46,7 @@ spec:
                   doGenerateSubmoduleConfigurations: false,
                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gen3sdk-python']],
                   submoduleCfg: [],
-                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUserJenkins', url: 'https://github.com/uc-cdis/cloud-automation.git']]
+                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUserJenkins', url: 'https://github.com/uc-cdis/gen3sdk-python.git']]
                 ])
                 // gen3-qa
                 checkout([
@@ -55,7 +55,7 @@ spec:
                   doGenerateSubmoduleConfigurations: false,
                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gen3-qa']],
                   submoduleCfg: [],
-                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUserJenkins2', url: 'https://github.com/uc-cdis/gen3sdk-python.git']]
+                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUserJenkins2', url: 'https://github.com/uc-cdis/gen3-qa.git']]
                 ])
             }
         }
