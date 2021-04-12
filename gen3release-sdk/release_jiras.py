@@ -94,9 +94,6 @@ PROJECT_NAME = os.environ["JIRA_PROJECT_NAME"]
 RELEASE_TITLE = "{} {} Gen3 Core Release".format(month, year)
 COMPONENTS = [
     {"name": "Team Catch(Err)"},
-    {"name": "Team WOMBAT"},
-    {"name": "Team HTTP-302"},
-    {"name": "Team JINK"},
 ]
 
 epic_dict = {
