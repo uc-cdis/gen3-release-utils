@@ -241,6 +241,10 @@ def recursive_copy(srcEnv, tgtEnv, src, dst):
                     files_copied[src_filepath] = True
                     continue
 
+                if a_file in tgtEnv.files_to_ignore:
+                    logging.warn(f"Ignoring file [{a_file}] as per ignore list...")
+                    continue
+
                 # files mapped in environment_specific_params need special treatment
                 params_template = tgtEnv.environment_specific_params.get(a_file)
                 names_template = tgtEnv.params_to_set.get(a_file)

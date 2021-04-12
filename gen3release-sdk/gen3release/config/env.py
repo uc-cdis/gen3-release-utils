@@ -84,6 +84,8 @@ class Env:
             },
         }
 
+        self.files_to_ignore = ["fence-config-public.yaml"]
+
         self.params_to_set = {
             "manifest.json": {"guppy": {"indices": [], "config_index": ""}},
             "etlMapping.yaml": {"mappings": []},
