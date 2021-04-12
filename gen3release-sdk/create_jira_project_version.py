@@ -14,7 +14,7 @@ month = datetime.date(1900, monthinteger, 1).strftime("%B")
 
 result = jira.create_version(
     "{}".format(os.environ["RELEASE_VERSION"]),
-    "PXP",
+    os.environ["JIRA_PROJECT"],
     description="Gen3 Release - {}".format(month),
     releaseDate=None,
     startDate=None,

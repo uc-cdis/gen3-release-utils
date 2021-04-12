@@ -9,7 +9,9 @@ jira = JIRA(
     options, basic_auth=(os.environ["JIRA_SVC_ACCOUNT"], os.environ["JIRA_API_TOKEN"])
 )
 
-version = jira.get_project_version_by_name("PXP", os.environ["RELEASE_NAME"])
+version = jira.get_project_version_by_name(
+    os.environ["JIRA_PROJECT"], os.environ["RELEASE_NAME"]
+)
 if version:
     version.update(released=True)
     print("Release marked as RELEASED successfully!")
