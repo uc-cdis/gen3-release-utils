@@ -29,6 +29,9 @@ while IFS= read -r repo; do
   elif [ "$repo" == "gen3-fuse" ]; then
       echo "Found a repo called gen3-fuse"
       IMG_TO_PUSH="gen3fuse-sidecar"
+  elif [ "$repo" == "cloud-automation" ]; then
+      echo "Found a repo called cloud-automation"
+      IMG_TO_PUSH="awshelper"
   elif [ "$repo" == "sower-jobs" ]; then
       echo "iterate through list ['metadata-manifest-ingestion', 'get-dbgap-metadata', 'manifest-indexing', 'download-indexd-manifest']"
       sower_jobs=(metadata-manifest-ingestion get-dbgap-metadata manifest-indexing download-indexd-manifest)
@@ -53,13 +56,10 @@ while IFS= read -r repo; do
 
       # move to the next repo
       continue
-  elif [ "$repo" == "ws-storage" ]; then
-      echo "Skipping this one as it is not part of 2020.12"
-
-      # move to the next repo
-      continue
+  elif [ "$repo" == "ACCESS-backend" ]; then
+      echo "Found a repo called ACCESS-backend"
+      IMG_TO_PUSH="access-backend"
   fi
-
 
   tag="$RELEASE_VERSION"
   gen3 ecr update-policy gen3/$IMG_TO_PUSH
