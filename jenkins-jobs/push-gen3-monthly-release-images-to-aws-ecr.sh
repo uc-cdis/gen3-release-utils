@@ -42,7 +42,7 @@ while IFS= read -r repo; do
 	    gen3 ecr quay-sync $IMG_TO_PUSH $tag
 	    RC=$?
 	    if [ $RC != 0 ]; then
-              echo "SH@# , this F@#$%@ing thing is BROKEN\!"
+              echo "The Image is BROKEN\!"
     	      curl -X POST --data-urlencode "payload={\\\"channel\\\": \\\"#gen3-qa-notifications\\\", \\\"username\\\": \\\"release-automation-watcher\\\", \\\"text\\\": \\\"THE IMAGE ${IMG_TO_PUSH} CANNOT BE PUSHED TO AWS ECR :red_circle: WHOEVER OWNS THIS IMAGE CAN YOU PLEASE INVESTIGATE?? \\\", \\\"icon_emoji\\\": \\\":facepalm:\\\"}" \$(g3kubectl get configmap global -o jsonpath={.data.ci_test_notifications_webhook})
 	    fi
       done
@@ -59,7 +59,7 @@ while IFS= read -r repo; do
 	    gen3 ecr quay-sync $IMG_TO_PUSH $tag
 	    RC=$?
 	    if [ $RC != 0 ]; then
-              echo "SH@# , this F@#$%@ing thing is BROKEN\!"
+              echo "The Image is BROKEN\!"
     	      curl -X POST --data-urlencode "payload={\\\"channel\\\": \\\"#gen3-qa-notifications\\\", \\\"username\\\": \\\"release-automation-watcher\\\", \\\"text\\\": \\\"THE IMAGE ${IMG_TO_PUSH} CANNOT BE PUSHED TO AWS ECR :red_circle: WHOEVER OWNS THIS IMAGE CAN YOU PLEASE INVESTIGATE?? \\\", \\\"icon_emoji\\\": \\\":facepalm:\\\"}" \$(g3kubectl get configmap global -o jsonpath={.data.ci_test_notifications_webhook})
 	    fi
       done
@@ -76,7 +76,7 @@ while IFS= read -r repo; do
   gen3 ecr quay-sync $IMG_TO_PUSH $tag
   RC=$?
   if [ $RC != 0 ]; then
-    echo "SH@# , this F@#$%@ing thing is BROKEN\!"
+    echo "The Image is BROKEN\!"
     curl -X POST --data-urlencode "payload={\\\"channel\\\": \\\"#gen3-qa-notifications\\\", \\\"username\\\": \\\"release-automation-watcher\\\", \\\"text\\\": \\\"THE IMAGE ${IMG_TO_PUSH} CANNOT BE PUSHED TO AWS ECR :red_circle: WHOEVER OWNS THIS IMAGE CAN YOU PLEASE INVESTIGATE?? \\\", \\\"icon_emoji\\\": \\\":facepalm:\\\"}" \$(g3kubectl get configmap global -o jsonpath={.data.ci_test_notifications_webhook})
   fi
 done < "$repo_list"
