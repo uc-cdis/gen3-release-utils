@@ -40,8 +40,8 @@ while IFS= read -r repo; do
         IMG_TO_PUSH="$sowerjob"
         tag="$RELEASE_VERSION"
 
-        gen3 ecr update-policy gen3/$IMG_TO_PUSH
         set +e
+        gen3 ecr update-policy gen3/$IMG_TO_PUSH
         gen3 ecr quay-sync $IMG_TO_PUSH $tag
         RC=$?
         if [ $RC -ne 0  ]; then
@@ -61,8 +61,9 @@ while IFS= read -r repo; do
       for mariner_img in "${mariner_images[@]}"; do
 		IMG_TO_PUSH="$mariner_img"
         tag="$RELEASE_VERSION"
-        gen3 ecr update-policy gen3/$IMG_TO_PUSH
+
 	set +e
+        gen3 ecr update-policy gen3/$IMG_TO_PUSH
         gen3 ecr quay-sync $IMG_TO_PUSH $tag
 	RC=$?
 	if [ $RC -ne 0  ]; then
@@ -82,8 +83,9 @@ while IFS= read -r repo; do
   fi
 
   tag="$RELEASE_VERSION"
-  gen3 ecr update-policy gen3/$IMG_TO_PUSH
+
   set +e
+  gen3 ecr update-policy gen3/$IMG_TO_PUSH
   gen3 ecr quay-sync $IMG_TO_PUSH $tag
   RC=$?
   if [ $RC -ne 0  ]; then
