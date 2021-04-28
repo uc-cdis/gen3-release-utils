@@ -18,6 +18,7 @@ export GEN3_HOME=another_repo/cloud-automation && source "$GEN3_HOME/gen3/gen3se
 export KUBECTL_NAMESPACE="default"
 
 g3kubectl get configmap global
+webhook_url=$(g3kubectl get configmap global -o jsonpath={.data.ci_test_notifications_webhook})
 
 git clone https://github.com/uc-cdis/cloud-automation.git
 
@@ -58,7 +59,8 @@ while IFS= read -r repo; do
         RC=$?
         if [ $RC -ne 0  ]; then
           echo "The Image is BROKEN\!"
-          curl -X POST --data-urlencode "payload={\\\"channel\\\": \\\"#gen3-qa-notifications\\\", \\\"username\\\": \\\"release-automation-watcher\\\", \\\"text\\\": \\\"THE IMAGE ${IMG_TO_PUSH} CANNOT BE PUSHED TO AWS ECR :red_circle: WHOEVER OWNS THIS IMAGE CAN YOU PLEASE INVESTIGATE?? \\\", \\\"icon_emoji\\\": \\\":facepalm:\\\"}" $(g3kubectl get configmap global -o jsonpath={.data.ci_test_notifications_webhook})
+          webhook_url=$(g3kubectl get configmap global -o jsonpath={.data.ci_test_notifications_webhook})
+          curl -X POST --data-urlencode "payload={\\\"channel\\\": \\\"#gen3-qa-notifications\\\", \\\"username\\\": \\\"release-automation-watcher\\\", \\\"text\\\": \\\"THE IMAGE ${IMG_TO_PUSH} CANNOT BE PUSHED TO AWS ECR :red_circle: WHOEVER OWNS THIS IMAGE CAN YOU PLEASE INVESTIGATE?? \\\", \\\"icon_emoji\\\": \\\":facepalm:\\\"}" $webhook_url
          exit 1
        else
         echo "Successful gen3 ecr quay-sync $IMG_TO_PUSH $tag"
@@ -81,7 +83,7 @@ while IFS= read -r repo; do
 	RC=$?
 	if [ $RC -ne 0  ]; then
           echo "The Image is BROKEN\!"
-    	  curl -X POST --data-urlencode "payload={\\\"channel\\\": \\\"#gen3-qa-notifications\\\", \\\"username\\\": \\\"release-automation-watcher\\\", \\\"text\\\": \\\"THE IMAGE ${IMG_TO_PUSH} CANNOT BE PUSHED TO AWS ECR :red_circle: WHOEVER OWNS THIS IMAGE CAN YOU PLEASE INVESTIGATE?? \\\", \\\"icon_emoji\\\": \\\":facepalm:\\\"}" $(g3kubectl get configmap global -o jsonpath={.data.ci_test_notifications_webhook})
+    	  curl -X POST --data-urlencode "payload={\\\"channel\\\": \\\"#gen3-qa-notifications\\\", \\\"username\\\": \\\"release-automation-watcher\\\", \\\"text\\\": \\\"THE IMAGE ${IMG_TO_PUSH} CANNOT BE PUSHED TO AWS ECR :red_circle: WHOEVER OWNS THIS IMAGE CAN YOU PLEASE INVESTIGATE?? \\\", \\\"icon_emoji\\\": \\\":facepalm:\\\"}" $webhook_url
           exit 1
 	else
           echo "Successful gen3 ecr quay-sync $IMG_TO_PUSH $tag"
@@ -104,7 +106,7 @@ while IFS= read -r repo; do
   RC=$?
   if [ $RC -ne 0  ]; then
     echo "The Image is BROKEN\!"
-    curl -X POST --data-urlencode "payload={\\\"channel\\\": \\\"#gen3-qa-notifications\\\", \\\"username\\\": \\\"release-automation-watcher\\\", \\\"text\\\": \\\"THE IMAGE ${IMG_TO_PUSH} CANNOT BE PUSHED TO AWS ECR :red_circle: WHOEVER OWNS THIS IMAGE CAN YOU PLEASE INVESTIGATE?? \\\", \\\"icon_emoji\\\": \\\":facepalm:\\\"}" $(g3kubectl get configmap global -o jsonpath={.data.ci_test_notifications_webhook})
+    curl -X POST --data-urlencode "payload={\\\"channel\\\": \\\"#gen3-qa-notifications\\\", \\\"username\\\": \\\"release-automation-watcher\\\", \\\"text\\\": \\\"THE IMAGE ${IMG_TO_PUSH} CANNOT BE PUSHED TO AWS ECR :red_circle: WHOEVER OWNS THIS IMAGE CAN YOU PLEASE INVESTIGATE?? \\\", \\\"icon_emoji\\\": \\\":facepalm:\\\"}" $webhook_url
     exit 1
   else
     echo "Successful gen3 ecr quay-sync $IMG_TO_PUSH $tag"
