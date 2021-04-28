@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # checkout gen3-release-utils
+# checkout cloud-automation
 
 # String parameter RELEASE_VERSION
 #   e.g., 2021.04
@@ -13,6 +14,13 @@ cd another_repo
 git clone https://github.com/uc-cdis/cloud-automation.git
 cd ..
 export GEN3_HOME=another_repo/cloud-automation && source "$GEN3_HOME/gen3/gen3setup.sh"
+
+git clone https://github.com/uc-cdis/cloud-automation.git
+
+# setup gen3 CLI
+export GEN3_HOME=$WORKSPACE/cloud-automation
+source $GEN3_HOME/gen3/lib/utils.sh
+source $GEN3_HOME/gen3/gen3setup.sh
 
 repo_list="repo_list.txt"
 while IFS= read -r repo; do
