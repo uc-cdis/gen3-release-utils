@@ -1,4 +1,4 @@
-#!/bin/bash +x
+#!/bin/bash
 
 # checkout gen3-release-utils
 
@@ -6,6 +6,7 @@
 #   e.g., 2021.04
 
 set -e
+set -x
 
 mkdir -p another_repo
 cd another_repo
@@ -36,7 +37,7 @@ while IFS= read -r repo; do
       echo "iterate through list ['metadata-manifest-ingestion', 'get-dbgap-metadata', 'manifest-indexing', 'download-indexd-manifest']"
       sower_jobs=(metadata-manifest-ingestion get-dbgap-metadata manifest-indexing download-indexd-manifest)
       for sowerjob in "${sower_jobs[@]}"; do
-	IMG_TO_PUSH="$sowerjob"
+        IMG_TO_PUSH="$sowerjob"
         tag="$RELEASE_VERSION"
 
         gen3 ecr update-policy gen3/$IMG_TO_PUSH
