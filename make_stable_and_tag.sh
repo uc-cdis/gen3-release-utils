@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if [[ "$name_of_the_branch" == "master" ]]; then
+  echo "all good. proceed..."
+else
+  echo "ABORT\! Not a master branch!!!"
+  exit 1
+fi
+
 if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 2 ]; then
   echo "------------------------------------------------------------------------------"
   echo "Usage - make_stable_and_tag <integrationBranchName> <releaseTagName>"
@@ -30,7 +37,7 @@ fi
 
 repo_list="../repo_list.txt"
 while IFS= read -r repo; do
-  echo "### Cutting ${targetBranchName} branch for repo ${repo} ###"
+  echo "### Pulling ${targetBranchName} branch into the stable branch for repo ${repo} ###"
   git clone "${urlPrefix}${repo}"
   cd "${repo}" || exit 1
   git checkout "${targetBranchName}"
@@ -47,7 +54,12 @@ while IFS= read -r repo; do
     echo "$result"
     exit 1
   fi
-  result=$(git tag "${tagName}" -a -m "Gen3 Core Release ${tagName}")
+  result=$(git tag "${tagName}" -a -m "Gen3 Core Release ${tagName}" 2>&1)
+  if [[ "$result" == *"already exists"* ]]; then
+    echo "meh. Tag ${tagName} already exists for repo ${repo}... skipping it."
+    continue
+  fi
+
   RC=$?
   if [ $RC -ne 0 ]; then
     echo "$result"
