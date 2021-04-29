@@ -33,7 +33,7 @@ while IFS= read -r repo; do
   IMG_TO_PUSH="$repo"
   if [ "$repo" == "pelican" ]; then
       echo "Found a repo called pelican"
-      IMG_TO_PUSH="pelican-exportt"
+      IMG_TO_PUSH="pelican-export"
   elif [ "$repo" == "docker-nginx" ]; then
       echo "Found a repo called docker-nginx"
       IMG_TO_PUSH="nginx"
