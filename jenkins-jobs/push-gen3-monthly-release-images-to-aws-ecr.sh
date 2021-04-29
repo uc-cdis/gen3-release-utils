@@ -18,7 +18,7 @@ export GEN3_HOME=another_repo/cloud-automation && source "$GEN3_HOME/gen3/gen3se
 export KUBECTL_NAMESPACE="default"
 
 g3kubectl get configmap global
-webhook_url=$(g3kubectl get configmap global -o jsonpath={.data.ci_test_notifications_webhook})
+webhook_url=$(g3kubectl get configmap global -o jsonpath={.data.jenkins_saturation_notifications_webhook})
 
 git clone https://github.com/uc-cdis/cloud-automation.git
 
