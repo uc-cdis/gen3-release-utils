@@ -2,7 +2,7 @@
   String parameter LIST_OF_LOAD_TEST_SCENARIOS
     Default value: fence-presigned-url,sheepdog-import-clinical-metada,metadata-service-create-and-query,metadata-service-filter-large-database
 
-  String parameter GEN3_RELEASE
+  String parameter RELEASE_VERSION
     e.g., 2021.04
 */
 
@@ -27,7 +27,7 @@ environments.each {loadTestScenario ->
   params += new StringParameterValue("INDEXD_NUM_OF_RECORDS_TO_CREATE", "1000");
   params += new StringParameterValue("DESIRED_NUMBER_OF_FENCE_PODS", "10");
 
-  params += new StringParameterValue("GEN3_RELEASE", "${GEN3_RELEASE}");
+  params += new StringParameterValue("RELEASE_VERSION", "${RELEASE_VERSION}");
 
   def paramsAction = new ParametersAction(params);
   hudson.model.Hudson.instance.queue.schedule(job, quietPeriod, null, paramsAction);
