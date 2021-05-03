@@ -8,15 +8,15 @@
 # Obtained through Jenkins credentials
 
 TODAY=`date`
-RELEASE_TAG=`date --date="$TODAY +1 month" +%Y.%m`
+RELEASE_VERSION=`date --date="$TODAY +1 month" +%Y.%m`
 INTEGRATION_BRANCH_NAME=`date --date="$TODAY +1 month" +"integration%Y%m"`
 
 echo $TODAY
-echo $RELEASE_TAG
+echo $RELEASE_VERSION
 echo $INTEGRATION_BRANCH_NAME
 
 export GITHUB_USERNAME="atharvar28"
 
 git config --global user.email "cdis@uchicago.edu"
 
-./make_stable_and_tag.sh "${INTEGRATION_BRANCH_NAME}" "${RELEASE_TAG}"
+./make_stable_and_tag.sh "${INTEGRATION_BRANCH_NAME}" "${RELEASE_VERSION}"
