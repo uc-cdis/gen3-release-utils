@@ -101,6 +101,7 @@ class Env:
             "ambassador",
             "nb2",
             "jupyterhub",
+            "jenkins",
         ]
 
         self.blocks_to_update = {
