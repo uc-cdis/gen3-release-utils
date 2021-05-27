@@ -19,7 +19,7 @@
   String parameter DESIRED_NUMBER_OF_FENCE_PODS
     Default value: 10
 
-  String parameter GEN3_RELEASE
+  String parameter RELEASE_VERSION
     e.g., 2021.04
 
   String parameter INDEXD_NUM_OF_RECORDS_TO_CREATE
@@ -154,7 +154,7 @@ pipeline {
                     sh """#!/bin/bash -x
 
                         echo "uploading results..."
-                        aws s3 cp ./gen3-qa/result.json "s3://qaplanetv1-data-bucket/\$GEN3_RELEASE/\$LOAD_TEST_DESCRIPTOR/result_\$(date +%s).json"
+                        aws s3 cp ./gen3-qa/result.json "s3://qaplanetv1-data-bucket/\$RELEASE_VERSION/\$LOAD_TEST_DESCRIPTOR/result_\$(date +%s).json"
                     """
                 }
             }
