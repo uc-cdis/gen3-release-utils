@@ -1,6 +1,7 @@
 #!/bin/bash
 
 name_of_the_branch=$(git rev-parse --abbrev-ref HEAD)
+echo "### ## name_of_the_branch: $name_of_the_branch"
 
 if [[ "$name_of_the_branch" == "master" ]]; then
   echo "all good. proceed..."
