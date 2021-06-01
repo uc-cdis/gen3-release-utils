@@ -1,12 +1,11 @@
 #!/bin/bash
 
-name_of_the_branch=$(git rev-parse --abbrev-ref HEAD)
-echo "### ## name_of_the_branch: $name_of_the_branch"
+echo "### ## name_of_the_branch: $BRANCH_NAME"
 
-if [[ "$name_of_the_branch" == "master" ]]; then
+if [[ "$BRANCH_NAME" == "master" ]]; then
   echo "all good. proceed..."
 else
-  echo "ABORT\! Not a master branch!!!"
+  echo "ABORT\! Not a master branch!!! If you are running this locally, declare the BRANCH_NAME environment variable accordingly."
   exit 1
 fi
 
