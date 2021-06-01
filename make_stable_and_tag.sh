@@ -1,5 +1,7 @@
 #!/bin/bash
 
+name_of_the_branch=$(git branch --show-current)
+
 if [[ "$name_of_the_branch" == "master" ]]; then
   echo "all good. proceed..."
 else
