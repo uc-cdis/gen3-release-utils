@@ -3,7 +3,7 @@
 urlPrefix="https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/uc-cdis/"
 tagName=$1
 
-repo_list='../repo_list.txt'
+repo_list='repo_list.txt'
 while IFS= read -r repo; do
   git clone "${urlPrefix}${repo}"
   cd "${repo}" || exit 1
