@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# this script serves the purpose only when the release process is messed up
+# so before you run/ execute this script please ask for a peer review
+
 urlPrefix="https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/uc-cdis/"
 tagName=$1
 
