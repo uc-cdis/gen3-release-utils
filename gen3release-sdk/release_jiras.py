@@ -4,7 +4,7 @@ import os
 import sys
 import datetime
 
-release = os.environ["RELEASE"]
+release = os.environ["RELEASE_VERSION"]
 
 options = {"server": "https://ctds-planx.atlassian.net"}
 jira = JIRA(
