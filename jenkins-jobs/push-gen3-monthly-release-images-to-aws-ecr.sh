@@ -34,6 +34,9 @@ while IFS= read -r repo; do
   if [ "$repo" == "pelican" ]; then
       echo "Found a repo called pelican"
       IMG_TO_PUSH="pelican-export"
+  elif [ "$repo" == "bdcat-data-ingestion" ]; then
+      echo "Found a repo called bdcat-data-ingestion"
+      IMG_TO_PUSH="data-ingestion-pipeline"
   elif [ "$repo" == "docker-nginx" ]; then
       echo "Found a repo called docker-nginx"
       IMG_TO_PUSH="nginx"
