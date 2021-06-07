@@ -52,6 +52,8 @@ sed -i 's/quay.io\/cdis\/manifest-indexing:202/707767160287.dkr.ecr.us-east-1.am
 sed -i 's/quay.io\/cdis\/manifest-merging:202/707767160287.dkr.ecr.us-east-1.amazonaws.com\/gen3\/manifest-merging:202/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
 sed -i 's/quay.io\/cdis\/download-indexd-manifest:202/707767160287.dkr.ecr.us-east-1.amazonaws.com\/gen3\/download-indexd-manifest:202/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
 
+sed -i 's/quay.io\/cdis\/data-ingestion-pipeline:202/707767160287.dkr.ecr.us-east-1.amazonaws.com\/gen3\/bdcat-data-ingestion:202/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
+
 cat ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
 
 gen3release apply -v $RELEASE_VERSION -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} ${RELEASE_VERSION} ${TARGET_ENVIRONMENT} $(date +%s)"
