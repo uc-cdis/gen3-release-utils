@@ -103,7 +103,7 @@ class Env:
             "nb2",
             "jupyterhub",
             "jenkins",
-            "requestor"
+            "requestor",
         ]
 
         self.blocks_to_update = {
