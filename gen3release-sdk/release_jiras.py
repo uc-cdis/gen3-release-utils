@@ -132,6 +132,7 @@ for task in tasks:
         "project": PROJECT_NAME,
         "summary": summary,
         "description": task["description"],
+        "customfield_10067": {"id": "10054", "value": "Product Team"},
         "issuetype": {"name": "Story"},
         "components": COMPONENTS,
         "assignee": {"accountId": team_members[team_member_index]["id"]},
