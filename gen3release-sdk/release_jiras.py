@@ -99,7 +99,7 @@ COMPONENTS = [
 epic_dict = {
     "project": PROJECT_NAME,
     "customfield_10011": RELEASE_TITLE,
-    "customfield_10067": {"name": "Product Team"},
+    "customfield_10067": {"value": "Product Team"},
     "summary": RELEASE_TITLE,
     "description": "This epic comprises all the tasks releated to {}".format(
         RELEASE_TITLE
