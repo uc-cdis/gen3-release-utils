@@ -99,6 +99,7 @@ COMPONENTS = [
 epic_dict = {
     "project": PROJECT_NAME,
     "customfield_10011": RELEASE_TITLE,
+    "customfield_10067": {"id": "10054", "value": "Product Team"},
     "summary": RELEASE_TITLE,
     "description": "This epic comprises all the tasks releated to {}".format(
         RELEASE_TITLE
@@ -131,6 +132,7 @@ for task in tasks:
         "project": PROJECT_NAME,
         "summary": summary,
         "description": task["description"],
+        "customfield_10067": {"id": "10054", "value": "Product Team"},
         "issuetype": {"name": "Story"},
         "components": COMPONENTS,
         "assignee": {"accountId": team_members[team_member_index]["id"]},
