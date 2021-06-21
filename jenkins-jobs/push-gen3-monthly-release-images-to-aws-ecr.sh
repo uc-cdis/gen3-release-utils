@@ -39,7 +39,8 @@ while IFS= read -r repo; do
       IMG_TO_PUSH="nginx"
   elif [ "$repo" == "cdis-data-client" ]; then
       echo "Found a repo called cdis-data-client"
-      IMG_TO_PUSH="gen3-client"
+      echo "there is no docker img for this repo. Ignore..."
+      continue
   elif [ "$repo" == "gen3-fuse" ]; then
       echo "Found a repo called gen3-fuse"
       IMG_TO_PUSH="gen3fuse-sidecar"
