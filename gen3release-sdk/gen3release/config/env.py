@@ -67,11 +67,6 @@ class Env:
                     "login": {
                         "title": "GEN3_RELEASE_SDK_PLACEHOLDER",
                     },
-                    "footerLogos": [
-                        {
-                            "src": "GEN3_RELEASE_SDK_PLACEHOLDER",
-                        }
-                    ],
                 },
             },
             "fence-config-public.yaml": {
