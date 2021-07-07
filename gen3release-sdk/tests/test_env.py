@@ -169,7 +169,7 @@ def test_find_and_replace(target_env):
     manifest_data = {
         "versions": {
             "arborist": "quay.io/cdis/arborist:2020.07",
-            "aws-es-proxy": "abutaha/aws-es-proxy:0.8",
+            "aws-es-proxy": "quay.io/cdis/aws-es-proxy:0.8",
             "ambassador": "quay.io/datawire/ambassador:1.4.2",
         },
         "sower": [
@@ -198,7 +198,7 @@ def test_find_and_replace(target_env):
     expected_manifest = {
         "versions": {
             "arborist": "quay.io/cdis/arborist:2020.20",
-            "aws-es-proxy": "abutaha/aws-es-proxy:0.8",
+            "aws-es-proxy": "quay.io/cdis/aws-es-proxy:0.8",
             "ambassador": "quay.io/datawire/ambassador:9000",
         },
         "sower": [
