@@ -34,7 +34,7 @@ python3.6 -m pip install dist/${wheel_file} --user
 
 # TODO: TO NOT DO THIS
 # Inject ECR img paths for all components
-ls_quay_imgs=($(cat ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json| jq .versions | grep "quay.io/cdis" | awk '{ print $1 }' | tr ":" " " | xargs)); for quay_img in "${ls_quay_imgs[@]}"; do if [ "${quay_img}" = "aws-es-proxy" ]; then continue fi cat ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json | jq -c --arg ecr_path "707767160287.dkr.ecr.us-east-1.amazonaws.com/gen3/${quay_img}:${RELEASE_VERSION}" --arg jq_quay_img "$quay_img" '.versions[$jq_quay_img] = $ecr_path' | jq > $WORKSPACE/manifest.json.tmp && mv $WORKSPACE/manifest.json.tmp ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json; done
+ls_quay_imgs=($(cat ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json| jq .versions | grep "quay.io/cdis" | awk '{ print $1 }' | tr ":" " " | xargs)); for quay_img in "${ls_quay_imgs[@]}"; do if [[ "${quay_img}" == "aws-es-proxy" ]]; then continue; fi; cat ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json | jq -c --arg ecr_path "707767160287.dkr.ecr.us-east-1.amazonaws.com/gen3/${quay_img}:${RELEASE_VERSION}" --arg jq_quay_img "$quay_img" '.versions[$jq_quay_img] = $ecr_path' | jq > $WORKSPACE/manifest.json.tmp && mv $WORKSPACE/manifest.json.tmp ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json; done
 sed -i 's/\/metadata:202/\/metadata-service:202/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
 sed -i 's/dashboard:202/gen3-statics:202/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
 sed -i 's/datareplicate:/dcf-dataservice:/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
