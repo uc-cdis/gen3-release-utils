@@ -95,7 +95,6 @@ class Env:
             "arranger",
             "arranger-dashboard",
             "arranger-adminapi",
-            "audit-service",
             "aws-es-proxy",
             "dashboard",
             "fluentd",
