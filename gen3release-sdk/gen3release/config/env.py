@@ -28,6 +28,7 @@ class Env:
                     "logs_bucket": "GEN3_RELEASE_SDK_PLACEHOLDER",
                     "sync_from_dbgap": "GEN3_RELEASE_SDK_PLACEHOLDER",
                     "useryaml_s3path": "GEN3_RELEASE_SDK_PLACEHOLDER",
+                    "dd_enabled": "GEN3_RELEASE_SDK_PLACEHOLDER",
                 },
                 "hatchery": {
                     "user-namespace": "GEN3_RELEASE_SDK_PLACEHOLDER",
