@@ -30,6 +30,7 @@ def test_load_environment_params(target_env):
             "logs_bucket": "some bucket",
             "sync_from_dbgap": "",
             "useryaml_s3path": "",
+            "dd_enabled": "",
         },
         "hatchery": {
             "user-namespace": "a namespace",
