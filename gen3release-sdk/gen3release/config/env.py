@@ -93,12 +93,10 @@ class Env:
             "arranger-adminapi",
             "augur",
             "auspice",
-            "audit-service",
             "aws-es-proxy",
             "covid19-etl",
             "covid19-notebook-etl",
             "covid19-bayes-model",
-            "dashboard",
             "fluentd",
             "ambassador",
             "nb2",
@@ -160,6 +158,8 @@ class Env:
             logging.debug("Malformed override json string passed - {}".format(override))
             dict_override = {}
         for svc in json_block:
+            if "dashboard" not in json_block:
+                self.svcs_to_ignore.append("dashboard")
             if svc not in self.svcs_to_ignore:
                 logging.debug("applying version {} to {}".format(version, svc))
                 json_block[svc] = "{}:{}".format(json_block[svc].split(":")[0], version)
