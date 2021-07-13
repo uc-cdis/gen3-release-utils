@@ -33,7 +33,7 @@ pipeline {
                         sh """#!/bin/bash +x
                             export GEN3_HOME=\$WORKSPACE/cloud-automation
 
-                            curl -X POST "https://cdis.slack.com/api/chat.postMessage?token=\$SDET_BOT_SLACK_API_TOKEN&channel=${CHANNEL_ID}&icon_url=https://avatars.slack-edge.com/2020-08-09/1303194126929_463d1342f0b003d50ec8_48.jpg&username=replay-bot&text=<@UQKCGCU1H>%20replay-pr%20${repo}%20${prNum}"
+                            curl -X POST "https://cdis.slack.com/api/chat.postMessage?token=\$SDET_BOT_SLACK_API_TOKEN&channel=${CHANNEL_ID}&icon_url=https://avatars.slack-edge.com/2020-08-09/1303194126929_463d1342f0b003d50ec8_48.jpg&username=replay-bot&text=<@${QABOT_ID}>%20replay-pr%20${repo}%20${prNum}"
                             echo "replayed!"
 
                             sleep 1200
