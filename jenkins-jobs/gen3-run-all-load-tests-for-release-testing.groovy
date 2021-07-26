@@ -26,6 +26,7 @@ environments.each {loadTestScenario ->
   params += new StringParameterValue("SHEEPDOG_NUM_OF_RECORDS_TO_IMPORT", "100");
   params += new StringParameterValue("INDEXD_NUM_OF_RECORDS_TO_CREATE", "1000");
   params += new StringParameterValue("DESIRED_NUMBER_OF_FENCE_PODS", "10");
+  params += new StringParameterValue("SQS_URL","https://sqs.us-east-1.amazonaws.com/707767160287/qaplanetv2--qa-niaid--audit-sqs");
 
   params += new StringParameterValue("RELEASE_VERSION", "${RELEASE_VERSION}");
 
