@@ -23,17 +23,17 @@ export no_proxy=localhost,127.0.0.1,localaddress,169.254.169.254,.internal.io,lo
 git clone https://github.com/uc-cdis/${REPO_NAME}.git
 
 export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
-python3.6 -m pip install poetry --user
-python3.6 -m pip install pygithub --user
-python3.6 -m pip install ruamel.yaml --user
+python3.8 -m pip install poetry --user
+python3.8 -m pip install pygithub --user
+python3.8 -m pip install ruamel.yaml --user
 
-python3.6 -m pip uninstall gen3release -y
+python3.8 -m pip uninstall gen3release -y
 
 cd gen3release-sdk
-python3.6 -m poetry build
+python3.8 -m poetry build
 
 wheel_file=$(ls dist | grep whl | tail -n1)
 
-python3.6 -m pip install dist/${wheel_file} --user
+python3.8 -m pip install dist/${wheel_file} --user
 
 gen3release copy -s ${WORKSPACE}/${REPO_NAME}/${SOURCE_ENVIRONMENT} -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} $(date +%s)"

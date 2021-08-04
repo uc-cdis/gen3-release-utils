@@ -18,19 +18,19 @@
 git clone https://github.com/uc-cdis/${REPO_NAME}.git
 
 export PATH=$PATH:/var/jenkins_home/.local/bin:/var/jenkins_home/.local/lib:/home/jenkins/.local/bin
-python3.6 -m pip install poetry --user
+python3.8 -m pip install poetry --user
 
 # TODO: Why are we doing this instead of poetry install and poetry run?
-python3.6 -m pip install pygithub --user
+python3.8 -m pip install pygithub --user
 
-python3.6 -m pip uninstall gen3release -y
+python3.8 -m pip uninstall gen3release -y
 
 cd gen3release-sdk
-python3.6 -m poetry build
+python3.8 -m poetry build
 
 wheel_file=$(ls dist | grep whl | tail -n1)
 
-python3.6 -m pip install dist/${wheel_file} --user
+python3.8 -m pip install dist/${wheel_file} --user
 
 # TODO: TO NOT DO THIS
 # Inject ECR img paths for all components

@@ -7,4 +7,4 @@
 
 ls -ilha files
 
-python3.6 files/metrics.py
+python3.8 files/metrics.py
