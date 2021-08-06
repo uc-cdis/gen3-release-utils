@@ -64,21 +64,21 @@ spec:
         stage('Initial setup') {
             steps {
                 // manifest repo
-                checkout([  
-                  $class: 'GitSCM', 
-                  branches: [[name: 'refs/heads/master']], 
-                  doGenerateSubmoduleConfigurations: false, 
-                  extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${REPO_NAME}"]], 
-                  submoduleCfg: [], 
+                checkout([
+                  $class: 'GitSCM',
+                  branches: [[name: 'refs/heads/master']],
+                  doGenerateSubmoduleConfigurations: false,
+                  extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${REPO_NAME}"]],
+                  submoduleCfg: [],
                   userRemoteConfigs: [[credentialsId: 'PlanXCyborgUserJenkins2', url: "https://github.com/uc-cdis/${REPO_NAME}"]]
                 ])
                 // gen3-release-utils
-                checkout([  
-                  $class: 'GitSCM', 
-                  branches: [[name: '*/master']], 
-                  doGenerateSubmoduleConfigurations: false, 
-                  extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gen3-release-utils']], 
-                  submoduleCfg: [], 
+                checkout([
+                  $class: 'GitSCM',
+                  branches: [[name: '*/master']],
+                  doGenerateSubmoduleConfigurations: false,
+                  extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gen3-release-utils']],
+                  submoduleCfg: [],
                   userRemoteConfigs: [[credentialsId: 'PlanXCyborgUserJenkins2', url: 'https://github.com/uc-cdis/gen3-release-utils']]
                 ])
             }
@@ -89,17 +89,17 @@ spec:
                 dir("gen3-release-utils") {
                     sh '''
                       export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
-                      python3.6 -m pip install poetry --user
+                      python3.8 -m pip install poetry --user
 
-                      python3.6 -m pip uninstall gen3release -y
+                      python3.8 -m pip uninstall gen3release -y
 
                       cd gen3release-sdk
-                      python3.6 -m poetry build
+                      python3.8 -m poetry build
 
                       wheel_file=$(ls dist | grep whl | tail -n1)
 
-                      python3.6 -m pip install dist/${wheel_file} --user
-                      
+                      python3.8 -m pip install dist/${wheel_file} --user
+
                       gen3release apply -v $INTEGRATION_BRANCH -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} ${INTEGRATION_BRANCH} ${TARGET_ENVIRONMENT} $(date +%s)"
                     '''
                 }
