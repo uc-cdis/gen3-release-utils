@@ -37,12 +37,13 @@ sowerConfigBlock=$(cat chicagoland.pandemicresponsecommons.org/manifest.json | j
 jq --argjson obj '{"sower": '"$sowerConfigBlock"'}' '. += $obj' < nightly.planx-pla.net/manifest.json-tmp > temp && mv temp nightly.planx-pla.net/manifest.json-tmp
 
 # set all sower jobs images to master
-sed -i 's/gen3\/pelican-export:\(.*\)/gen3\/pelican-export:master",/' nightly.planx-pla.net/manifest.json-tmp
-sed -i 's/gen3\/metadata-manifest-ingestion:\(.*\)/gen3\/metadata-manifest-ingestion:master",/' nightly.planx-pla.net/manifest.json-tmp
-sed -i 's/gen3\/get-dbgap-metadata:\(.*\)/gen3\/get-dbgap-metadata:master",/' nightly.planx-pla.net/manifest.json-tmp
-sed -i 's/gen3\/manifest-indexing:\(.*\)/gen3\/manifest-indexing:master",/' nightly.planx-pla.net/manifest.json-tmp
-sed -i 's/gen3\/manifest-merging:\(.*\)/gen3\/manifest-merging:master",/' nightly.planx-pla.net/manifest.json-tmp
-sed -i 's/gen3\/download-indexd-manifest:\(.*\)/gen3\/download-indexd-manifest:master",/' nightly.planx-pla.net/manifest.json-tmp
+# with the quay img path as latest-master imgs are not automatically pushed to ECR
+sed -i 's/\(.*\)\/gen3\/pelican-export:\(.*\)/quay.io\/cdis\/pelican-export:master",/' nightly.planx-pla.net/manifest.json-tmp
+sed -i 's/\(.*\)\/gen3\/metadata-manifest-ingestion:\(.*\)/quay.io\/cdis\/metadata-manifest-ingestion:master",/' nightly.planx-pla.net/manifest.json-tmp
+sed -i 's/\(.*\)\/gen3\/get-dbgap-metadata:\(.*\)/quay.io\/cdis\/get-dbgap-metadata:master",/' nightly.planx-pla.net/manifest.json-tmp
+sed -i 's/\(.*\)\/gen3\/manifest-indexing:\(.*\)/quay.io\/cdis\/manifest-indexing:master",/' nightly.planx-pla.net/manifest.json-tmp
+sed -i 's/\(.*\)\/gen3\/manifest-merging:\(.*\)/quay.io\/cdis\/manifest-merging:master",/' nightly.planx-pla.net/manifest.json-tmp
+sed -i 's/\(.*\)\/gen3\/download-indexd-manifest:\(.*\)/quay.io\/cdis\/download-indexd-manifest:master",/' nightly.planx-pla.net/manifest.json-tmp
 
 guppyConfigBlock=$(cat chicagoland.pandemicresponsecommons.org/manifest.json | jq -r .guppy)
 jq --argjson obj '{"guppy": '"$guppyConfigBlock"'}' '. += $obj' < nightly.planx-pla.net/manifest.json-tmp > temp && mv temp nightly.planx-pla.net/manifest.json-tmp
