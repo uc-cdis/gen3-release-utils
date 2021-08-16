@@ -39,20 +39,19 @@ for pr in get_pull_requests.json():
             log.info(
                 f"pr {pr['title']} is eligible for closing. created_at#: {pr['created_at']}"
             )
+            try:
+                url = f"https://api.github.com/repos/uc-cdis/cdis-manifest/pulls/{pr['number']}"
+                res = requests.patch(
+                    url, json={"state": "closed"}, auth=HTTPBasicAuth(gh_user, gh_token)
+                )
+                res.raise_for_status()
+            except requests.exceptions.HTTPError as httperr:
+                log.error(
+                    "request to {0} failed due to the following error: {1}".format(
+                        url, str(httperr)
+                    )
+                )
+                os.exit(1)
+            print(f"the PR {pr['title']} is now closed.")
         else:
             log.info(f"Skipping PR {pr['title']}...")
-
-        try:
-            url = f"https://api.github.com/repos/uc-cdis/cdis-manifest/pulls/{pr['number']}"
-            res = requests.patch(
-                url, json={"state": "closed"}, auth=HTTPBasicAuth(gh_user, gh_token)
-            )
-            res.raise_for_status()
-        except requests.exceptions.HTTPError as httperr:
-            log.error(
-                "request to {0} failed due to the following error: {1}".format(
-                    url, str(httperr)
-                )
-            )
-            os.exit(1)
-        print(f"the PR {pr['title']} is now closed.")
