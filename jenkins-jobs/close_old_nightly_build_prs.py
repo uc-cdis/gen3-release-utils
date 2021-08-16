@@ -16,8 +16,7 @@ log.info(
     f"Shooting a GET request to https://api.github.com/repos/uc-cdis/cdis-manifest/pulls?state=open..."
 )
 get_pull_requests = requests.get(
-    # f"https://api.github.com/repos/uc-cdis/cdis-manifest/pulls?state=open",
-    f"https://api.github.com/repos/uc-cdis/cdis-manifest/pulls",
+    f"https://api.github.com/repos/uc-cdis/cdis-manifest/pulls?state=open",
     auth=(gh_user, gh_token),
 )
 
