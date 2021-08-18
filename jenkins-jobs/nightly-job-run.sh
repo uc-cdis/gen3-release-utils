@@ -31,9 +31,9 @@ dictionaryUrl=$(cat $selectedCommons/manifest.json | jq -r .global.dictionary_ur
 jq '.global.dictionary_url = '\"$dictionaryUrl\"'' nightly.planx-pla.net/manifest.json > nightly.planx-pla.net/manifest.json-tmp
 
 # mutate other critical service-specific config blocks:
-portalConfigBlock=$(cat chicagoland.pandemicresponsecommons.org/manifest.json | jq -r .portal)
+portalConfigBlock=$(cat ${selectedCommons}/manifest.json | jq -r .portal)
 jq --argjson obj '{"portal": '"$portalConfigBlock"'}' '. += $obj' < nightly.planx-pla.net/manifest.json-tmp > temp && mv temp nightly.planx-pla.net/manifest.json-tmp
-sowerConfigBlock=$(cat chicagoland.pandemicresponsecommons.org/manifest.json | jq -r .sower)
+sowerConfigBlock=$(cat ${selectedCommons}/manifest.json | jq -r .sower)
 jq --argjson obj '{"sower": '"$sowerConfigBlock"'}' '. += $obj' < nightly.planx-pla.net/manifest.json-tmp > temp && mv temp nightly.planx-pla.net/manifest.json-tmp
 
 # set all sower jobs images to master
@@ -45,7 +45,7 @@ sed -i 's/\(.*\)"image":\(.*\)\/gen3\/manifest-indexing:\(.*\)/\1"image": "quay.
 sed -i 's/\(.*\)"image":\(.*\)\/gen3\/manifest-merging:\(.*\)/\1"image": "quay.io\/cdis\/manifest-merging:master",/' nightly.planx-pla.net/manifest.json-tmp
 sed -i 's/\(.*\)"image":\(.*\)\/gen3\/download-indexd-manifest:\(.*\)/\1"image": "quay.io\/cdis\/download-indexd-manifest:master",/' nightly.planx-pla.net/manifest.json-tmp
 
-guppyConfigBlock=$(cat chicagoland.pandemicresponsecommons.org/manifest.json | jq -r .guppy)
+guppyConfigBlock=$(cat ${selectedCommons}/manifest.json | jq -r .guppy)
 jq --argjson obj '{"guppy": '"$guppyConfigBlock"'}' '. += $obj' < nightly.planx-pla.net/manifest.json-tmp > temp && mv temp nightly.planx-pla.net/manifest.json-tmp
 
 
