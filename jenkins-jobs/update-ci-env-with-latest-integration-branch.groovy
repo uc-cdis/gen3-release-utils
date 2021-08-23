@@ -26,6 +26,7 @@ spec:
   containers:
   - name: shell
     image: quay.io/cdis/gen3-qa-worker:master
+    imagePullPolicy: Always
     command:
     - sleep
     args:
