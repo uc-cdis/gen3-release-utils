@@ -70,7 +70,7 @@ spec:
                   doGenerateSubmoduleConfigurations: false,
                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${REPO_NAME}"]],
                   submoduleCfg: [],
-                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUserJenkins2', url: "https://github.com/uc-cdis/${REPO_NAME}"]]
+                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUser', url: "https://github.com/uc-cdis/${REPO_NAME}"]]
                 ])
                 // gen3-release-utils
                 checkout([
@@ -79,7 +79,7 @@ spec:
                   doGenerateSubmoduleConfigurations: false,
                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gen3-release-utils']],
                   submoduleCfg: [],
-                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUserJenkins2', url: 'https://github.com/uc-cdis/gen3-release-utils']]
+                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUser', url: 'https://github.com/uc-cdis/gen3-release-utils']]
                 ])
             }
         }
