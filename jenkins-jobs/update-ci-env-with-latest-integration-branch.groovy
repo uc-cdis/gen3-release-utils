@@ -1,14 +1,12 @@
 /*
   String parameter INTEGRATION_BRANCH
-    Default value: integration202008
+    Default value: integration202109
   String parameter PR_TITLE
     Default value: Updating CI env with
   String parameter TARGET_ENVIRONMENT
-    format: ci-env-1.planx-pla.net
-  String parameter TARGET_ENVIRONMENT
-    format: ci-env-1.planx-pla.net
+    format: qa-dcp.planx-pla.net
   String parameter REPO_NAME
-    format: gitops-qa-v2
+    format: gitops-qa
 */
 
 
@@ -87,23 +85,12 @@ spec:
         stage('Update CI environment') {
             steps {
               withCredentials([usernamePassword(credentialsId: 'PlanXCyborgUser', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                dir("gen3-release-utils") {
+                dir("gen3-release-utils/gen3release-sdk") {
                     sh '''
                       export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
                       pip3 install -U pip --user
-
-                      python3.8 -m pip install poetry --user
-
-                      python3.8 -m pip uninstall gen3release -y
-
-                      cd gen3release-sdk
-                      python3.8 -m poetry build
-
-                      wheel_file=$(ls dist | grep whl | tail -n1)
-
-                      python3.8 -m pip install dist/${wheel_file} --user
-
-                      gen3release apply -v $INTEGRATION_BRANCH -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} ${INTEGRATION_BRANCH} ${TARGET_ENVIRONMENT} $(date +%s)"
+                      poetry install
+                      poetry run gen3release apply -v $INTEGRATION_BRANCH -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} ${INTEGRATION_BRANCH} ${TARGET_ENVIRONMENT} $(date +%s)"
                     '''
                 }
               }
