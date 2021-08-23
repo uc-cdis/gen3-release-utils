@@ -85,7 +85,7 @@ spec:
         }
         stage('Update CI environment') {
             steps {
-              withCredentials([string(credentialsId: 'PlanXCyborgToken', variable: 'GITHUB_TOKEN')]) {
+              withCredentials([usernamePassword(credentialsId: 'PlanXCyborgUser', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
                 dir("gen3-release-utils") {
                     sh '''
                       export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
