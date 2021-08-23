@@ -90,6 +90,8 @@ spec:
                 dir("gen3-release-utils") {
                     sh '''
                       export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
+                      pip3 install -U pip --user
+
                       python3.8 -m pip install poetry --user
 
                       python3.8 -m pip uninstall gen3release -y
@@ -108,9 +110,4 @@ spec:
             }
         }
     }
-    // post {
-    //    always {
-    //        archiveArtifacts artifacts: '*.txt'
-    //    }
-    //}
 }
