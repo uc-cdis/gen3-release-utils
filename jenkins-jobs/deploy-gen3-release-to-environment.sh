@@ -15,22 +15,28 @@
 # GITHUB_TOKEN
 # Obtained through Jenkins credentials
 
+if [ -z "$TARGET_ENVIRONMENT" ]
+then echo "Error: TARGET_ENVIRONMENT is empty!"
+exit 1
+fi
+
 git clone https://github.com/uc-cdis/${REPO_NAME}.git
 
 export PATH=$PATH:/var/jenkins_home/.local/bin:/var/jenkins_home/.local/lib:/home/jenkins/.local/bin
-python3.8 -m pip install poetry --user
+python3 -m pip install poetry --user
 
 # TODO: Why are we doing this instead of poetry install and poetry run?
-python3.8 -m pip install pygithub --user
+python3 -m pip install pygithub --user
 
-python3.8 -m pip uninstall gen3release -y
+python3 -m pip uninstall gen3release -y
 
 cd gen3release-sdk
-python3.8 -m poetry build
+python3 -m poetry build
 
+ls dist | grep whl | tail -n1
 wheel_file=$(ls dist | grep whl | tail -n1)
 
-python3.8 -m pip install dist/${wheel_file} --user
+poetry install
 
 # TODO: TO NOT DO THIS
 # Inject ECR img paths for all components
@@ -56,4 +62,4 @@ sed -i 's/quay.io\/cdis\/data-ingestion-pipeline:202/707767160287.dkr.ecr.us-eas
 
 cat ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
 
-gen3release apply -v $RELEASE_VERSION -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} ${RELEASE_VERSION} ${TARGET_ENVIRONMENT} $(date +%s)"
+poetry run gen3release apply -v $RELEASE_VERSION -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} ${RELEASE_VERSION} ${TARGET_ENVIRONMENT} $(date +%s)"
