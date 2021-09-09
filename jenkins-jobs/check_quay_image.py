@@ -12,11 +12,14 @@ def get_image():
     )
     print(url)
     res = requests.get(url)
-    quay_result = json.loads(res.text)
-    if len(quay_result["images"][0]) > 0:
-        print("Created: ", quay_result["images"][0]["created"])
-        print("ID: ", quay_result["images"][0]["id"])
-        print("Image Exists")
+    try:
+        quay_result = json.loads(res.text)
+        if len(quay_result["images"][0]) > 0:
+            print("Created: ", quay_result["images"][0]["created"])
+            print("ID: ", quay_result["images"][0]["id"])
+            print("Image Exists")
+    except KeyError:
+        print("The Image doesn't Exist")
 
 
 print("Check if the Quay Images are ready")
