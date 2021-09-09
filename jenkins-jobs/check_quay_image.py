@@ -20,7 +20,7 @@ def get_image():
 
 
 print("Check if the Quay Images are ready")
-with open("../repo_list.txt") as repoList:
+with open("repo_list.txt") as repoList:
     for repo in repoList:
         services = repo
         if repo.strip() == "pelican":
