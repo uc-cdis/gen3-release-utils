@@ -2,13 +2,13 @@ import requests
 import json
 import os
 
-# release = os.environ["Release_Tag"]
+release = os.environ["Release_Tag"]
 
 
 def get_image():
     print(f"### Services : {services.strip()}")
-    url = "https://quay.io/api/v1/repository/cdis/{}/tag/2021.09/images".format(
-        services.strip()
+    url = "https://quay.io/api/v1/repository/cdis/{}/tag/{}/images".format(
+        services.strip(), release.strip()
     )
     print(url)
     res = requests.get(url)
