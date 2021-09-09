@@ -68,4 +68,4 @@ with open("repo_list.txt") as repoList:
         elif repo.strip() == "ACCESS-backend":
             print("No docker image found")
             continue
-    get_image()
+        get_image()
