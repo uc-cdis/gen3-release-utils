@@ -2,7 +2,7 @@ import requests
 import json
 import os
 
-release = os.environ["Release_Tag"]
+# release = os.environ["Release_Tag"]
 
 
 def get_image():
