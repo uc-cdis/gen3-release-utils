@@ -22,35 +22,48 @@ def get_image():
         print(f"The Image doesn't Exist for {services}")
 
 
+repo_dict = {
+    "pelican": "pelican-export",
+    "docker-nginx": "nginx",
+    "gen3-fuse": "gen3fuse-sidecar",
+    "cloud-automation": "awshelper",
+    "dataguids.org": "dataguids",
+}
+
 print("Check if the Quay Images are ready")
 with open("repo_list.txt") as repoList:
     for repo in repoList:
         repo = repo.strip()
         services = repo
-        if repo == "pelican":
-            services = "pelican-export"
+        if repo in repo_dict:
+            services = repo_dict[repo]
             get_image()
             continue
+
+        # if repo == "pelican":
+        #     services = "pelican-export"
+        #     get_image()
+        #     continue
         elif repo == "cdis-data-client":
             print(f"### Services : {services}")
             print("No docker image found")
             continue
-        elif repo == "docker-nginx":
-            services = "nginx"
-            get_image()
-            continue
-        elif repo == "gen3-fuse":
-            services = "gen3fuse-sidecar"
-            get_image()
-            continue
-        elif repo == "cloud-automation":
-            services = "awshelper"
-            get_image()
-            continue
-        elif repo == "dataguids.org":
-            services = "dataguids"
-            get_image()
-            continue
+        # elif repo == "docker-nginx":
+        #     services = "nginx"
+        #     get_image()
+        #     continue
+        # elif repo == "gen3-fuse":
+        #     services = "gen3fuse-sidecar"
+        #     get_image()
+        #     continue
+        # elif repo == "cloud-automation":
+        #     services = "awshelper"
+        #     get_image()
+        #     continue
+        # elif repo == "dataguids.org":
+        #     services = "dataguids"
+        #     get_image()
+        #     continue
         elif repo == "sower-jobs":
             print("Iterating through the list of images for sower-jobs")
             sower_jobs = [
