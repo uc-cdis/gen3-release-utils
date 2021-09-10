@@ -17,9 +17,8 @@ def get_image():
             print("Created: ", quay_result["images"][0]["created"])
             print("ID: ", quay_result["images"][0]["id"])
             print(f"Image Exists for {services.strip()}")
-        else:
-            failed_list.append(services)
     except KeyError:
+        failed_list.append(services)
         print(f"The Image doesn't Exist for {services}")
 
 
