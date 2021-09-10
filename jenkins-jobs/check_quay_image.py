@@ -3,13 +3,12 @@ import json
 import os
 
 release = os.environ["RELEASE_TAG"]
+failed_list = []
 
 
 def get_image():
     print(f"### Services : {services.strip()}")
-    url = "https://quay.io/api/v1/repository/cdis/{}/tag/{}/images".format(
-        services.strip(), release.strip()
-    )
+    url = f"https://quay.io/api/v1/repository/cdis/{services}/tag/{release}/images"
     print(url)
     res = requests.get(url)
     try:
@@ -18,39 +17,42 @@ def get_image():
             print("Created: ", quay_result["images"][0]["created"])
             print("ID: ", quay_result["images"][0]["id"])
             print(f"Image Exists for {services.strip()}")
+        else:
+            failed_list.append(services)
     except KeyError:
-        print(f"The Image doesn't Exist for {services.strip()}")
+        print(f"The Image doesn't Exist for {services}")
 
 
 print("Check if the Quay Images are ready")
 with open("repo_list.txt") as repoList:
     for repo in repoList:
+        repo = repo.strip()
         services = repo
-        if repo.strip() == "pelican":
+        if repo == "pelican":
             services = "pelican-export"
             get_image()
             continue
-        elif repo.strip() == "cdis-data-client":
-            print(f"### Services : {services.strip()}")
+        elif repo == "cdis-data-client":
+            print(f"### Services : {services}")
             print("No docker image found")
             continue
-        elif repo.strip() == "docker-nginx":
+        elif repo == "docker-nginx":
             services = "nginx"
             get_image()
             continue
-        elif repo.strip() == "gen3-fuse":
+        elif repo == "gen3-fuse":
             services = "gen3fuse-sidecar"
             get_image()
             continue
-        elif repo.strip() == "cloud-automation":
+        elif repo == "cloud-automation":
             services = "awshelper"
             get_image()
             continue
-        elif repo.strip() == "dataguids.org":
+        elif repo == "dataguids.org":
             services = "dataguids"
             get_image()
             continue
-        elif repo.strip() == "sower-jobs":
+        elif repo == "sower-jobs":
             print("Iterating through the list of images for sower-jobs")
             sower_jobs = [
                 "metadata-manifest-ingestion",
@@ -62,13 +64,15 @@ with open("repo_list.txt") as repoList:
                 services = sowerjob.strip()
                 get_image()
                 continue
-        elif repo.strip() == "mariner":
+        elif repo == "mariner":
             print("Iterating though the list of images for mariner")
             mariner = ["mariner-engine", "mariner-s3sidecar", "mariner-server"]
-            for image in mariner:
-                services = image.strip()
+            for marinerImage in mariner:
+                services = marinerImage.strip()
                 get_image()
-        elif repo.strip() == "ACCESS-backend":
+        elif repo == "ACCESS-backend":
             print("No docker image found")
             continue
         get_image()
+
+print(f"List of repos that failed the check : {failed_list}")
