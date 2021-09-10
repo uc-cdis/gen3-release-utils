@@ -71,8 +71,8 @@ with open("repo_list.txt") as repoList:
             continue
         get_image()
 
+print(f"List of repos that failed the check : {failed_list}")
 # if the failed_list contains any repo name
 # then the job should fail and print the list
 if len(failed_list) > 0:
     sys.exit(1)
-print(f"List of repos that failed the check : {failed_list}")
