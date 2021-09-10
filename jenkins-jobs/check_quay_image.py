@@ -2,7 +2,7 @@ import requests
 import json
 import os
 
-release = os.environ["Release_Tag"]
+release = os.environ["RELEASE_TAG"]
 
 
 def get_image():
@@ -17,9 +17,9 @@ def get_image():
         if len(quay_result["images"][0]) > 0:
             print("Created: ", quay_result["images"][0]["created"])
             print("ID: ", quay_result["images"][0]["id"])
-            print("Image Exists")
+            print(f"Image Exists for {services.strip()}")
     except KeyError:
-        print("The Image doesn't Exist")
+        print(f"The Image doesn't Exist for {services.strip()}")
 
 
 print("Check if the Quay Images are ready")
