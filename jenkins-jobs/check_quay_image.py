@@ -1,11 +1,13 @@
 import requests
 import json
 import os
+import sys
 
 release = os.environ["RELEASE_TAG"]
 failed_list = []
 
 
+# function to get quay images using thr quay api call
 def get_image():
     print(f"### Services : {services.strip()}")
     url = f"https://quay.io/api/v1/repository/cdis/{services}/tag/{release}/images"
@@ -22,6 +24,9 @@ def get_image():
         print(f"The Image doesn't Exist for {services}")
 
 
+# here
+# key : github repo name
+# value : quay image build name
 repo_dict = {
     "pelican": "pelican-export",
     "docker-nginx": "nginx",
@@ -66,4 +71,8 @@ with open("repo_list.txt") as repoList:
             continue
         get_image()
 
+# if the failed_list contains any repo name
+# then the job should fail and print the list
+if len(failed_list) > 0:
+    sys.exit(1)
 print(f"List of repos that failed the check : {failed_list}")
