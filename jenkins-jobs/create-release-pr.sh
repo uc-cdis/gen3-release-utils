@@ -34,6 +34,6 @@ python3.8 -m poetry build
 
 wheel_file=$(ls dist | grep whl | tail -n1)
 
-python3.8 -m pip install dist/${wheel_file} --user
+poetry install
 
-gen3release copy -s ${WORKSPACE}/${REPO_NAME}/${SOURCE_ENVIRONMENT} -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} $(date +%s)"
+poetry run gen3release copy -s ${WORKSPACE}/${REPO_NAME}/${SOURCE_ENVIRONMENT} -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} $(date +%s)"
