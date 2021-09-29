@@ -16,7 +16,7 @@ def main():
     if os.path.exists(credential_filepath):
         credential = open(credential_filepath)
         api_key = json.load(credential)["api_key"]
-        expire_timestamp = jwt.decode(api_key, options={"verify_signature": False})[
+        expire_timestamp = jwt.decode(api_key, verify=False)[
             "exp"
         ]
         expire_datetime = datetime.fromtimestamp(expire_timestamp)
