@@ -15,8 +15,21 @@ pipeline {
                 cleanWs()
             }
         }
+        stage('Initial setup') {
+            steps {
+                // gen3-release-utils
+                checkout([
+                  $class: 'GitSCM',
+                  branches: [[name: 'refs/heads/master']],
+                  doGenerateSubmoduleConfigurations: false,
+                  extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gen3-release-utils']],
+                  submoduleCfg: [],
+                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUserJenkins', url: 'https://github.com/uc-cdis/gen3-release-utils.git']]
+                ])
+        }
         stage('Iterate through all repos, find their img names and apply new tag') {
             steps {
+              dir("gen3-release-utils") {
                 script {
                     println("### ## current path: ${env.WORKSPACE}");
 
@@ -104,6 +117,7 @@ pipeline {
                         quietPeriod += 1;
                       }
                     }
+                  }
                 }
             }
         }
