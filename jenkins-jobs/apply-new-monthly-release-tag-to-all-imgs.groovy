@@ -34,6 +34,8 @@ pipeline {
                 script {
                     println("### ## current path: ${env.WORKSPACE}");
 
+                    sh '''ls -Rilha'''
+
                     // Read the contents of repo_list.txt
                     String fileContents = new File("${env.WORKSPACE}/gen3-release-utils/repo_list.txt").getText('UTF-8')
 
