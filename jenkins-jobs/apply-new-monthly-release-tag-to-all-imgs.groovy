@@ -26,6 +26,7 @@ pipeline {
                   submoduleCfg: [],
                   userRemoteConfigs: [[credentialsId: 'PlanXCyborgUserJenkins', url: 'https://github.com/uc-cdis/gen3-release-utils.git']]
                 ])
+            }
         }
         stage('Iterate through all repos, find their img names and apply new tag') {
             steps {
