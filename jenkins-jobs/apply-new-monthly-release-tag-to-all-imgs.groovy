@@ -4,7 +4,7 @@
 */
 
 // Read the contents of repo_list.txt
-String fileContents = new File('repo_list.txt').getText('UTF-8')
+String fileContents = new File('./repo_list.txt').getText('UTF-8')
 
 List<String> repos = Arrays.asList(LIST_OF_REPOS_WHOSE_IMAGES_NEED_TO_BE_TAGGED.split("\n"));
 
