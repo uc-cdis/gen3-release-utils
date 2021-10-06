@@ -117,8 +117,8 @@ pipeline {
                         quietPeriod += 1;
                       }
                     }
-                  }
                 }
+              }
             }
         }
     }
