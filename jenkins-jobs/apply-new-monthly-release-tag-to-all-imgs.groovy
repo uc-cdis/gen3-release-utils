@@ -12,28 +12,78 @@ def quietPeriod = 0;
 def jenkins = Jenkins.getInstance()
 def job = jenkins.getItem("quay-apply-new-tag-to-img");
 
-// TODO: create string containing integration202110 based on string 2021.10
-def currentImg = RELEASE_VERSION
+year = RELEASE_VERSION.split("\\.")[0]
+month = RELEASE_VERSION.split("\\.")[1]
+currentImg = "integration${year}${month}"
 
-repos.each {githubRepoName ->
-  // TODO:
-  // Some repo names do not match the quay img name :( we need to convert them
-  def quayRepoName = ""
+reposAndImageNames = [
+    "pelican": "pelican-export",
+    "docker-nginx": "nginx",
+    "gen3-fuse": "gen3fuse-sidecar",
+    "cloud-automation": "awshelper",
+    "dataguids.org": "dataguids",
+]
 
-  if githubRepoName == "pelican" {
-     quayRepoName = "pelican-export"
+repos.each{ githubRepoName ->
+  imgName = githubRepoName
+  if (reposAndImageNames.containsKey(githubRepoName)) {
+    imgName = reposAndImageNames[githubRepoName];
+    println "Applying new image tag ${RELEASE_VERSION} to img ${imgName}...";
+
+    def params = []
+
+    params += new StringParameterValue("SERVICE_NAME", imgName);
+    params += new StringParameterValue("CURRENT_IMG_TAG", currentImg);
+    params += new StringParameterValue("NEW_IMG_TAG", RELEASE_VERSION);
+
+    def paramsAction = new ParametersAction(params);
+    hudson.model.Hudson.instance.queue.schedule(job, quietPeriod, null, paramsAction);
+    quietPeriod += 1;
   }
+  else if (githubRepoName == "sower-jobs") {
+    sowerJobsImages=['metadata-manifest-ingestion', 'get-dbgap-metadata', 'manifest-indexing', 'download-indexd-manifest']
 
-  println "Applying new image tag ${RELEASE_VERSION} to current img ${}...";
+    sowerJobsImages.each{ sowerJobsImg ->
+      println "Applying new image tag ${RELEASE_VERSION} to img from repo ${sowerJobsImg}...";
 
-  def params = []
+      def params = []
 
-  params += new StringParameterValue("LOAD_TEST_DESCRIPTOR", loadTestScenario);
+      params += new StringParameterValue("SERVICE_NAME", imgName);
+      params += new StringParameterValue("CURRENT_IMG_TAG", currentImg);
+      params += new StringParameterValue("NEW_IMG_TAG", RELEASE_VERSION);
 
-  params += new StringParameterValue("TARGET_ENVIRONMENT", "qa-dcp");
-  params += new StringParameterValue("PRESIGNED_URL_ACL_FILTER", "QA");
+      def paramsAction = new ParametersAction(params);
+      hudson.model.Hudson.instance.queue.schedule(job, quietPeriod, null, paramsAction);
+      quietPeriod += 1;
+    }
+  }
+  else if (githubRepoName == "mariner") {
+    marinerImages=['mariner-engine', 'mariner-s3sidecar', 'mariner-server']
 
-  def paramsAction = new ParametersAction(params);
-  hudson.model.Hudson.instance.queue.schedule(job, quietPeriod, null, paramsAction);
-  quietPeriod += 1;
+    marinerImages.each{ marinerImg ->
+      println "Applying new image tag ${RELEASE_VERSION} to img from repo ${marinerImg}...";
+
+      def params = []
+
+      params += new StringParameterValue("SERVICE_NAME", imgName);
+      params += new StringParameterValue("CURRENT_IMG_TAG", currentImg);
+      params += new StringParameterValue("NEW_IMG_TAG", RELEASE_VERSION);
+
+      def paramsAction = new ParametersAction(params);
+      hudson.model.Hudson.instance.queue.schedule(job, quietPeriod, null, paramsAction);
+      quietPeriod += 1;
+    }
+  } else {
+    println "Applying new image tag ${RELEASE_VERSION} to img ${imgName}...";
+
+    def params = []
+
+    params += new StringParameterValue("SERVICE_NAME", imgName);
+    params += new StringParameterValue("CURRENT_IMG_TAG", currentImg);
+    params += new StringParameterValue("NEW_IMG_TAG", RELEASE_VERSION);
+
+    def paramsAction = new ParametersAction(params);
+    hudson.model.Hudson.instance.queue.schedule(job, quietPeriod, null, paramsAction);
+    quietPeriod += 1;
+  }
 }
