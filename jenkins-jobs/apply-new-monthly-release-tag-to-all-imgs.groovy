@@ -3,8 +3,6 @@
     e.g., 2021.04
 */
 
-def build = Thread.currentThread().executable
-
 println("### ## current path: ${build.workspace.toString()}");
 
 // Read the contents of repo_list.txt
