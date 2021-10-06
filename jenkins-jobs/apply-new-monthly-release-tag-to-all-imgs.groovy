@@ -37,9 +37,9 @@ pipeline {
                     sh "ls -ilh ${env.WORKSPACE}/gen3-release-utils"
 
                     // Read the contents of repo_list.txt
-                    String fileContents = readFile "${env.WORKSPACE}/gen3-release-utils/repo_list.txt"
+                    String repoListFileContents = readFile "${env.WORKSPACE}/gen3-release-utils/repo_list.txt"
 
-                    List<String> repos = Arrays.asList(LIST_OF_REPOS_WHOSE_IMAGES_NEED_TO_BE_TAGGED.split("\n"));
+                    List<String> repos = Arrays.asList(repoListFileContents.split("\n"));
 
                     def quietPeriod = 0;
                     def jenkins = Jenkins.getInstance()
