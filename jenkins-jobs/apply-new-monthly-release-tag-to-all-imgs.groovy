@@ -3,6 +3,10 @@
     e.g., 2021.04
 */
 
+// debug current folder path
+def currPath = System.getProperty("user.dir");
+println("### ## current path: ${currPath}");
+
 // Read the contents of repo_list.txt
 String fileContents = new File('./repo_list.txt').getText('UTF-8')
 
