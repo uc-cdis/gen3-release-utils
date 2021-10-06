@@ -16,9 +16,7 @@ def main():
     if os.path.exists(credential_filepath):
         credential = open(credential_filepath)
         api_key = json.load(credential)["api_key"]
-        expire_timestamp = jwt.decode(api_key, options={"verify_signature": False})[
-            "exp"
-        ]
+        expire_timestamp = jwt.decode(api_key, verify=False)["exp"]
         expire_datetime = datetime.fromtimestamp(expire_timestamp)
         print(f"### ## expire datetime: {expire_datetime}")
         now_datetime = datetime.now()
