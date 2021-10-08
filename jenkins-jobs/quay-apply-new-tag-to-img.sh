@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# this script is called by jenkins-jobs/apply-new-monthly-release-tag-to-all-imgs.groovy
+
 # login to QUAY
 docker login -u="cdis+gen3" -p="${QUAY_API_TOKEN}" quay.io
 
