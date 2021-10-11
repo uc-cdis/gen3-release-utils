@@ -59,10 +59,9 @@ tasks = [
 user_ids = os.environ["JIRA_USER_IDS"].split(",")
 
 team_members = [
-    # {"name": "haraprasadj", "id": user_ids[3]},
-    {"name": "jingh8", "id": user_ids[2]},
-    {"name": "atharvar", "id": user_ids[1]},
-    {"name": "marceloc", "id": user_ids[0]},
+    # {"name": "haraprasadj", "id": user_ids[2]},
+    {"name": "jingh8", "id": user_ids[1]},
+    {"name": "atharvar", "id": user_ids[0]},
 ]
 
 # set initial team member index based on the number of the month
