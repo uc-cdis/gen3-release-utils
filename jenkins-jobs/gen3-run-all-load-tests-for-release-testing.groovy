@@ -23,6 +23,7 @@ environments.each {loadTestScenario ->
 
   params += new StringParameterValue("TARGET_ENVIRONMENT", "qa-dcp");
   params += new StringParameterValue("PRESIGNED_URL_ACL_FILTER", "QA");
+  params += new StringParameterValue("PRESIGNED_URL_AUTHZ_FILTER", "/programs/DEV/projects/test1,/programs/DEV/projects/test2,/programs/DEV/projects/test3");
   params += new StringParameterValue("SHEEPDOG_NUM_OF_RECORDS_TO_IMPORT", "100");
   params += new StringParameterValue("INDEXD_NUM_OF_RECORDS_TO_CREATE", "1000");
   params += new StringParameterValue("DESIRED_NUMBER_OF_FENCE_PODS", "10");
