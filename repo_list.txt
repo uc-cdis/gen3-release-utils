@@ -26,6 +26,5 @@ mariner
 ws-storage
 ACCESS-backend
 cloud-automation
-bdcat-data-ingestion
 dataguids.org
 audit-service
