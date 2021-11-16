@@ -22,7 +22,7 @@ if [[ $latest_release =~ ([0-9]{4})\.([0-9]{2}) ]]; then
   fi
   INCREMENTED_MONTH_NUM=$(( ( ($CONVERTED_MONTH_STR_TO_NUMBER) % 12 ) + 1 ));
   BRANCH_NAME_MONTH=$(printf "%02d\n" $INCREMENTED_MONTH_NUM)
-  BRANCH_NAME="integration$INCREMENTED_YEAR.${BRANCH_NAME_MONTH}"
+  BRANCH_NAME="integration$INCREMENTED_YEAR$BRANCH_NAME_MONTH"
   echo "creating branch ${BRANCH_NAME}..."
   ./make_branch.sh "$FORK_FROM" "${BRANCH_NAME}"
 else
