@@ -11,16 +11,20 @@
 # GITHUB_USERNAME
 # GITHUB_TOKEN
 
-latest_release=$(git ls-remote --tags https://github.com/uc-cdis/fence | grep "/202" | grep -v "\^{}" | awk '{ print $2 }' | cut -d "/" -f3 | tail -n1)
-
+latest_release=$(git ls-remote --tags https://github.com/uc-cdis/fence | grep "/20" | grep -v "\^{}" | awk '{ print $2 }' | cut -d "/" -f3 | tail -n1)
 BRANCH_NAME=""
-if [[ $latest_release =~ [0-9]{4}\.([0-9]{2}) ]]; then
+if [[ $latest_release =~ ([0-9]{4})\.([0-9]{2}) ]]; then
   echo "match"
-  CONVERTED_MONTH_STR_TO_NUMBER=$(expr ${BASH_REMATCH[1]} + 0)
-  INCREMENTED_MONTH_NUM=$(( ( ($CONVERTED_MONTH_STR_TO_NUMBER) + 1 ) % 12 ));
-  BRANCH_NAME=$(printf "%02d\n" $INCREMENTED_MONTH_NUM)
-  echo "creating branch integration2021${BRANCH_NAME}..."
-  ./make_branch.sh "$FORK_FROM" "integration2021${BRANCH_NAME}"
+  INCREMENTED_YEAR=$(expr ${BASH_REMATCH[1]} + 0)
+  CONVERTED_MONTH_STR_TO_NUMBER=$(expr ${BASH_REMATCH[2]} + 0)
+  if [[ $CONVERTED_MONTH_STR_TO_NUMBER -eq 12 ]]; then
+    INCREMENTED_YEAR=$(expr ${BASH_REMATCH[1]} + 1)
+  fi
+  INCREMENTED_MONTH_NUM=$(( ( ($CONVERTED_MONTH_STR_TO_NUMBER) % 12 ) + 1 ));
+  BRANCH_NAME_MONTH=$(printf "%02d\n" $INCREMENTED_MONTH_NUM)
+  BRANCH_NAME="integration$INCREMENTED_YEAR.${BRANCH_NAME_MONTH}"
+  echo "creating branch ${BRANCH_NAME}..."
+  ./make_branch.sh "$FORK_FROM" "${BRANCH_NAME}"
 else
   echo "not match. Skip branch creation."
 fi
