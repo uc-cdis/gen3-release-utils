@@ -23,11 +23,16 @@ environments.each {loadTestScenario ->
 
   params += new StringParameterValue("TARGET_ENVIRONMENT", "qa-dcp");
   params += new StringParameterValue("PRESIGNED_URL_ACL_FILTER", "QA");
+  params += new StringParameterValue("PRESIGNED_URL_AUTHZ_FILTER", "/programs/DEV/projects/test1,/programs/DEV/projects/test2,/programs/DEV/projects/test3");
   params += new StringParameterValue("SHEEPDOG_NUM_OF_RECORDS_TO_IMPORT", "100");
   params += new StringParameterValue("INDEXD_NUM_OF_RECORDS_TO_CREATE", "1000");
   params += new StringParameterValue("DESIRED_NUMBER_OF_FENCE_PODS", "10");
   params += new StringParameterValue("SIGNED_URL_PROTOCOL", "s3");
   params += new StringParameterValue("SQS_URL","https://sqs.us-east-1.amazonaws.com/707767160287/qaplanetv2--qa-niaid--audit-sqs");
+  params += new StringParameterValue("MINIMUM_RECORDS", "10000");
+  params += new StringParameterValue("RECORD_CHUNK_SIZE", "1024");
+  params += new StringParameterValue("NUM_PARALLEL_REQUESTS", "5");
+  params += new StringParameterValue("PASSPORTS_LIST", " ");
 
   params += new StringParameterValue("RELEASE_VERSION", "${RELEASE_VERSION}");
 
