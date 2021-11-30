@@ -47,11 +47,15 @@ tasks = [
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/push-gen3-monthly-release-images-to-aws-ecr. Also double-check if the repos_list.txt is up-to-date.",
     },
     {
-        "title": "SHARED: 8. Follow up with PMs to merge the PRs of respective commons",
+        "title": "8. Sanity Check the release ",
+        "description": "Kick off this job: https://jenkins.planx-pla.net/job/update-ci-env-with-latest-integration-branch/ with release version and the environment as parameters.",
+    },
+    {
+        "title": "SHARED: 9. Follow up with PMs to merge the PRs of respective commons",
         "description": "The `automerge` label is applied automatically to all PRs, once the PM approves it, the changes will be automatically merged and deployed to the environment. The QA engineers should monitor the PRs in case of any CI check failures.",
     },
     {
-        "title": "9. Mark the release as released",
+        "title": "10. Mark the release as released",
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/mark-gen3-monthly-release-as-released.",
     },
 ]
