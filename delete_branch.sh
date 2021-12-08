@@ -1,7 +1,19 @@
 #!bin/bash
 
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 1 ]; then
+  echo "------------------------------------------------------------------------------"
+  echo "Usage - delete_branch <target-branch-name>"
+  echo ""
+  echo "Provide the list of repositories to operate upon in a file named repo_list.txt"
+  echo ""
+  echo "The script generates the repo urls using urlPrefix and the repo names listed on"
+  echo "separate lines in the repo_list.txt file"
+  echo "-------------------------------------------------------------------------------"
+  exit 0;
+fi;
+
 urlPrefix="https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/uc-cdis/"
-quayURL="https://${QUAY_TOKEN}@quay.io/api/v1/repository/cdis"
+quayURL="https://quay.io/api/v1/repository/cdis"
 targetBranchName=$1
 
 if find . -name "gen3-integration-deletion" -type d; then
@@ -31,7 +43,8 @@ while IFS= read -r repo; do
     echo "${quayImageStatus}"
     if [ $quayImageStatus -eq 200 ]; then
       echo "The ${targetBranchName} image exists"
-      curl -X DELETE ${quayURL}/${repo}/tag/${targetBranchName}
+      curl -X DELETE -H "Authorization: Bearer ${QUAY_TOKEN}" ${quayURL}/${repo}/tag/${targetBranchName}
+      echo "${repo} Image deleted"
     else
       echo "The ${targetBranchName} doesnot exist"
     fi
