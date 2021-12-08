@@ -5,9 +5,8 @@
 # String parameter RELEASE_VERSION
 #   Default value: 2021.06
 
-export GITHUB_USERNAME="themarcelor"
+# GITHUB_USERNAME obtained from Jenkins Credentials
 # GITHUB_TOKEN obtained from Jenkins Credentials
-
 
 BRANCH_NAME=""
 if [[ $RELEASE_VERSION =~ [0-9]{4}\.([0-9]{2}) ]]; then
