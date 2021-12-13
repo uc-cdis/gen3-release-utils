@@ -155,7 +155,6 @@ class Git:
         the_pr = github_client.create_pull(
             title=pr_title, body=commit_msg, head=branch_name, base="master"
         )
-        the_pr.add_to_labels("automerge")
 
     def create_pull_request_copy(
         self, github_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name
