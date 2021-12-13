@@ -27,28 +27,28 @@ tasks = [
         "description": "Run the folling command to apply the integration branch images against the target QA environment: python gen3release/env_cli.py apply -v integration2020<nn> -e ~/workspace/gitops-qa/qa-<environment>.planx-pla.net",
     },
     {
-        "title": "3. Generate release notes and publish release manifest into `cdis-manifest/<year>/<month>` folder",
-        "description": "Generate the release notes with this Jenkins job: https://jenkins.planx-pla.net/job/gen3-qa-monthly-release-notes-generator. The cdis-manifest PR is tailored manually and it should include release notes and known bugs files (the PR must be labeled with `doc-only`).",
-    },
-    {
-        "title": "SHARED: 4. Release testing round: automated tests and manual tests against qa envs",
+        "title": "SHARED: 3. Release testing round: automated tests and manual tests against qa envs",
         "description": 'Full list of tests tracked in the "Test Plan - Gen3 Releases" spreadsheet',
     },
     {
-        "title": "5. Run load tests on qa-dcp and store json files with results for benchmarking purposes",
+        "title": "4. Run load tests on qa-dcp and store json files with results for benchmarking purposes",
         "description": "Run the following load scenarios: fence-presigned-url, sheepdog-import-clinical-metada, metadata-service-create-and-query and metadata-service-filter-large-database. Just kick off this job https://jenkins.planx-pla.net/job/gen3-run-load-tests/ and store the result.json files accordingly.",
     },
     {
-        "title": "6. Merge the integration branch into stable and tag the release",
+        "title": "5. Merge the integration branch into stable and tag the release",
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/merge-integration-branch-into-stable-and-tag/. Once the tag-based images are built in Quay, sanity check the images by creating a `gitops-qa` PR to deploy them against one of the QA environments.",
     },
     {
-        "title": "7. Pushing monthly release quay images to AWS ECR (as a backup)",
+        "title": "6. Pushing monthly release quay images to AWS ECR (as a backup)",
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/push-gen3-monthly-release-images-to-aws-ecr. Also double-check if the repos_list.txt is up-to-date.",
     },
     {
-        "title": "8. Sanity Check the release ",
+        "title": "7. Sanity Check the release ",
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/update-ci-env-with-latest-integration-branch/ with release version and the environment as parameters.",
+    },
+    {
+        "title": "8. Generate release notes and publish release manifest into `cdis-manifest/<year>/<month>` folder",
+        "description": "Generate the release notes with this Jenkins job: https://jenkins.planx-pla.net/job/gen3-qa-monthly-release-notes-generator. The cdis-manifest PR is tailored manually and it should include release notes and known bugs files (the PR must be labeled with `doc-only`).",
     },
     {
         "title": "SHARED: 9. Follow up with PMs to merge the PRs of respective commons",
