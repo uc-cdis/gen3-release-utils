@@ -102,7 +102,8 @@ class Env:
             "nb2",
             "jupyterhub",
             "jenkins",
-            "requestor",
+            "ohdsi-atlas",
+            "ohdsi-webapi",
         ]
 
         self.blocks_to_update = {
