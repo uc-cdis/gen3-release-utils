@@ -13,8 +13,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 
-
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
+
 
 def main():
     creds = None
@@ -34,53 +34,61 @@ def main():
 
     event1 = {
         "summary": "Code Freeze",
-        "description": '',
-        "start": {
-            "date": "2020-07-11", "timeZone": "America/Chicago"
-        },
-        "end": {
-            "date": "2020-07-11", "timeZone": "America/Chicago"
-        },
-
+        "description": "",
+        "start": {"date": "2020-07-11", "timeZone": "America/Chicago"},
+        "end": {"date": "2020-07-11", "timeZone": "America/Chicago"},
         "attendees": {
             {"email": " "},
         },
     }
-    event = (service.events().insert(calendarID="uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com", body=event1).execute())
+    event = (
+        service.events()
+        .insert(
+            calendarID="uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com",
+            body=event1,
+        )
+        .execute()
+    )
     print("CODE FREEZE event : %s" % (event.get("htmlLink")))
 
     event2 = {
         "summary": "Feature Freeze",
-        "description": '',
-        "start": {
-            "date": "2020-07-11", "timeZone": "America/Chicago"
-        },
-        "end": {
-            "date": "2020-07-11", "timeZone": "America/Chicago"
-        },
+        "description": "",
+        "start": {"date": "2020-07-11", "timeZone": "America/Chicago"},
+        "end": {"date": "2020-07-11", "timeZone": "America/Chicago"},
         "attendees": {
             {"email": " "},
         },
     }
-    event = (service.events().insert(calendarID="uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com", body=event2).execute())
+    event = (
+        service.events()
+        .insert(
+            calendarID="uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com",
+            body=event2,
+        )
+        .execute()
+    )
     print("FEATURE FREEZE event : %s" % (event.get("htmlLink")))
 
     event3 = {
         "summary": "RELEASE PUBLICATION",
-        "description": '',
-        "start": {
-            "date": "2020-07-11", "timeZone": "America/Chicago"
-        },
-        "end": {
-            "date": "2020-07-11", "timeZone": "America/Chicago"
-        },
+        "description": "",
+        "start": {"date": "2020-07-11", "timeZone": "America/Chicago"},
+        "end": {"date": "2020-07-11", "timeZone": "America/Chicago"},
         "attendees": {
             {"email": " "},
         },
     }
-    event = (service.events().insert(calendarID="uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com", body=event3).execute())
+    event = (
+        service.events()
+        .insert(
+            calendarID="uchicago.edu_54c4a5nk50mm3gnt8n0m0s1j74@group.calendar.google.com",
+            body=event3,
+        )
+        .execute()
+    )
     print("RELEASE PUBLICATION event : %s" % (event.get("htmlLink")))
+
 
 if __name__ == "__main__":
     main()
-
