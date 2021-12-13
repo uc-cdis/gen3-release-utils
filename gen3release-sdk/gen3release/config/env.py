@@ -103,7 +103,7 @@ class Env:
             "jupyterhub",
             "jenkins",
             "ohdsi-atlas",
-            "ohdsi-webapi"
+            "ohdsi-webapi",
         ]
 
         self.blocks_to_update = {
