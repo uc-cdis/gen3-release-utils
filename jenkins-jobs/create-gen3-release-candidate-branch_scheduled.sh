@@ -24,7 +24,7 @@ if [[ $latest_release =~ ([0-9]{4})\.([0-9]{2}) ]]; then
   BRANCH_NAME_MONTH=$(printf "%02d\n" $INCREMENTED_MONTH_NUM)
   BRANCH_NAME="integration$INCREMENTED_YEAR$BRANCH_NAME_MONTH"
   echo "creating branch ${BRANCH_NAME}..."
-  ./make_branch.sh "$FORK_FROM" "${BRANCH_NAME}"
+  ./jenkins-jobs/make_branch.sh "$FORK_FROM" "${BRANCH_NAME}"
 else
   echo "not match. Skip branch creation."
 fi
