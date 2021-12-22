@@ -2,12 +2,12 @@
 
 echo "### ## name_of_the_branch: $GIT_BRANCH"
 
-if [[ "$GIT_BRANCH" == "origin/master" ]]; then
-  echo "all good. proceed..."
-else
-  echo "ABORT\! Not a master branch!!! If you are running this locally, declare the GIT_BRANCH environment variable accordingly."
-  exit 1
-fi
+# if [[ "$GIT_BRANCH" == "origin/master" ]]; then
+#  echo "all good. proceed..."
+# else
+#  echo "ABORT\! Not a master branch!!! If you are running this locally, declare the GIT_BRANCH environment variable accordingly."
+#  exit 1
+# fi
 
 if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 2 ]; then
   echo "------------------------------------------------------------------------------"
