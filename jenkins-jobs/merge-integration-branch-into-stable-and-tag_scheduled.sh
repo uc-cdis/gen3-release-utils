@@ -15,7 +15,7 @@ echo $TODAY
 echo $RELEASE_VERSION
 echo $INTEGRATION_BRANCH_NAME
 
-export GITHUB_USERNAME="atharvar28"
+# export GITHUB_USERNAME="atharvar28"
 
 git config --global user.email "cdis@uchicago.edu"
 
