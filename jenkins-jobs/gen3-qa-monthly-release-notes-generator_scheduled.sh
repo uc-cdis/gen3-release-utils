@@ -15,7 +15,7 @@ END_DATE=`date --date="14 day ago" +%Y-%m-%d`
 RELEASE_VERSION=`date --date="$END_DATE +1 month" +%Y.%m`
 RELEASE_NAME="Core Gen3 Release $RELEASE_VERSION"
 
-./generate_release_notes.sh
+./jenkins-jobs/generate_release_notes.sh
 
 # The current logic does NOT handle the transition from December to January (tech debt)
 
