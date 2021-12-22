@@ -42,6 +42,12 @@ while IFS= read -r repo; do
   echo "### Pulling ${targetBranchName} branch into the stable branch for repo ${repo} ###"
   git clone "${urlPrefix}${repo}"
   cd "${repo}" || exit 1
+  git ls-remote --heads ${urlPrefix}${repo} ${targetBranchName} | grep ${BRANCH} >/dev/null
+  if [ "$?" == "0" ]; then
+    git checkout "${targetBranchName}"
+  else
+    git checkout -b "${targetBranchName}"
+  fi
   git checkout "${targetBranchName}"
   git config user.name "${GITHUB_USERNAME}"
   result=$(git pull origin "${sourceBranchName}")
