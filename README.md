@@ -57,7 +57,7 @@ This utility is used to create integration and stable branches in multiple repos
 - How to use it:
     - Update `repo_list.txt` with the repositories where branches need to be created
     - Execute the script as follows:
-    ```./make_branch.sh <sourceBranchName> <targetBranchName```
+    ```./jenkins-jobs/make_branch.sh <sourceBranchName> <targetBranchName```
 
 ### Release Notes Generation
 
@@ -74,7 +74,7 @@ This utility uses the gen3git tool to generate release notes for Gen3 monthly re
         - END_DATE - End date in YYYY-MM-DD format
         - GITHUB_TOKEN - Github personal access token
     - Execute generate_release_notes.sh
-    ```./generate_release_notes.sh```
+    ```./jenkins-jobs/generate_release_notes.sh```
 
 ### LEGACY TOOLS
 #### Manifest replication

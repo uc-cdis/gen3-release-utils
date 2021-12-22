@@ -19,4 +19,4 @@ export GITHUB_USERNAME="atharvar28"
 
 git config --global user.email "cdis@uchicago.edu"
 
-./make_stable_and_tag.sh "${INTEGRATION_BRANCH_NAME}" "${RELEASE_VERSION}"
+./jenkins-jobs/make_stable_and_tag.sh "${INTEGRATION_BRANCH_NAME}" "${RELEASE_VERSION}"
