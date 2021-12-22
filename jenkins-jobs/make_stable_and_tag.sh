@@ -2,12 +2,12 @@
 
 echo "### ## name_of_the_branch: $GIT_BRANCH"
 
-if [[ "$GIT_BRANCH" == "origin/master" ]]; then
-  echo "all good. proceed..."
-else
-  echo "ABORT\! Not a master branch!!! If you are running this locally, declare the GIT_BRANCH environment variable accordingly."
-  exit 1
-fi
+# if [[ "$GIT_BRANCH" == "origin/master" ]]; then
+#  echo "all good. proceed..."
+# else
+#  echo "ABORT\! Not a master branch!!! If you are running this locally, declare the GIT_BRANCH environment variable accordingly."
+#  exit 1
+# fi
 
 if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 2 ]; then
   echo "------------------------------------------------------------------------------"
@@ -42,6 +42,12 @@ while IFS= read -r repo; do
   echo "### Pulling ${targetBranchName} branch into the stable branch for repo ${repo} ###"
   git clone "${urlPrefix}${repo}"
   cd "${repo}" || exit 1
+  git ls-remote --heads ${urlPrefix}${repo} ${targetBranchName} | grep ${BRANCH} >/dev/null
+  if [ "$?" == "0" ]; then
+    git checkout "${targetBranchName}"
+  else
+    git checkout -b "${targetBranchName}"
+  fi
   git checkout "${targetBranchName}"
   git config user.name "${GITHUB_USERNAME}"
   result=$(git pull origin "${sourceBranchName}")
