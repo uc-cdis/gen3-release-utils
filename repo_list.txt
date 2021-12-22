@@ -1,14 +1,3 @@
-arborist
-gen3-statics
-fence
-cdis-data-client
-guppy
-hatchery
-indexd
-manifestservice
-pelican
-peregrine
-pidgin
 data-portal
 sheepdog
 sower
