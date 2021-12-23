@@ -30,7 +30,7 @@ while [[ $# -gt 0 ]]; do
       shift # past value
       ;;
     *)    # unknown option
-      echo "Unknown option: $1"
+      echo "#### Unknown option: $1 ####"
       exit 1
       ;;
   esac

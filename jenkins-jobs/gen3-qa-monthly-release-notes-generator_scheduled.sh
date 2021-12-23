@@ -16,7 +16,8 @@ END_DATE=`date --date="13 day ago" +%Y-%m-%d`
 RELEASE_VERSION=`date --date="$END_DATE +1 month" +%Y.%m`
 RELEASE_NAME="Core Gen3 Release $RELEASE_VERSION"
 
-bash ./jenkins-jobs/generate_release_notes.sh --startDate $START_DATE --endDate $END_DATE --releaseName $RELEASE_NAME
+echo "### Generating Release Notes ###"
+bash ./jenkins-jobs/generate_release_notes.sh --startDate "$START_DATE" --endDate "$END_DATE" --releaseName "$RELEASE_NAME"
 
 YEAR=$(echo $RELEASE_VERSION | cut -d"." -f 1)
 MONTH=$(echo $RELEASE_VERSION | cut -d"." -f 2)
