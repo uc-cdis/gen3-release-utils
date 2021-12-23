@@ -16,7 +16,7 @@ END_DATE=`date --date="13 day ago" +%Y-%m-%d`
 RELEASE_VERSION=`date --date="$END_DATE +1 month" +%Y.%m`
 RELEASE_NAME="Core Gen3 Release $RELEASE_VERSION"
 
-bash ./jenkins-jobs/generate_release_notes.sh --startDate=$START_DATE --endDate=$END_DATE --releaseName=$RELEASE_NAME
+bash ./jenkins-jobs/generate_release_notes.sh $START_DATE $END_DATE $RELEASE_NAME
 
 # The current logic does NOT handle the transition from December to January (tech debt)
 
@@ -46,4 +46,4 @@ python3.8 -m pip install dist/${wheel_file} --user
 
 cd $WORKSPACE
 
-gen3release notes -v ${RELEASE_VERSION} -f gen3_release_notes.md manifest.json
+gen3release notes -v ${RELEASE_VERSION} -f gen3_release_notes.md ./manifest.json

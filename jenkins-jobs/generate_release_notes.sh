@@ -11,6 +11,10 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
   exit 0;
 fi;
 
+$startDate=$1
+$endDate=$2
+$releaseName=$3
+
 repoOwner="uc-cdis"
 echo "### startDate is ${startDate} ###"
 echo "### endDate is ${endDate} ###"
