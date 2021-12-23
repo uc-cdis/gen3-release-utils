@@ -6,7 +6,8 @@
 
 # Archive: *.md, *.json
 
-pip install --editable git+https://github.com/uc-cdis/release-helper.git@gen3release#egg=gen3git --user
+pip3 install -U pip --user
+pip3 install --editable git+https://github.com/uc-cdis/release-helper.git@gen3release#egg=gen3git --user
 
 export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
 
@@ -15,7 +16,7 @@ END_DATE=`date --date="13 day ago" +%Y-%m-%d`
 RELEASE_VERSION=`date --date="$END_DATE +1 month" +%Y.%m`
 RELEASE_NAME="Core Gen3 Release $RELEASE_VERSION"
 
-./jenkins-jobs/generate_release_notes.sh
+./jenkins-jobs/generate_release_notes.sh --startDate=$START_DATE --endDate=$END_DATE --releaseName=$RELEASE_NAME
 
 # The current logic does NOT handle the transition from December to January (tech debt)
 
@@ -33,7 +34,7 @@ sed -i "s/${YEAR}.${MONTHSTR}/${YEAR}.${MONTH}/" manifest.json
 
 python3.8 -m pip install poetry --user
 python3.8 -m pip install pygithub --user
-
+python3.8 -m pip uninstall pygit2 --user
 python3.8 -m pip uninstall gen3release -y
 
 cd gen3release-sdk

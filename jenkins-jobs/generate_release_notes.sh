@@ -12,9 +12,7 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 0 ]; then
 fi;
 
 repoOwner="uc-cdis"
-startDate="$START_DATE"
 echo "### startDate is ${startDate} ###"
-endDate="$END_DATE"
 echo "### endDate is ${endDate} ###"
 githubAccessToken=$GITHUB_TOKEN
 
@@ -24,7 +22,7 @@ if find . -name "release_notes.md" -type f; then
 fi
 
 touch gen3_release_notes.md
-echo "# $RELEASE_NAME" >> gen3_release_notes.md
+echo "# $releaseName" >> gen3_release_notes.md
 echo >> gen3_release_notes.md
 
 repo_list="repo_list.txt"
