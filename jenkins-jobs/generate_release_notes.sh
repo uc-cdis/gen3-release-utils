@@ -11,7 +11,6 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 6 ]; then
   exit 0;
 fi;
 
-POSITIONAL=()
 while [[ $# -gt 0 ]]; do
   key="$1"
   case $key in
