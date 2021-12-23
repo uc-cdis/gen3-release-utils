@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 0 ]; then
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
   echo "------------------------------------------------------------------------------"
   echo "Usage - generate_release_notes"
   echo ""
@@ -11,11 +11,35 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$#" -ne 0 ]; then
   exit 0;
 fi;
 
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+    --startDate)
+      startDate="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    --endDate)
+      endDate="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    --releaseName)
+      releaseName="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    *)    # unknown option
+      echo "#### Unknown option: $1 ####"
+      exit 1
+      ;;
+  esac
+done
+
 repoOwner="uc-cdis"
-startDate="$START_DATE"
 echo "### startDate is ${startDate} ###"
-endDate="$END_DATE"
 echo "### endDate is ${endDate} ###"
+echo "### releaseName is ${releaseName} ###"
 githubAccessToken=$GITHUB_TOKEN
 
 if find . -name "release_notes.md" -type f; then
@@ -24,7 +48,7 @@ if find . -name "release_notes.md" -type f; then
 fi
 
 touch gen3_release_notes.md
-echo "# $RELEASE_NAME" >> gen3_release_notes.md
+echo "# $releaseName" >> gen3_release_notes.md
 echo >> gen3_release_notes.md
 
 repo_list="repo_list.txt"
