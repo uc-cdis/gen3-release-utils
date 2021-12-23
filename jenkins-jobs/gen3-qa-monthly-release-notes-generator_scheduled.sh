@@ -10,8 +10,8 @@ pip install --editable git+https://github.com/uc-cdis/release-helper.git@gen3rel
 
 export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
 
-START_DATE=`date --date="42 day ago" +%Y-%m-%d`
-END_DATE=`date --date="14 day ago" +%Y-%m-%d`
+START_DATE=`date --date="41 day ago" +%Y-%m-%d`
+END_DATE=`date --date="13 day ago" +%Y-%m-%d`
 RELEASE_VERSION=`date --date="$END_DATE +1 month" +%Y.%m`
 RELEASE_NAME="Core Gen3 Release $RELEASE_VERSION"
 
