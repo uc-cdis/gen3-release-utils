@@ -8,6 +8,7 @@
 #!/bin/bash
 
 set -e
+set -x
 
 export KUBECTL_NAMESPACE="$TARGET_ENVIRONMENT"
 
@@ -15,4 +16,10 @@ export KUBECTL_NAMESPACE="$TARGET_ENVIRONMENT"
 export GEN3_HOME=$WORKSPACE/cloud-automation
 source $GEN3_HOME/gen3/gen3setup.sh
 
+repoExist=$(aws ecr describe-repositories | jq -r .repositories[].repositoryName | grep ${SERVICE_NAME})
+if [[ -n repoExist ]]; then
+	gen3 ecr create-repository ${SERVICE_NAME}
+fi
 gen3 ecr quay-sync ${SERVICE_NAME} ${QUAY_VERSION}
+
+echo "The Image is pushed to ECR"
