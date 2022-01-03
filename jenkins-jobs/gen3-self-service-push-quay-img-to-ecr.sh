@@ -17,7 +17,7 @@ export GEN3_HOME=$WORKSPACE/cloud-automation
 source $GEN3_HOME/gen3/gen3setup.sh
 
 repoExist=$(aws ecr describe-repositories | jq -r .repositories[].repositoryName | grep ${SERVICE_NAME})
-if [[ -n repoExist ]]; then
+if [[ -z repoExist ]]; then
   echo "create new ECR repo for ${SERVICE_NAME} ..."
 	gen3 ecr create-repository ${SERVICE_NAME}
   echo "The Repo ${SERViCE_NAME} is created in AWS ECR"
