@@ -47,7 +47,8 @@ def test_make_parser():
             "-e",
             "/home/usr/demo/targetenv",
             "-l",
-            "label1 label2",
+            "label1",
+            "label2",
         ]
     )
     assert args.env == "/home/usr/demo/targetenv"

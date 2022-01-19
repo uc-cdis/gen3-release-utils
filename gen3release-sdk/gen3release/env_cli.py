@@ -297,7 +297,7 @@ def apply(args):
     logging.debug("override: {}".format(override))
     logging.debug("target_env: {}".format(target_env))
     logging.debug("pr_title: {}".format(pr_title))
-    logging.debug("pr_title: {}".format(label))
+    logging.debug("pr_title: {}".format(pr_labels))
 
     # Create Environment Config object
     e = Env(target_env)
