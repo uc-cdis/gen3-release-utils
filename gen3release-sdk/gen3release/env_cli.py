@@ -320,7 +320,7 @@ def apply(args):
         # create local branch, commit, push and create pull request
         commit_msg = "Applying version {} to {}".format(version, e.name)
         gh.create_pull_request_apply(
-            gh_client, version, e, modified_files, pr_title, commit_msg, branch_name
+            gh_client, version, e, modified_files, pr_title, pr_label, commit_msg, branch_name
         )
         logging.info("PR created successfully!")
         # TODO: Switch local branch to master
