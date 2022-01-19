@@ -92,6 +92,15 @@ The most commonly used commands are:
         type=str,
         help="triggers automation that creates a pull request on github and sets a title (e.g., chore(qa): Updating qa-dcp with release 2020.04)",
     )
+    parser_apply.add_argument(
+        "-l",
+        "--label",
+        nargs="*",
+        dest="pr_labels",
+        required=False,
+        type=str,
+        help="set one or more labels delimited by space to the pull request (e.g., gen3-release automerge)",
+    )
     parser_apply.set_defaults(func=apply)
 
     parser_copy = subparsers.add_parser(
@@ -283,10 +292,12 @@ def apply(args):
     override = args.override
     target_env = args.env
     pr_title = args.pr_title
+    pr_labels = args.pr_labels
     logging.debug("version: {}".format(version))
     logging.debug("override: {}".format(override))
     logging.debug("target_env: {}".format(target_env))
     logging.debug("pr_title: {}".format(pr_title))
+    logging.debug("pr_title: {}".format(pr_labels))
 
     # Create Environment Config object
     e = Env(target_env)
@@ -310,7 +321,14 @@ def apply(args):
         # create local branch, commit, push and create pull request
         commit_msg = "Applying version {} to {}".format(version, e.name)
         gh.create_pull_request_apply(
-            gh_client, version, e, modified_files, pr_title, commit_msg, branch_name
+            gh_client,
+            version,
+            e,
+            modified_files,
+            pr_title,
+            pr_labels,
+            commit_msg,
+            branch_name,
         )
         logging.info("PR created successfully!")
         # TODO: Switch local branch to master

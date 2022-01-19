@@ -130,6 +130,7 @@ class Git:
         tgtEnv,
         modified_files,
         pr_title,
+        pr_labels,
         commit_msg,
         branch_name,
     ):
@@ -155,6 +156,10 @@ class Git:
         the_pr = github_client.create_pull(
             title=pr_title, body=commit_msg, head=branch_name, base="master"
         )
+
+        if pr_labels:
+            for pr_label in pr_labels:
+                the_pr.add_to_labels(pr_label)
 
     def create_pull_request_copy(
         self, github_client, tgtEnv, modified_files, pr_title, commit_msg, branch_name

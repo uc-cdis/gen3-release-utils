@@ -90,7 +90,7 @@ spec:
                       export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
                       pip3 install -U pip --user
                       poetry install
-                      poetry run gen3release apply -v $INTEGRATION_BRANCH -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} ${INTEGRATION_BRANCH} ${TARGET_ENVIRONMENT} $(date +%s)"
+                      poetry run gen3release apply -v $INTEGRATION_BRANCH -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} ${INTEGRATION_BRANCH} ${TARGET_ENVIRONMENT} $(date +%s) -l gen3-release"
                     '''
                 }
               }
