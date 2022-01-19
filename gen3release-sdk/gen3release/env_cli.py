@@ -92,6 +92,14 @@ The most commonly used commands are:
         type=str,
         help="triggers automation that creates a pull request on github and sets a title (e.g., chore(qa): Updating qa-dcp with release 2020.04)",
     )
+    parser_apply.add_argument(
+        "-l",
+        "--label",
+        dest="pr_label",
+        required=False,
+        type=str,
+        help="set a label to the pull request (e.g., gen3-release)",
+    )
     parser_apply.set_defaults(func=apply)
 
     parser_copy = subparsers.add_parser(
@@ -283,10 +291,12 @@ def apply(args):
     override = args.override
     target_env = args.env
     pr_title = args.pr_title
+    pr_label = args.pr_label
     logging.debug("version: {}".format(version))
     logging.debug("override: {}".format(override))
     logging.debug("target_env: {}".format(target_env))
     logging.debug("pr_title: {}".format(pr_title))
+    logging.debug("pr_title: {}".format(label))
 
     # Create Environment Config object
     e = Env(target_env)
