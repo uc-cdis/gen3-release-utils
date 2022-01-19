@@ -103,6 +103,7 @@ def test_create_pull_request_apply(ghub, mock_repo, target_env):
         target_env,
         ["manifest.json", "manifests/hatchery/hatchery.json"],
         "prtitle",
+        ["label1"],
         "commit message",
         "new_branch_name",
     )

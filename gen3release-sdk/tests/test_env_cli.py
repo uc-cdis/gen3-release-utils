@@ -145,6 +145,7 @@ def test_apply(mocked_env, apply_env, mocked_time, mocked_Gh):
         mocked_env(),
         ["file_1", "file_2"],
         args_pr.pr_title,
+        args_pr.pr_labels,
         "Applying version 2020.20 to env",
         "chore/apply_202020_to_env_10",
     )
