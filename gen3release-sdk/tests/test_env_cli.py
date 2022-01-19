@@ -38,6 +38,21 @@ def test_make_parser():
     )
     assert args.env == "/home/usr/demo/targetenv"
     assert args.func == env_cli.apply
+    parser3 = env_cli.make_parser()
+    args = parser3.parse_args(
+        [
+            "apply",
+            "-v",
+            "/home/usr/demo/environment1",
+            "-e",
+            "/home/usr/demo/targetenv",
+            "-l",
+            "label1 label2",
+        ]
+    )
+    assert args.env == "/home/usr/demo/targetenv"
+    assert args.func == env_cli.apply
+    assert args.pr_labels == ["label1", "label2"]
 
 
 @patch("gen3release.env_cli.Gh")
@@ -113,6 +128,7 @@ def test_apply(mocked_env, apply_env, mocked_time, mocked_Gh):
         override='{"ambassador":"quay.io/datawire/ambassador:9000"}',
         env=ABS_PATH + "/data/fake_target_env",
         pr_title="A pr title",
+        pr_labels=["label1", "label2"],
     )
     apply_env.return_value = ["file_1", "file_2"]
     mocked_time.time.return_value = "10.0"
