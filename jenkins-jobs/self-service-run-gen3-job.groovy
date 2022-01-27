@@ -51,8 +51,8 @@ pipeline {
     }
   }
   post {
-      always {
-          archiveArtifacts artifacts: '**/*.log'
-      }
+    always {
+      archiveArtifacts artifacts: '**/*.log'
+    }
   }
 }
