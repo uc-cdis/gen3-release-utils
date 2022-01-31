@@ -96,7 +96,7 @@ class Env:
             "aws-es-proxy",
             "covid19-etl",
             "covid19-notebook-etl",
-            "covid19-bayes-model",
+            "covid19-bayes",
             "fluentd",
             "ambassador",
             "nb2",
