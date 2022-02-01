@@ -49,7 +49,6 @@ while IFS= read -r repo; do
   else
     git checkout -b "${targetBranchName}"
   fi
-  git checkout "${targetBranchName}"
   git config user.name "${GITHUB_USERNAME}"
   result=$(git pull origin "${sourceBranchName}")
   RC=$?
