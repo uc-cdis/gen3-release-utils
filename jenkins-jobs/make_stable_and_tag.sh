@@ -44,8 +44,8 @@ while IFS= read -r repo; do
   cd "${repo}" || exit 1
   git ls-remote --heads ${urlPrefix}${repo} ${targetBranchName} | grep ${BRANCH} >/dev/null
   if [ "$?" == "0" ]; then
+    git branch -D "${targetBranchName}"
     git checkout "${targetBranchName}"
-    git pull origin "${targetBranchName}"
   else
     git checkout -b "${targetBranchName}"
   fi
