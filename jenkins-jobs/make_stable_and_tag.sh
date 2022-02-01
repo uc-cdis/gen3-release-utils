@@ -50,7 +50,7 @@ while IFS= read -r repo; do
   fi
   git checkout "${targetBranchName}"
   git config user.name "${GITHUB_USERNAME}"
-  result=$(git pull origin "${sourceBranchName}")
+  result=$(git pull origin "${sourceBranchName}" --rebase)
   RC=$?
   if [ $RC -ne 0 ]; then
     echo "$result"
