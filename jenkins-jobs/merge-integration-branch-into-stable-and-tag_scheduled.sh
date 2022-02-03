@@ -7,13 +7,13 @@
 # GITHUB_TOKEN
 # Obtained through Jenkins credentials
 
-# TODAY=`date`
-# RELEASE_VERSION=`date --date="$TODAY +1 month" +%Y.%m`
-# INTEGRATION_BRANCH_NAME=`date --date="$TODAY +1 month" +"integration%Y%m"`
+TODAY=`date`
+RELEASE_VERSION=`date --date="$TODAY +1 month" +%Y.%m`
+INTEGRATION_BRANCH_NAME=`date --date="$TODAY +1 month" +"integration%Y%m"`
 
-# echo $TODAY
-# echo $RELEASE_VERSION
-# echo $INTEGRATION_BRANCH_NAME
+echo $TODAY
+echo $RELEASE_VERSION
+echo $INTEGRATION_BRANCH_NAME
 
 git config --global user.email "cdis@uchicago.edu"
 
