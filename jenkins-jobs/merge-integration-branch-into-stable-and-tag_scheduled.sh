@@ -17,4 +17,4 @@
 
 git config --global user.email "cdis@uchicago.edu"
 
-./jenkins-jobs/make_stable_and_tag.sh integration202202 2022.02
+./jenkins-jobs/make_stable_and_tag.sh "${INTEGRATION_BRANCH_NAME}" "${RELEASE_VERSION}"
