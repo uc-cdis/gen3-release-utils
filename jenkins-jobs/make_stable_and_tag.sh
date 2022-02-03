@@ -48,14 +48,14 @@ while IFS= read -r repo; do
   else
     git checkout -b "${targetBranchName}"
   fi
-  git checkout "${targetBranchName}"
   git config user.name "${GITHUB_USERNAME}"
-  result=$(git pull origin "${sourceBranchName}")
+  result=$(git pull origin "${sourceBranchName}" -s recursive -Xtheirs)
   RC=$?
   if [ $RC -ne 0 ]; then
     echo "$result"
     exit 1
   fi
+  git pull origin "${targetBranchName}"
   result=$(git push origin "${targetBranchName}")
   RC=$?
   if [ $RC -ne 0 ]; then
