@@ -100,7 +100,11 @@ pipeline {
                   file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON'),
                   file(credentialsId: 'ed-dev-environment-credentials', variable: 'ED_DEV_ENV_CREDS_JSON'),
                   string(credentialsId: 'temporary-qa-dcp-long-living-access-token', variable: 'ACCESS_TOKEN'),
-                  file(credentialsId: 'QA-NIAID-CRED', variable: 'QA_NIAID_CREDS')
+                  file(credentialsId: 'QA-NIAID-CRED', variable: 'QA_NIAID_CREDS'),
+                  file(credentialsId: 'CTDS_TEST_ENV_MTLS_CERT', variable: 'CTDS_TEST_ENV_MTLS_CERT'),
+                  file(credentialsId: 'CTDS_TEST_ENV_MTLS_KEY', variable: 'CTDS_TEST_ENV_MTLS_KEY'),
+                  file(credentialsId: 'QA_DCP_MTLS_CERT', variable: 'QA_DCP_MTLS_CERT'),
+                  file(credentialsId: 'QA_DCP_MTLS_KEY', variable: 'QA_DCP_MTLS_KEY')
                 ]){
                   dir("gen3-qa") {
                       script {
@@ -117,6 +121,20 @@ pipeline {
                           npm install
 
                           SELECTED_LOAD_TEST_DESCRIPTOR=""
+
+                          if [ "$TARGET_ENVIRONMENT" == "qa-dcp" ]; then
+                            echo "b/c target env is qa-dcp, using qa-dcp mLTS client cert"
+                            export MTLS_DOMAIN="qa-dcp.planx-pla.net"
+                            export MTLS_CERT="$QA_DCP_MTLS_CERT"
+                            export MTLS_KEY="$QA_DCP_MTLS_KEY"
+                          elif [ "$LOAD_TEST_DESCRIPTOR" == "some-other-environment" ]; then
+                            # TODO add more here if needed
+                          else
+                            echo "b/c target env is either ctds-test-env OR doesn't have mTLS, we'll just use the ctds-test-env mLTS client cert"
+                            export MTLS_DOMAIN="ctds-test-env.planx-pla.net"
+                            export MTLS_CERT="$CTDS_TEST_ENV_MTLS_CERT"
+                            export MTLS_KEY="$CTDS_TEST_ENV_MTLS_KEY"
+                          fi
 
                           # TODO: Make this work
                           # case statement to use one of the load test descriptor JSON files
@@ -139,6 +157,24 @@ pipeline {
                               sed -i 's/"indexd_record_acl": "phs000178",/"indexd_record_acl": "$PRESIGNED_URL_ACL_FILTER",/' load-testing/sample-descriptors/load-test-drs-endpoint-bottleneck-sample.json
                               sed -i 's/"presigned_url_protocol": "phs000178",/"indexd_record_acl": "SIGNED_URL_PROTOCOL",/' load-testing/sample-descriptors/load-test-drs-endpoint-bottleneck-sample.json
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-drs-endpoint-bottleneck-sample.json random-guids"
+                              ;;
+                          ga4gh-drs-performance)
+                              echo "Selected drs-performance"
+                              # FOR DRS ENDPOINTS
+                              sed -i 's/"indexd_record_authz_list": "/programs/DEV/projects/test,/programs/DEV/projects/test2,/programs/DEV/projects/test3",/"indexd_record_authz_list": "$PRESIGNED_URL_AUTHZ_FILTER",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"presigned_url_protocol": "s3",/"presigned_url_protocol": "$SIGNED_URL_PROTOCOL",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"minimum_records": 10000,/"minimum_records": "$MINIMUM_RECORDS",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"record_chunk_size": 1024,/"record_chunk_size": "$RECORD_CHUNK_SIZE",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"num_parallel_requests": 5,/"num_parallel_requests": "$NUM_PARALLEL_REQUESTS",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"passports_list": "",/"passports_list": "$PASSPORTS_LIST",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+
+                              sed -i 's/"MTLS_DOMAIN": "test",/"MTLS_DOMAIN": "$MTLS_DOMAIN",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"MTLS_CERT": "test",/"MTLS_CERT": "$MTLS_CERT",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"MTLS_KEY": "test",/"MTLS_KEY": "$MTLS_KEY",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+
+                              echo "\nload-test-ga4gh-drs-performance-sample.json contents:"
+                              cat load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-ga4gh-drs-performance-sample.json"
                               ;;
                           sheepdog-import-clinical-metada)
                               echo "Selected Sheepdog import clinical metadata"
@@ -163,6 +199,21 @@ pipeline {
                               echo "Selected Metadata Service filter large database test"
                               # FOR MDS soak test
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-metadata-service-large-database-sample.json"
+                              ;;
+                          metadata-service-create-and-delete)
+                              echo "Selected Metadata Service filter large database test"
+                              # FOR MDS soak test
+                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-metadata-service-create-and-delete-sample.json"
+                              ;;
+                          metadata-service-create-mds-record)
+                              echo "Selected Metadata Service filter large database test"
+                              # FOR MDS soak test
+                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-metadata-service-create-mds-sample.json"
+                              ;;
+                          study-viewer)
+                              echo "Selected Study Viewer test"
+                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-study-viewer.json"
+                              sed -i 's/"override_access_token": "<place_access_token_here>",/"override_access_token": "$QA_NIAID_CREDS",/' load-testing/sample-descriptors/load-test-study-viewer.json
                               ;;
                           study-viewer)
                               echo "Selected Study Viewer test"
