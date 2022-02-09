@@ -170,7 +170,7 @@ pipeline {
 
                               sed -i 's/"MTLS_DOMAIN": "test",/"MTLS_DOMAIN": "$MTLS_DOMAIN",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
                               sed -i 's/"MTLS_CERT": "test",/"MTLS_CERT": "$MTLS_CERT",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
-                              sed -i 's/"MTLS_KEY": "test",/"MTLS_KEY": "$MTLS_KEY",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"MTLS_KEY": "test"/"MTLS_KEY": "$MTLS_KEY"/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
 
                               echo "\nload-test-ga4gh-drs-performance-sample.json contents:"
                               cat load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
