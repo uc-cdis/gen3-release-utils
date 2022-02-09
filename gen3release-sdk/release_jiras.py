@@ -78,49 +78,34 @@ year = year_and_month.group(1)
 # get month string
 month = datetime.date(1900, int(year_and_month.group(2)), 1).strftime("%B")
 
-# Do not create duplicate Epic + Tasks
-query = jira.search_issues(
-    jql_str='issuetype = Epic AND project = {} AND text ~ "{} {} Gen3 Core Release"'.format(
-        os.environ["JIRA_PROJECT_NAME"], month, year
-    )
-)
-
-if len(query) > 0:
-    print(
-        "Epic for {} release [{}] already exists. Abort automatic creation of tickets...".format(
-            release, query[0]
-        )
-    )
-    sys.exit(1)
-
 PROJECT_NAME = os.environ["JIRA_PROJECT_NAME"]
 RELEASE_TITLE = "{} {} Gen3 Core Release".format(month, year)
 COMPONENTS = [
     {"name": "Team Catch(Err)"},
 ]
 
-epic_dict = {
+story_dict = {
     "project": PROJECT_NAME,
-    "customfield_10011": RELEASE_TITLE,
+    "customfield_10014": "QAT-350",
     "customfield_10067": {"id": "10055", "value": "Project Team"},
     "summary": RELEASE_TITLE,
-    "description": "This epic comprises all the tasks releated to {}".format(
+    "description": "This story comprises all the tasks releated to {}".format(
         RELEASE_TITLE
     ),
-    "issuetype": {"name": "Epic"},
+    "issuetype": {"name": "Story"},
     "components": COMPONENTS,
     "assignee": {"accountId": team_members[team_member_index]["id"]},
 }
 
-new_epic = jira.create_issue(fields=epic_dict)
-RELEASE_EPIC = new_epic.key
+new_story = jira.create_issue(fields=story_dict)
+RELEASE_STORY = new_story.key
 
 print("start adding tasks to " + RELEASE_TITLE)
 
 
 def create_ticket(issue_dict, team_member_index):
     new_issue = jira.create_issue(fields=issue_dict)
-    jira.add_issues_to_epic(RELEASE_EPIC, [new_issue.key])
+    # jira.add_issues_to_epic(RELEASE_EPIC, [new_issue.key])
     print(
         team_members[team_member_index]["name"]
         + " has been assigned to "
@@ -133,10 +118,13 @@ for task in tasks:
     summary = task["title"]
     issue_dict = {
         "project": PROJECT_NAME,
+        "parent": {
+            "key": RELEASE_STORY,
+        },
         "summary": summary,
         "description": task["description"],
         "customfield_10067": {"id": "10055", "value": "Project Team"},
-        "issuetype": {"name": "Story"},
+        "issuetype": {"name": "Sub-task"},
         "components": COMPONENTS,
         "assignee": {"accountId": team_members[team_member_index]["id"]},
     }
