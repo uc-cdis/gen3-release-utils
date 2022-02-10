@@ -19,7 +19,7 @@ urlPrefix="https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/uc-cdis/"
 git clone "${urlPrefix}cdis-manifest"
 cd cdis-manifest
 
-commons=("gen3.theanvil.io" "gen3.biodatacatalyst.nhlbi.nih.gov" "nci-crdc.datacommons.io" "vpodc.data-commons.org")
+commons=("gen3.theanvil.io" "chicagoland.pandemicresponsecommons.org" "gen3.biodatacatalyst.nhlbi.nih.gov" "nci-crdc.datacommons.io" "vpodc.data-commons.org")
 
 # Select from one randomly
 # TODO: We should cycle through each of them every night (TBD) -- This will pollute the cdis-manifest PRs screen so we should also .. CLOSE the PRs through a morning job :D
