@@ -129,6 +129,7 @@ pipeline {
                             export MTLS_KEY="$QA_DCP_MTLS_KEY"
                           elif [ "$LOAD_TEST_DESCRIPTOR" == "some-other-environment" ]; then
                             # TODO add more here if needed
+                            echo not implemented
                           else
                             echo "b/c target env is either ctds-test-env OR doesn't have mTLS, we'll just use the ctds-test-env mLTS client cert"
                             export MTLS_DOMAIN="ctds-test-env.planx-pla.net"
