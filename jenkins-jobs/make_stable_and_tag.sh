@@ -39,27 +39,29 @@ fi
 
 repo_list="../repo_list.txt"
 while IFS= read -r repo; do
-  echo "### Cloning repo ${repo} ###"
+  echo "### Pulling ${targetBranchName} branch into the stable branch for repo ${repo} ###"
   git clone "${urlPrefix}${repo}"
   cd "${repo}" || exit 1
-  
-  echo "### Deleting stable branch ###"
-  git branch -D stable
-  git push -d origin stable
-  
-  echo "### Deleting the tag if it has already exist ###"
-  git tag --delete "${tagName}"
-  git push --delete origin "${tagName}"
-  
   git ls-remote --heads ${urlPrefix}${repo} ${targetBranchName} | grep ${BRANCH} >/dev/null
   if [ "$?" == "0" ]; then
     git checkout "${targetBranchName}"
   else
-    git checkout "${sourceBranchName}"
-    git checkout -b "${targetBranchName}" "${sourceBranchName}"
+    git checkout -b "${targetBranchName}"
   fi
-  
-  echo "### Tagging the new release ${tagName} ###"
+  git config user.name "${GITHUB_USERNAME}"
+  result=$(git pull origin "${sourceBranchName}" -s recursive -Xtheirs)
+  RC=$?
+  if [ $RC -ne 0 ]; then
+    echo "$result"
+    exit 1
+  fi
+  git pull origin "${targetBranchName}"
+  result=$(git push origin "${targetBranchName}")
+  RC=$?
+  if [ $RC -ne 0 ]; then
+    echo "$result"
+    exit 1
+  fi
   result=$(git tag "${tagName}" -a -m "Gen3 Core Release ${tagName}" 2>&1)
   if [[ "$result" == *"already exists"* ]]; then
     echo "meh. Tag ${tagName} already exists for repo ${repo}... skipping it."
@@ -82,4 +84,4 @@ done < "$repo_list"
 
 cd ..
 echo "### Cleaning up folder gen3-integration ###"
-rm -rf gen3-integration
+rm -rf gen3-integration 
