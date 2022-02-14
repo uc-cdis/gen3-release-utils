@@ -126,14 +126,16 @@ pipeline {
                           SELECTED_LOAD_TEST_DESCRIPTOR=""
 
                           if [ "$TARGET_ENVIRONMENT" == "qa-dcp" ]; then
-                            echo "b/c target env is qa-dcp, using qa-dcp mLTS client cert"
+                            echo "b/c target env is qa-dcp, using qa-dcp mLTS client cert and tokens"
                             mv "$QA_DCP_MTLS_CERT" "\$JENKINS_PATH/mtls.crt"
                             mv "$QA_DCP_MTLS_KEY" "\$JENKINS_PATH/mtls.key"
-                          elif [ "$LOAD_TEST_DESCRIPTOR" == "some-other-environment" ]; then
-                            # TODO add more here if needed
-                            echo not implemented
+                          elif [ "$TARGET_ENVIRONMENT" == "ctds-test-env" ]; then
+                            echo "b/c target env is ctds-test-env, we'll use the ctds-test-env mLTS client cert and tokens"
+                            mv "$CTDS_TEST_ENV_MTLS_CERT" "\$JENKINS_PATH/mtls.crt"
+                            mv "$CTDS_TEST_ENV_MTLS_KEY" "\$JENKINS_PATH/mtls.key"
+                            mv "$CTDS_TEST_ENV_CREDS_JSON" credentials.json
                           else
-                            echo "b/c target env is either ctds-test-env OR doesn't have mTLS, we'll just use the ctds-test-env mLTS client cert"
+                            echo "configured ctds-test-env mTLS by default b/c you did not choose a TARGET_ENVIRONMENT which has configured mTLS creds"
                             mv "$CTDS_TEST_ENV_MTLS_CERT" "\$JENKINS_PATH/mtls.crt"
                             mv "$CTDS_TEST_ENV_MTLS_KEY" "\$JENKINS_PATH/mtls.key"
                           fi
