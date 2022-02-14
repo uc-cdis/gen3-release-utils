@@ -11,7 +11,7 @@ failed_list = []
 # function to get quay images using thr quay api call
 def get_image():
     print(f"### Services : {services.strip()}")
-    url = f"https://quay.io/api/v1/repository/cdis/{services}/tag/"
+    url = f"https://quay.io/api/v1/repository/cdis/{services}/build/"
     print(url)
     res = requests.get(url)
     quay_result = json.loads(res.text)
