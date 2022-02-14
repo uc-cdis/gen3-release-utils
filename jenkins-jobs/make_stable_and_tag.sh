@@ -58,20 +58,8 @@ while IFS= read -r repo; do
     git checkout "${sourceBranchName}"
     git checkout -b "${targetBranchName}" "${sourceBranchName}"
   fi
-  git config user.name "${GITHUB_USERNAME}"
-  result=$(git pull origin "${sourceBranchName}" -s recursive -Xtheirs)
-  RC=$?
-  if [ $RC -ne 0 ]; then
-    echo "$result"
-    exit 1
-  fi
-  git pull origin "${targetBranchName}"
-  result=$(git push origin "${targetBranchName}")
-  RC=$?
-  if [ $RC -ne 0 ]; then
-    echo "$result"
-    exit 1
-  fi
+  
+  echo "### Tagging the new release ${tagName} ###"
   result=$(git tag "${tagName}" -a -m "Gen3 Core Release ${tagName}" 2>&1)
   if [[ "$result" == *"already exists"* ]]; then
     echo "meh. Tag ${tagName} already exists for repo ${repo}... skipping it."
