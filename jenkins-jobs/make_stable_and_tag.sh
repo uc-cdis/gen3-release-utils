@@ -46,7 +46,8 @@ while IFS= read -r repo; do
   if [ "$?" == "0" ]; then
     git checkout "${targetBranchName}"
   else
-    git checkout -b "${targetBranchName}"
+    git checkout "${sourceBranchName}"
+    git checkout -b "${targetBranchName}" "${sourceBranchName}"
   fi
   git config user.name "${GITHUB_USERNAME}"
   result=$(git pull origin "${sourceBranchName}" -s recursive -Xtheirs)
