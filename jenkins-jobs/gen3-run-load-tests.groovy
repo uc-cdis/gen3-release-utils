@@ -94,6 +94,9 @@ pipeline {
             }
         }
         stage('run tests') {
+            environment {
+                JENKINS_PATH = sh(script: 'pwd', , returnStdout: true).trim()
+            }
             steps {
                 withCredentials([
                   file(credentialsId: 'fence-google-app-creds-secret', variable: 'GOOGLE_APP_CREDS_JSON'),
@@ -124,15 +127,15 @@ pipeline {
 
                           if [ "$TARGET_ENVIRONMENT" == "qa-dcp" ]; then
                             echo "b/c target env is qa-dcp, using qa-dcp mLTS client cert"
-                            mv "$QA_DCP_MTLS_CERT" mtls.crt
-                            mv "$QA_DCP_MTLS_KEY" mtls.key
+                            mv "$QA_DCP_MTLS_CERT" "\$JENKINS_PATH/mtls.crt"
+                            mv "$QA_DCP_MTLS_KEY" "\$JENKINS_PATH/mtls.key"
                           elif [ "$LOAD_TEST_DESCRIPTOR" == "some-other-environment" ]; then
                             # TODO add more here if needed
                             echo not implemented
                           else
                             echo "b/c target env is either ctds-test-env OR doesn't have mTLS, we'll just use the ctds-test-env mLTS client cert"
-                            mv "$CTDS_TEST_ENV_MTLS_CERT" mtls.crt
-                            mv "$QA_DCP_MTLS_KEY" mtls.key
+                            mv "$CTDS_TEST_ENV_MTLS_CERT" "\$JENKINS_PATH/mtls.crt"
+                            mv "$CTDS_TEST_ENV_MTLS_KEY" "\$JENKINS_PATH/mtls.key"
                           fi
 
                           # TODO: Make this work
@@ -167,7 +170,11 @@ pipeline {
                               sed -i 's/"num_parallel_requests": 5,/"num_parallel_requests": "$NUM_PARALLEL_REQUESTS",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
                               sed -i 's/"passports_list": "",/"passports_list": "$PASSPORTS_LIST",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
 
-                              sed -i "s/\"MTLS_DOMAIN\": \"qa-dcp.planx-pla.net\",/\"MTLS_DOMAIN\": \"$MTLS_DOMAIN\",/" load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"MTLS_DOMAIN": "qa-dcp.planx-pla.net",/"MTLS_DOMAIN": "'"$MTLS_DOMAIN"'",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+
+                              # use ; as sed delimeter
+                              sed -i 's;"MTLS_CERT": "mtls.crt",;"MTLS_CERT": "'"$JENKINS_PATH\\/mtls.crt"'",;' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's;"MTLS_KEY": "mtls.key";"MTLS_KEY": "'"$JENKINS_PATH\\/mtls.key"'";' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
 
                               echo "\nload-test-ga4gh-drs-performance-sample.json contents:"
                               cat load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
