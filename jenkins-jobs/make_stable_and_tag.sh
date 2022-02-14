@@ -39,14 +39,24 @@ fi
 
 repo_list="../repo_list.txt"
 while IFS= read -r repo; do
-  echo "### Pulling ${targetBranchName} branch into the stable branch for repo ${repo} ###"
+  echo "### Cloning repo ${repo} ###"
   git clone "${urlPrefix}${repo}"
   cd "${repo}" || exit 1
+  
+  echo "### Deleting stable branch ###"
+  git branch -D stable
+  git push -d origin stable
+  
+  echo "### Deleting the tag if it has already exist ###"
+  git tag --delete "${tagName}"
+  git push --delete origin "${tagName}"
+  
   git ls-remote --heads ${urlPrefix}${repo} ${targetBranchName} | grep ${BRANCH} >/dev/null
   if [ "$?" == "0" ]; then
     git checkout "${targetBranchName}"
   else
-    git checkout -b "${targetBranchName}"
+    git checkout "${sourceBranchName}"
+    git checkout -b "${targetBranchName}" "${sourceBranchName}"
   fi
   git config user.name "${GITHUB_USERNAME}"
   result=$(git pull origin "${sourceBranchName}" -s recursive -Xtheirs)
