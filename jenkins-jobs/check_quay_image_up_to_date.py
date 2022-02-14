@@ -11,23 +11,20 @@ failed_list = []
 # function to get quay images using thr quay api call
 def get_image():
     print(f"### Services : {services.strip()}")
-    url = f"https://quay.io/api/v1/repository/cdis/{services}/tag/{release}/images"
+    url = f"https://quay.io/api/v1/repository/cdis/{services}/tag/"
     print(url)
     res = requests.get(url)
-    try:
-        quay_result = json.loads(res.text)
-        if len(quay_result["images"][0]) > 0:
-            image_created = quay_result["images"][0]["created"]
-            print("Created: ", image_created)
-            if create_date:
-                if create_date not in image_created:
-                    failed_list.append(services)
-                    print(f"The Image doesn't have build on {create_date} for {services}")
-            print("ID: ", quay_result["images"][0]["id"])
-            print(f"Image Exists for {services.strip()}")
-    except KeyError:
-        failed_list.append(services)
-        print(f"The Image doesn't Exist for {services}")
+    quay_result = json.loads(res.text)
+    tags = quay_result["tags"]
+    for tag in tags:
+        if tag['name'] == release:
+            print(f"{release} of {services} modified at {tag['last_modified']}")
+            if create_date in tag['last_modified']:
+                print(f"{services} is up to date")
+                return
+    
+    failed_list.append(services)
+    print(f"{services} doesn't have up-to-date {release}")
 
 
 # here
