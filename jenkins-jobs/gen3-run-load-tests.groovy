@@ -107,7 +107,8 @@ pipeline {
                   file(credentialsId: 'CTDS_TEST_ENV_MTLS_CERT', variable: 'CTDS_TEST_ENV_MTLS_CERT'),
                   file(credentialsId: 'CTDS_TEST_ENV_MTLS_KEY', variable: 'CTDS_TEST_ENV_MTLS_KEY'),
                   file(credentialsId: 'QA_DCP_MTLS_CERT', variable: 'QA_DCP_MTLS_CERT'),
-                  file(credentialsId: 'QA_DCP_MTLS_KEY', variable: 'QA_DCP_MTLS_KEY')
+                  file(credentialsId: 'QA_DCP_MTLS_KEY', variable: 'QA_DCP_MTLS_KEY'),
+                  file(credentialsId: 'CTDS_TEST_ENV_CREDS_JSON', variable: 'CTDS_TEST_ENV_CREDS_JSON')
                 ]){
                   dir("gen3-qa") {
                       script {
