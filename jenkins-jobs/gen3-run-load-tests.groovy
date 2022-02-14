@@ -124,17 +124,15 @@ pipeline {
 
                           if [ "$TARGET_ENVIRONMENT" == "qa-dcp" ]; then
                             echo "b/c target env is qa-dcp, using qa-dcp mLTS client cert"
-                            export MTLS_DOMAIN="qa-dcp.planx-pla.net"
-                            export MTLS_CERT="$QA_DCP_MTLS_CERT"
-                            export MTLS_KEY="$QA_DCP_MTLS_KEY"
+                            mv "$QA_DCP_MTLS_CERT" mtls.crt
+                            mv "$QA_DCP_MTLS_KEY" mtls.key
                           elif [ "$LOAD_TEST_DESCRIPTOR" == "some-other-environment" ]; then
                             # TODO add more here if needed
                             echo not implemented
                           else
                             echo "b/c target env is either ctds-test-env OR doesn't have mTLS, we'll just use the ctds-test-env mLTS client cert"
-                            export MTLS_DOMAIN="ctds-test-env.planx-pla.net"
-                            export MTLS_CERT="$CTDS_TEST_ENV_MTLS_CERT"
-                            export MTLS_KEY="$CTDS_TEST_ENV_MTLS_KEY"
+                            mv "$CTDS_TEST_ENV_MTLS_CERT" mtls.crt
+                            mv "$QA_DCP_MTLS_KEY" mtls.key
                           fi
 
                           # TODO: Make this work
@@ -169,9 +167,7 @@ pipeline {
                               sed -i 's/"num_parallel_requests": 5,/"num_parallel_requests": "$NUM_PARALLEL_REQUESTS",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
                               sed -i 's/"passports_list": "",/"passports_list": "$PASSPORTS_LIST",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
 
-                              sed -i 's/"MTLS_DOMAIN": "test",/"MTLS_DOMAIN": "$MTLS_DOMAIN",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
-                              sed -i 's/"MTLS_CERT": "test",/"MTLS_CERT": "$MTLS_CERT",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
-                              sed -i 's/"MTLS_KEY": "test"/"MTLS_KEY": "$MTLS_KEY"/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i "s/\"MTLS_DOMAIN\": \"qa-dcp.planx-pla.net\",/\"MTLS_DOMAIN\": \"$MTLS_DOMAIN\",/" load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
 
                               echo "\nload-test-ga4gh-drs-performance-sample.json contents:"
                               cat load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
