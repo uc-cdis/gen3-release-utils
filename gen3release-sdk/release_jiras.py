@@ -54,7 +54,7 @@ tasks = [
         "title": "SHARED: 9. Follow up with PMs to merge the PRs of respective commons",
         "description": "The `automerge` label is applied automatically to all PRs, once the PM approves it, the changes will be automatically merged and deployed to the environment. The QA engineers should monitor the PRs in case of any CI check failures.",
     },
-     {
+    {
         "title": "10. Delete the integration-branch from ECR",
         "description": "Deleting the integration-branch will help lower the cost on the AWS",
     },
