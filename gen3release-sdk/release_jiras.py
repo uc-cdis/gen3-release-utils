@@ -55,7 +55,11 @@ tasks = [
         "description": "The `automerge` label is applied automatically to all PRs, once the PM approves it, the changes will be automatically merged and deployed to the environment. The QA engineers should monitor the PRs in case of any CI check failures.",
     },
     {
-        "title": "10. Mark the release as released",
+        "title": "10. Delete the integration-branch from ECR",
+        "description": "Deleting the integration-branch will help lower the cost on the AWS",
+    },
+    {
+        "title": "11. Mark the release as released",
         "description": "Kick off this job: https://jenkins.planx-pla.net/job/mark-gen3-monthly-release-as-released.",
     },
 ]
@@ -63,7 +67,7 @@ tasks = [
 user_ids = os.environ["JIRA_USER_IDS"].split(",")
 
 team_members = [
-    # {"name": "haraprasadj", "id": user_ids[2]},
+    {"name": "haraprasadj", "id": user_ids[2]},
     {"name": "jingh8", "id": user_ids[1]},
     {"name": "atharvar", "id": user_ids[0]},
 ]
