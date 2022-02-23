@@ -56,7 +56,7 @@ pipeline {
                         "cloud-automation": "awshelper",
                         "dataguids.org": "dataguids",
                         "cdis-data-client": "gen3-client",
-                        "ACCESS-backen": "access-backend"
+                        "ACCESS-backend": "access-backend"
                     ]
 
                     repos.each{ githubRepoName ->
