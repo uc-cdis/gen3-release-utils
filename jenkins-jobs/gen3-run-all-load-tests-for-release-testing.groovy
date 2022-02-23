@@ -33,6 +33,7 @@ environments.each {loadTestScenario ->
   params += new StringParameterValue("RECORD_CHUNK_SIZE", "1024");
   params += new StringParameterValue("NUM_PARALLEL_REQUESTS", "5");
   params += new StringParameterValue("PASSPORTS_LIST", " ");
+  params += new StringParameterValue("MTLS_DOMAIN", "ctds-test-env.planx-pla.net");
 
   params += new StringParameterValue("RELEASE_VERSION", "${RELEASE_VERSION}");
 
