@@ -30,8 +30,8 @@ COMPONENTS = os.environ["COMPONENTS"].split(",")
 LABELS = os.environ["LABELS"].split(",")
 ENVS = os.environ["ENVS"].split(",")
 
-JIRA_USERNAME = os.environ.get("JIRA_USERNAME")
-JIRA_API_TOKEN = os.environ.get("JIRA_API_TOKEN")
+JIRA_USERNAME = os.environ["JIRA_USERNAME"]
+JIRA_API_TOKEN = os.environ["JIRA_API_TOKEN"]
 auth = (JIRA_USERNAME, JIRA_API_TOKEN)
 
 ENVS_DICT = {
