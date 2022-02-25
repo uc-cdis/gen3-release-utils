@@ -68,12 +68,27 @@ pipeline {
         }
         stage('Setup for Load Tests') {
             steps {
+              withCredentials([
+                string(credentialsId: 'DD_API_KEY', variable: 'DD_API_KEY')
+              ]){
                 sh """#!/bin/bash
 
                   export KUBECTL_NAMESPACE="$TARGET_ENVIRONMENT"
                   # setup gen3 CLI
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
                   source \$GEN3_HOME/gen3/gen3setup.sh
+
+                  DOCKER_CONTENT_TRUST=1 \
+                  docker run -d \
+                      --name datadog \
+                      -v /var/run/docker.sock:/var/run/docker.sock:ro \
+                      -v /proc/:/host/proc/:ro \
+                      -v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro \
+                      -e DD_SITE="datadoghq.com" \
+                      -e DD_API_KEY="$DD_API_KEY" \
+                      -e DD_DOGSTATSD_NON_LOCAL_TRAFFIC=1 \
+                      -p 8125:8125/udp \
+                      datadog/agent:latest
 
                   if [ "$LOAD_TEST_DESCRIPTOR" == "audit-presigned-url" ]; then
                     echo "Populating audit-service SQS with presigned-url messages"
@@ -91,6 +106,7 @@ pipeline {
                     echo "Presigned URL test was not selected. Skipping auto-scaling changes..."
                   fi
                 """
+              }
             }
         }
         stage('run tests') {
