@@ -85,7 +85,7 @@ pipeline {
                     # This is not working
                     # We should use "gen3 gitops configmaps scaling && gen3 scaling apply all" instead.
                     # gen3 replicas presigned-url-fence $DESIRED_NUMBER_OF_FENCE_PODS
-                    gen3 replicas presigned-url-fence 6
+                    gen3 scaling update presigned-url-fence 6 10 14
                     sleep 60
                     g3kubectl get pods | grep fence
                   else
