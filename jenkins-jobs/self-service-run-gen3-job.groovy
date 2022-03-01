@@ -11,6 +11,11 @@ pipeline {
     }
   }
   stages {
+      stage('Clean old workspace') {
+          steps {
+              cleanWs()
+          }
+      }
       stage('Checkout code') {
           steps {
               // cloud-automation
