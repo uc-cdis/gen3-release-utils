@@ -47,7 +47,9 @@ pipeline {
             export KUBECTL_NAMESPACE=\${TARGET_ENVIRONMENT}
             source $GEN3_HOME/gen3/gen3setup.sh
             gen3 kube-setup-secrets
-            gen3 roll all
+            if [ $GEN3_ROLL_ALL == "true" ]; then
+              gen3 roll all
+            fi
             gen3 job run \${JOB_NAME}
             sleep 60
             gen3 job logs \${JOB_NAME} -f
