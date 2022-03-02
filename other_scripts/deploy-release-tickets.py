@@ -131,5 +131,5 @@ if __name__ == "__main__":
     #     assert c in components
 
     for project in ENVS:
-        for envs in ENVS_DICT[project]:
-            create_deployment_tickets(project, envs, version)
+        envs = ENVS_DICT[project]
+        create_deployment_tickets(project, envs, version)
