@@ -41,7 +41,7 @@ ENVS_DICT = {
     "VA": ["va-testing", "Prod"],
     "MIDRC": ["Staging", "validate", "Prod"],
     "BDcat": ["Prod", "Preprod", "staging"],
-    "Anvil": ["Prod", "staging", "internalstaging"]
+    "Anvil": ["Prod", "staging", "internalstaging"],
     "HEAL": ["QA", "Pre-prod", "Prod", "externaldata"],
 }
 
