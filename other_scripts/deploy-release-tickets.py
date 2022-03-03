@@ -41,6 +41,7 @@ ENVS_DICT = {
     "NCT": ["QA", "Prod"],
     "VA": ["va-testing", "Prod"],
     "MIDRC": ["Staging", "validate", "Prod"],
+    "HEAL": ["QA", "Pre-prod", "Prod", "externaldata"],
 }
 
 
