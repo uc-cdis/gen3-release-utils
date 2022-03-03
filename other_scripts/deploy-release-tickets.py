@@ -35,12 +35,13 @@ JIRA_API_TOKEN = os.environ["JIRA_API_TOKEN"]
 auth = (JIRA_USERNAME, JIRA_API_TOKEN)
 
 ENVS_DICT = {
-    "IBD": ["QA", "Prod"],
     "JCOIN": ["QA", "Prod"],
     "KidsFirst": ["QA", "external QA", "external Staging", "Prod"],
     "NCT": ["QA", "Prod"],
     "VA": ["va-testing", "Prod"],
     "MIDRC": ["Staging", "validate", "Prod"],
+    "BDcat": ["Prod", "Preprod", "staging"],
+    "Anvil": ["Prod", "staging", "internalstaging"]
     "HEAL": ["QA", "Pre-prod", "Prod", "externaldata"],
 }
 
