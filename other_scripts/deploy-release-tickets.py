@@ -44,7 +44,7 @@ ENVS_DICT = {
     "Anvil": ["Prod", "staging", "internalstaging"],
     "HEAL": ["QA", "Pre-prod", "Prod", "externaldata"],
     "DCF": ["Staging", "Prod"],
-    "COVID19": ["QA", "Prod"]
+    "COVID19": ["QA", "Prod"],
 }
 
 
