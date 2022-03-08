@@ -43,6 +43,8 @@ ENVS_DICT = {
     "BDcat": ["Prod", "Preprod", "staging"],
     "Anvil": ["Prod", "staging", "internalstaging"],
     "HEAL": ["QA", "Pre-prod", "Prod", "externaldata"],
+    "DCF": ["Staging", "Prod"],
+    "COVID19": ["QA", "Prod"]
 }
 
 
