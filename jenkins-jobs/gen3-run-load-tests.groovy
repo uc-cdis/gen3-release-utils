@@ -167,7 +167,9 @@ pipeline {
                           ga4gh-drs-performance)
                               echo "Selected drs-performance"
                               # FOR DRS ENDPOINTS
-                              sed -i 's/"indexd_record_authz_list": "/programs/DEV/projects/test,/programs/DEV/projects/test2,/programs/DEV/projects/test3",/"indexd_record_authz_list": "$PRESIGNED_URL_AUTHZ_FILTER",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              # use ; as sed delimeter
+                              sed -i 's;"indexd_record_authz_list": "/programs/DEV/projects/test1,/programs/DEV/projects/test2,/programs/DEV/projects/test3",;"indexd_record_authz_list": "$PRESIGNED_URL_AUTHZ_FILTER",;' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+
                               sed -i 's/"presigned_url_protocol": "s3",/"presigned_url_protocol": "$SIGNED_URL_PROTOCOL",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
                               sed -i 's/"minimum_records": 10000,/"minimum_records": "$MINIMUM_RECORDS",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
                               sed -i 's/"record_chunk_size": 1024,/"record_chunk_size": "$RECORD_CHUNK_SIZE",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
