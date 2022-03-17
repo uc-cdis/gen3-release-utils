@@ -60,12 +60,6 @@ with open("repo_list.txt") as repoList:
                 services = sowerjob.strip()
                 get_image()
                 continue
-        elif repo == "mariner":
-            print("Iterating though the list of images for mariner")
-            mariner = ["mariner-engine", "mariner-s3sidecar", "mariner-server"]
-            for marinerImage in mariner:
-                services = marinerImage.strip()
-                get_image()
         elif repo == "ACCESS-backend":
             print("No docker image found")
             continue

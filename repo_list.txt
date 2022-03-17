@@ -22,7 +22,6 @@ gen3-spark
 metadata-service
 docker-nginx
 dcf-dataservice
-mariner
 ws-storage
 ACCESS-backend
 cloud-automation
