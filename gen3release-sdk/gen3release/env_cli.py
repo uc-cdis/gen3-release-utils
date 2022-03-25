@@ -357,6 +357,7 @@ def apply_version_to_environment(version, override, e):
                     e.name, manifest
                 )
             )
+            sys.exit(1)
 
     # keep only relative paths (base_path = workspace)
     base_path = e.full_path
