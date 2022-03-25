@@ -5,7 +5,8 @@ import sys
 from datetime import datetime
 
 release = os.environ["RELEASE_TAG"]
-create_date = os.environ["CREATE_DATE"]
+if "CREATE_DATE" in os.environ:
+    create_date = os.environ["CREATE_DATE"]
 failed_list = []
 
 
