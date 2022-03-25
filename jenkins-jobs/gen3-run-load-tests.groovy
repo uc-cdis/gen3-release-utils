@@ -85,7 +85,8 @@ pipeline {
                     # This is not working
                     # We should use "gen3 gitops configmaps scaling && gen3 scaling apply all" instead.
                     # gen3 replicas presigned-url-fence $DESIRED_NUMBER_OF_FENCE_PODS
-                    # sleep 60
+                    gen3 scaling update presigned-url-fence 6 10 14
+                    sleep 60
                     g3kubectl get pods | grep fence
                   else
                     echo "Presigned URL test was not selected. Skipping auto-scaling changes..."
@@ -94,13 +95,21 @@ pipeline {
             }
         }
         stage('run tests') {
+            environment {
+                JENKINS_PATH = sh(script: 'pwd', , returnStdout: true).trim()
+            }
             steps {
                 withCredentials([
                   file(credentialsId: 'fence-google-app-creds-secret', variable: 'GOOGLE_APP_CREDS_JSON'),
                   file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON'),
                   file(credentialsId: 'ed-dev-environment-credentials', variable: 'ED_DEV_ENV_CREDS_JSON'),
                   string(credentialsId: 'temporary-qa-dcp-long-living-access-token', variable: 'ACCESS_TOKEN'),
-                  file(credentialsId: 'QA-NIAID-CRED', variable: 'QA_NIAID_CREDS')
+                  file(credentialsId: 'QA-NIAID-CRED', variable: 'QA_NIAID_CREDS'),
+                  file(credentialsId: 'CTDS_TEST_ENV_MTLS_CERT', variable: 'CTDS_TEST_ENV_MTLS_CERT'),
+                  file(credentialsId: 'CTDS_TEST_ENV_MTLS_KEY', variable: 'CTDS_TEST_ENV_MTLS_KEY'),
+                  file(credentialsId: 'QA_DCP_MTLS_CERT', variable: 'QA_DCP_MTLS_CERT'),
+                  file(credentialsId: 'QA_DCP_MTLS_KEY', variable: 'QA_DCP_MTLS_KEY'),
+                  file(credentialsId: 'CTDS_TEST_ENV_CREDS_JSON', variable: 'CTDS_TEST_ENV_CREDS_JSON')
                 ]){
                   dir("gen3-qa") {
                       script {
@@ -117,6 +126,21 @@ pipeline {
                           npm install
 
                           SELECTED_LOAD_TEST_DESCRIPTOR=""
+
+                          if [ "$TARGET_ENVIRONMENT" == "qa-dcp" ]; then
+                            echo "b/c target env is qa-dcp, using qa-dcp mLTS client cert and tokens"
+                            mv "$QA_DCP_MTLS_CERT" "\$JENKINS_PATH/mtls.crt"
+                            mv "$QA_DCP_MTLS_KEY" "\$JENKINS_PATH/mtls.key"
+                          elif [ "$TARGET_ENVIRONMENT" == "ctds-test-env" ]; then
+                            echo "b/c target env is ctds-test-env, we'll use the ctds-test-env mLTS client cert and tokens"
+                            mv "$CTDS_TEST_ENV_MTLS_CERT" "\$JENKINS_PATH/mtls.crt"
+                            mv "$CTDS_TEST_ENV_MTLS_KEY" "\$JENKINS_PATH/mtls.key"
+                            mv "$CTDS_TEST_ENV_CREDS_JSON" credentials.json
+                          else
+                            echo "configured ctds-test-env mTLS by default b/c you did not choose a TARGET_ENVIRONMENT which has configured mTLS creds"
+                            mv "$CTDS_TEST_ENV_MTLS_CERT" "\$JENKINS_PATH/mtls.crt"
+                            mv "$CTDS_TEST_ENV_MTLS_KEY" "\$JENKINS_PATH/mtls.key"
+                          fi
 
                           # TODO: Make this work
                           # case statement to use one of the load test descriptor JSON files
@@ -139,6 +163,28 @@ pipeline {
                               sed -i 's/"indexd_record_acl": "phs000178",/"indexd_record_acl": "$PRESIGNED_URL_ACL_FILTER",/' load-testing/sample-descriptors/load-test-drs-endpoint-bottleneck-sample.json
                               sed -i 's/"presigned_url_protocol": "phs000178",/"indexd_record_acl": "SIGNED_URL_PROTOCOL",/' load-testing/sample-descriptors/load-test-drs-endpoint-bottleneck-sample.json
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-drs-endpoint-bottleneck-sample.json random-guids"
+                              ;;
+                          ga4gh-drs-performance)
+                              echo "Selected drs-performance"
+                              # FOR DRS ENDPOINTS
+                              # use ; as sed delimeter
+                              sed -i 's;"indexd_record_authz_list": "/programs/DEV/projects/test1,/programs/DEV/projects/test2,/programs/DEV/projects/test3",;"indexd_record_authz_list": "$PRESIGNED_URL_AUTHZ_FILTER",;' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+
+                              sed -i 's/"presigned_url_protocol": "s3",/"presigned_url_protocol": "$SIGNED_URL_PROTOCOL",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"minimum_records": 10000,/"minimum_records": "$MINIMUM_RECORDS",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"record_chunk_size": 1024,/"record_chunk_size": "$RECORD_CHUNK_SIZE",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"num_parallel_requests": 5,/"num_parallel_requests": "$NUM_PARALLEL_REQUESTS",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's/"passports_list": "",/"passports_list": "$PASSPORTS_LIST",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+
+                              sed -i 's/"MTLS_DOMAIN": "qa-dcp.planx-pla.net",/"MTLS_DOMAIN": "'"$MTLS_DOMAIN"'",/' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+
+                              # use ; as sed delimeter
+                              sed -i 's;"MTLS_CERT": "mtls.crt",;"MTLS_CERT": "'"$JENKINS_PATH\\/mtls.crt"'",;' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              sed -i 's;"MTLS_KEY": "mtls.key";"MTLS_KEY": "'"$JENKINS_PATH\\/mtls.key"'";' load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+
+                              echo "\nload-test-ga4gh-drs-performance-sample.json contents:"
+                              cat load-testing/sample-descriptors/load-test-ga4gh-drs-performance-sample.json
+                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-ga4gh-drs-performance-sample.json"
                               ;;
                           sheepdog-import-clinical-metada)
                               echo "Selected Sheepdog import clinical metadata"
@@ -163,6 +209,21 @@ pipeline {
                               echo "Selected Metadata Service filter large database test"
                               # FOR MDS soak test
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-metadata-service-large-database-sample.json"
+                              ;;
+                          metadata-service-create-and-delete)
+                              echo "Selected Metadata Service filter large database test"
+                              # FOR MDS soak test
+                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-metadata-service-create-and-delete-sample.json"
+                              ;;
+                          metadata-service-create-mds-record)
+                              echo "Selected Metadata Service filter large database test"
+                              # FOR MDS soak test
+                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-metadata-service-create-mds-sample.json"
+                              ;;
+                          study-viewer)
+                              echo "Selected Study Viewer test"
+                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-study-viewer.json"
+                              sed -i 's/"override_access_token": "<place_access_token_here>",/"override_access_token": "$QA_NIAID_CREDS",/' load-testing/sample-descriptors/load-test-study-viewer.json
                               ;;
                           study-viewer)
                               echo "Selected Study Viewer test"

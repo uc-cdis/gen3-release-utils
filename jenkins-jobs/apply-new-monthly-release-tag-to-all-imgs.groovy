@@ -55,6 +55,8 @@ pipeline {
                         "gen3-fuse": "gen3fuse-sidecar",
                         "cloud-automation": "awshelper",
                         "dataguids.org": "dataguids",
+                        "cdis-data-client": "gen3-client",
+                        "ACCESS-backend": "access-backend"
                     ]
 
                     repos.each{ githubRepoName ->
@@ -81,7 +83,7 @@ pipeline {
 
                           def params = []
 
-                          params += new StringParameterValue("SERVICE_NAME", imgName);
+                          params += new StringParameterValue("SERVICE_NAME", sowerJobsImg);
                           params += new StringParameterValue("CURRENT_IMG_TAG", currentImg);
                           params += new StringParameterValue("NEW_IMG_TAG", RELEASE_VERSION);
 
@@ -98,7 +100,7 @@ pipeline {
 
                           def params = []
 
-                          params += new StringParameterValue("SERVICE_NAME", imgName);
+                          params += new StringParameterValue("SERVICE_NAME", marinerImg);
                           params += new StringParameterValue("CURRENT_IMG_TAG", currentImg);
                           params += new StringParameterValue("NEW_IMG_TAG", RELEASE_VERSION);
 
