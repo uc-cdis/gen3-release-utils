@@ -3,7 +3,7 @@ Create tickets to deploy a version to a list of projects.
 Usage:
 JIRA_USERNAME=me@uchicago.edu JIRA_API_TOKEN=alo python deploy-release-tickets.py 2022.02
 
-ENVS = { <project>: [<env>, <env>] }
+ENVS_DIST = { <project>: [<env>, <env>] }
 => To configure one story per project and one subtask per env.
 
 To create a JIRA token:
@@ -24,21 +24,28 @@ import sys
 
 
 # parameters
-ROOT_URL = "https://ctds-planx.atlassian.net/rest/api/3"
-PROJECT_KEY = "PXP"
-COMPONENTS = ["Team JINK"]
-LABELS = ["jink-staging"]
-ENVS = {
-    "IBD": ["QA", "Prod"],
+ROOT_URL = os.environ["ROOT_URL"]
+PROJECT_KEY = os.environ["PROJECT_KEY"]
+COMPONENTS = os.environ["COMPONENTS"].split(",")
+LABELS = os.environ["LABELS"].split(",")
+ENVS = os.environ["ENVS"].split(",")
+
+JIRA_USERNAME = os.environ["JIRA_USERNAME"]
+JIRA_API_TOKEN = os.environ["JIRA_API_TOKEN"]
+auth = (JIRA_USERNAME, JIRA_API_TOKEN)
+
+ENVS_DICT = {
     "JCOIN": ["QA", "Prod"],
     "KidsFirst": ["QA", "external QA", "external Staging", "Prod"],
     "NCT": ["QA", "Prod"],
+    "VA": ["va-testing", "Prod"],
+    "MIDRC": ["Staging", "validate", "Prod"],
+    "BDcat": ["Prod", "Preprod", "staging"],
+    "Anvil": ["Prod", "staging", "internalstaging"],
+    "HEAL": ["QA", "Pre-prod", "Prod", "externaldata"],
+    "DCF": ["Staging", "Prod"],
+    "COVID19": ["QA", "Prod"],
 }
-
-
-JIRA_USERNAME = os.environ.get("JIRA_USERNAME")
-JIRA_API_TOKEN = os.environ.get("JIRA_API_TOKEN")
-auth = (JIRA_USERNAME, JIRA_API_TOKEN)
 
 
 def create_deployment_tickets(project, envs, version):
@@ -127,5 +134,6 @@ if __name__ == "__main__":
     # for c in COMPONENTS:
     #     assert c in components
 
-    for project, envs in ENVS.items():
+    for project in ENVS:
+        envs = ENVS_DICT[project]
         create_deployment_tickets(project, envs, version)

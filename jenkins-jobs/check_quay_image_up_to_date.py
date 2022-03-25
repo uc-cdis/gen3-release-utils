@@ -2,26 +2,43 @@ import requests
 import json
 import os
 import sys
+from datetime import datetime
 
 release = os.environ["RELEASE_TAG"]
+if "CREATE_DATE" in os.environ:
+    create_date = os.environ["CREATE_DATE"]
+else:
+    create_date = ""
 failed_list = []
 
 
 # function to get quay images using thr quay api call
 def get_image():
     print(f"### Services : {services.strip()}")
-    url = f"https://quay.io/api/v1/repository/cdis/{services}/tag/{release}/images"
+    url = f"https://quay.io/api/v1/repository/cdis/{services}/tag/"
     print(url)
     res = requests.get(url)
-    try:
-        quay_result = json.loads(res.text)
-        if len(quay_result["images"][0]) > 0:
-            print("Created: ", quay_result["images"][0]["created"])
-            print("ID: ", quay_result["images"][0]["id"])
-            print(f"Image Exists for {services.strip()}")
-    except KeyError:
-        failed_list.append(services)
-        print(f"The Image doesn't Exist for {services}")
+    quay_result = json.loads(res.text)
+    tags = quay_result["tags"]
+
+    for tag in tags:
+        if tag["name"] == release:
+            print(f"{release} of {services} modified at {tag['last_modified']}")
+            if create_date:
+                # Format: 'Thu, 24 Mar 2022 16:12:50 -0000'
+                last_modified_substring = tag["last_modified"][5:16]
+                last_modified_date = datetime.strptime(
+                    last_modified_substring, "%d %b %Y"
+                )
+                desired_date = datetime.strptime(create_date, "%d %b %Y")
+                if not last_modified_date < desired_date:
+                    print(f"{release} of {services} is up to date")
+                    return
+            else:
+                print(f"{release} of {services} exists")
+                return
+    failed_list.append(services)
+    print(f"{services} doesn't have up-to-date {release}")
 
 
 # here

@@ -104,6 +104,7 @@ class Env:
             "jenkins",
             "ohdsi-atlas",
             "ohdsi-webapi",
+            "frontend-framework",
         ]
 
         self.blocks_to_update = {
