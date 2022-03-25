@@ -17,12 +17,11 @@ def get_image():
     quay_result = json.loads(res.text)
     tags = quay_result["tags"]
     for tag in tags:
-        if tag['name'] == release:
+        if tag["name"] == release:
             print(f"{release} of {services} modified at {tag['last_modified']}")
-            if create_date in tag['last_modified']:
+            if create_date in tag["last_modified"]:
                 print(f"{services} is up to date")
                 return
-    
     failed_list.append(services)
     print(f"{services} doesn't have up-to-date {release}")
 
