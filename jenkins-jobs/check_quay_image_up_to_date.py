@@ -7,6 +7,8 @@ from datetime import datetime
 release = os.environ["RELEASE_TAG"]
 if "CREATE_DATE" in os.environ:
     create_date = os.environ["CREATE_DATE"]
+else:
+    create_date = ""
 failed_list = []
 
 
