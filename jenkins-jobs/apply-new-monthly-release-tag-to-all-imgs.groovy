@@ -91,24 +91,8 @@ pipeline {
                           hudson.model.Hudson.instance.queue.schedule(job, quietPeriod, null, paramsAction);
                           quietPeriod += 1;
                         }
-                      }
-                      else if (githubRepoName == "mariner") {
-                        marinerImages=['mariner-engine', 'mariner-s3sidecar', 'mariner-server']
-
-                        marinerImages.each{ marinerImg ->
-                          println "Applying new image tag ${RELEASE_VERSION} to img from repo ${marinerImg}...";
-
-                          def params = []
-
-                          params += new StringParameterValue("SERVICE_NAME", marinerImg);
-                          params += new StringParameterValue("CURRENT_IMG_TAG", currentImg);
-                          params += new StringParameterValue("NEW_IMG_TAG", RELEASE_VERSION);
-
-                          def paramsAction = new ParametersAction(params);
-                          hudson.model.Hudson.instance.queue.schedule(job, quietPeriod, null, paramsAction);
-                          quietPeriod += 1;
-                        }
-                      } else {
+                      } 
+                      else {
                         println "Applying new image tag ${RELEASE_VERSION} to img ${imgName}...";
 
                         def params = []

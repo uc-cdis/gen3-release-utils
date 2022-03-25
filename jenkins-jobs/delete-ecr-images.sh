@@ -62,17 +62,6 @@ while IFS= read -r repo; do
       done
       continue
 
-    elif [ "$repo" == "mariner" ]; then
-      echo "## iterate through the list ['mariner-engine', 'mariner-s3sidecar', 'mariner-server']"
-      mariner_images=(mariner-engine mariner-s3sidecar mariner-server)
-      for mariner_img in "${mariner_images[@]}"; do
-        ECR_REPO="$mariner_img"
-	    set +e
-        check_image
-        set -e
-      done
-      continue
-
     elif [ "$repo" == "ACCESS-backend" ]; then
       ECR_REPO="access-backend"
     fi
