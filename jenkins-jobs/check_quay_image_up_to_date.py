@@ -2,6 +2,7 @@ import requests
 import json
 import os
 import sys
+from datetime import datetime
 
 release = os.environ["RELEASE_TAG"]
 create_date = os.environ["CREATE_DATE"]
@@ -16,11 +17,22 @@ def get_image():
     res = requests.get(url)
     quay_result = json.loads(res.text)
     tags = quay_result["tags"]
+
     for tag in tags:
         if tag["name"] == release:
             print(f"{release} of {services} modified at {tag['last_modified']}")
-            if create_date in tag["last_modified"]:
-                print(f"{services} is up to date")
+            if create_date:
+                # Format: 'Thu, 24 Mar 2022 16:12:50 -0000'
+                last_modified_substring = tag["last_modified"][5:16]
+                last_modified_date = datetime.strptime(
+                    last_modified_substring, "%d %b %Y"
+                )
+                desired_date = datetime.strptime(create_date, "%d %b %Y")
+                if not last_modified_date < desired_date:
+                    print(f"{release} of {services} is up to date")
+                    return
+            else:
+                print(f"{release} of {services} exists")
                 return
     failed_list.append(services)
     print(f"{services} doesn't have up-to-date {release}")
