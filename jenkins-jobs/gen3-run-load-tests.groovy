@@ -74,7 +74,6 @@ pipeline {
                 sh """#!/bin/bash
 
                   export KUBECTL_NAMESPACE="$TARGET_ENVIRONMENT"
-                  export USE_DATADOG=true
                   # setup gen3 CLI
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
                   source \$GEN3_HOME/gen3/gen3setup.sh
@@ -137,6 +136,7 @@ pipeline {
                           export TEST_DATA_PATH=../testData
                           export GEN3_SKIP_PROJ_SETUP=true
                           export RUNNING_LOCAL=false
+                          export USE_DATADOG=true
 
                           mv "$QA_DCP_CREDS_JSON" credentials.json
 
