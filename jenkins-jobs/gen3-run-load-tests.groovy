@@ -263,7 +263,7 @@ pipeline {
                           node load-testing/loadTestRunner.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
 
                           echo "done"
-                          docker kill datadog
+                          docker rm -f datadog
                         """
                         }
                     }
