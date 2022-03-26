@@ -78,18 +78,6 @@ pipeline {
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
                   source \$GEN3_HOME/gen3/gen3setup.sh
 
-                  DOCKER_CONTENT_TRUST=1 \
-                  docker run -d \
-                      --name datadog \
-                      -v /var/run/docker.sock:/var/run/docker.sock:ro \
-                      -v /proc/:/host/proc/:ro \
-                      -v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro \
-                      -e DD_SITE="datadoghq.com" \
-                      -e DD_API_KEY="$DD_API_KEY" \
-                      -e DD_DOGSTATSD_NON_LOCAL_TRAFFIC=1 \
-                      -p 8125:8125/udp \
-                      datadog/agent:latest
-
                   if [ "$LOAD_TEST_DESCRIPTOR" == "audit-presigned-url" ]; then
                     echo "Populating audit-service SQS with presigned-url messages"
                     bash gen3-qa/load-testing/audit-service/sendPresignedURLMessages.sh $SQS_URL
@@ -125,7 +113,8 @@ pipeline {
                   file(credentialsId: 'CTDS_TEST_ENV_MTLS_KEY', variable: 'CTDS_TEST_ENV_MTLS_KEY'),
                   file(credentialsId: 'QA_DCP_MTLS_CERT', variable: 'QA_DCP_MTLS_CERT'),
                   file(credentialsId: 'QA_DCP_MTLS_KEY', variable: 'QA_DCP_MTLS_KEY'),
-                  file(credentialsId: 'CTDS_TEST_ENV_CREDS_JSON', variable: 'CTDS_TEST_ENV_CREDS_JSON')
+                  file(credentialsId: 'CTDS_TEST_ENV_CREDS_JSON', variable: 'CTDS_TEST_ENV_CREDS_JSON'),
+                  string(credentialsId: 'DD_API_KEY', variable: 'DD_API_KEY')
                 ]){
                   dir("gen3-qa") {
                       script {
@@ -137,6 +126,18 @@ pipeline {
                           export GEN3_SKIP_PROJ_SETUP=true
                           export RUNNING_LOCAL=false
                           export USE_DATADOG=true
+
+                          DOCKER_CONTENT_TRUST=1 \
+                          docker run -d \
+                              --name datadog \
+                              -v /var/run/docker.sock:/var/run/docker.sock:ro \
+                              -v /proc/:/host/proc/:ro \
+                              -v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro \
+                              -e DD_SITE="datadoghq.com" \
+                              -e DD_API_KEY="$DD_API_KEY" \
+                              -e DD_DOGSTATSD_NON_LOCAL_TRAFFIC=1 \
+                              -p 8125:8125/udp \
+                              datadog/agent:latest
 
                           mv "$QA_DCP_CREDS_JSON" credentials.json
 
