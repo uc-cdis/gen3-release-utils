@@ -126,6 +126,8 @@ pipeline {
                           export GEN3_SKIP_PROJ_SETUP=true
                           export RUNNING_LOCAL=false
                           export USE_DATADOG=true
+                          export K6_STATSD_ADDR=localhost:8126
+                          export K6_STATSD_ENABLE_TAGS=true
 
                           DOCKER_CONTENT_TRUST=1 \
                           docker run -d \
@@ -136,7 +138,7 @@ pipeline {
                               -e DD_SITE="datadoghq.com" \
                               -e DD_API_KEY="$DD_API_KEY" \
                               -e DD_DOGSTATSD_NON_LOCAL_TRAFFIC=1 \
-                              -p 8125:8125/udp \
+                              -p 8126:8126/udp \
                               datadog/agent:latest
 
                           mv "$QA_DCP_CREDS_JSON" credentials.json
