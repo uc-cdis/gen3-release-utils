@@ -78,7 +78,7 @@ pipeline {
                   source \$GEN3_HOME/gen3/gen3setup.sh
 
                   echo "Checking indexd record ... "
-                  export indexdRecord=\$(curl "https://${TARGET_ENVIRONMENT}/index/index" | jq -r '.records | length')
+                  export indexdRecord=\$(curl "https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index" | jq -r '.records | length')
                   echo "----"
                   echo \${indexdRecord}
                   echo "----"
