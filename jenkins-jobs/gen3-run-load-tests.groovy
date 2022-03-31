@@ -88,7 +88,7 @@ pipeline {
                     export access_token=\$(gen3 api access-token cdis.autotest@gmail.com)
                     export indexdRecord=\$(curl "https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index" | jq -r '.records | length')
                     echo \${indexdRecord}
-                    if [[ \${indexdRecord} -le 10 ]]; then
+                    if [[ \${indexdRecord} -le 0 ]]; then
                       curl -X POST 'https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index' -H "Authorization: Bearer \${access_token}" -H "Content-Type: application/json" -d \
                         '{"acl":["phs000178"],"authz":["/programs/QA/projects/test"],"file_name":"qa-test.txt","form":"object","hashes":{"md5":"404e8919021a03285697647487f528ef"},"size":2681688756,"urls":["gs://dcf-integration-qa/qa-test.txt", "s3://cdis-presigned-url-test/testdata"]}' #pragma: allowlist secret
                     else
