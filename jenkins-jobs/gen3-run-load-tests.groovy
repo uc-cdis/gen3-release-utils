@@ -68,7 +68,9 @@ pipeline {
         }
         stage('Setup for Load Tests') {
             steps {
-                withCredentials(file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON')){
+                withCredentials([
+                  file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON')
+                ]){
                 sh """#!/bin/bash
 
                   export KUBECTL_NAMESPACE="$TARGET_ENVIRONMENT"
