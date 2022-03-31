@@ -78,18 +78,6 @@ pipeline {
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
                   source \$GEN3_HOME/gen3/gen3setup.sh
 
-                  export access_token=\$(gen3 api access-token cdis.autotest@gmail.com)
-
-                  export indexdRecord=\$(curl "https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index" | jq -r '.records | length')
-                  echo \${indexdRecord}
-
-                  if [[ \${indexdRecord} -le 10 ]]; then
-                    curl -X POST 'https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index' -H "Authorization: Bearer \${access_token}" -H "Content-Type: application/json" -d \
-                      '{"authz":["/programs/QA/projects/test"],"file_name":"qa-test.txt","form":"object","hashes":{"md5":"404e8919021a03285697647487f528ef"},"size":2681688756,"urls":["gs://dcf-integration-qa/qa-test.txt", "s3://cdis-presigned-url-test/testdata"]}' #pragma: allowlist secret
-                  else
-                    echo "There are sufficient record in indexd. We should be good to go .."
-                  fi
-
                   if [ "$LOAD_TEST_DESCRIPTOR" == "audit-presigned-url" ]; then
                     echo "Populating audit-service SQS with presigned-url messages"
                     bash gen3-qa/load-testing/audit-service/sendPresignedURLMessages.sh $SQS_URL
@@ -97,9 +85,15 @@ pipeline {
                     echo "Populating audit-service SQS with login messages"
                     bash gen3-qa/load-testing/audit-service/sendLoginMessages.sh $SQS_URL
                   elif [ "$LOAD_TEST_DESCRIPTOR" == "fence-presigned-url" ]; then
-                    # This is not working
-                    # We should use "gen3 gitops configmaps scaling && gen3 scaling apply all" instead.
-                    # gen3 replicas presigned-url-fence $DESIRED_NUMBER_OF_FENCE_PODS
+                    export access_token=\$(gen3 api access-token cdis.autotest@gmail.com)
+                    export indexdRecord=\$(curl "https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index" | jq -r '.records | length')
+                    echo \${indexdRecord}
+                    if [[ \${indexdRecord} -le 10 ]]; then
+                      curl -X POST 'https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index' -H "Authorization: Bearer \${access_token}" -H "Content-Type: application/json" -d \
+                        '{"acl":["phs000178"],"authz":["/programs/QA/projects/test"],"file_name":"qa-test.txt","form":"object","hashes":{"md5":"404e8919021a03285697647487f528ef"},"size":2681688756,"urls":["gs://dcf-integration-qa/qa-test.txt", "s3://cdis-presigned-url-test/testdata"]}' #pragma: allowlist secret
+                    else
+                      echo "There are sufficient record in indexd. We should be good to go .."
+                    fi
                     gen3 scaling update presigned-url-fence 6 10 14
                     sleep 60
                     g3kubectl get pods | grep fence
