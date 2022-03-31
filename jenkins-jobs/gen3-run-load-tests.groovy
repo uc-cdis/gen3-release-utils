@@ -77,9 +77,10 @@ pipeline {
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
                   source \$GEN3_HOME/gen3/gen3setup.sh
 
+                  echo "Checking indexd record ... "
                   export indexdRecord=\$(curl "https://$TARGET_ENVIRONMENT/index/index" | jq -r '.records | length')
                   echo "----"
-                  echo \$indexdRecord
+                  echo \${indexdRecord}
                   echo "----"
                   if [[ ${indexdRecord} -lt 0 ]];
                     curl -X POST 'https://$TARGET_ENVIRONMENT/index/index' -H "$QA_DCP_CREDS_JSON" -H "Content-Type: application/json" -d \
