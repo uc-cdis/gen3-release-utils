@@ -73,7 +73,7 @@ pipeline {
                 ]){
                 sh """#!/bin/bash
 
-                  export KUBECTL_NAMESPACE="$TARGET_ENVIRONMENT"
+                  export KUBECTL_NAMESPACE="${TARGET_ENVIRONMENT}"
                   # setup gen3 CLI
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
                   source \$GEN3_HOME/gen3/gen3setup.sh
