@@ -81,11 +81,12 @@ pipeline {
                   export indexdRecord=\$(curl "https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index" | jq -r '.records | length')
                   echo \${indexdRecord}
 
-                  if [[ \${indexdRecord} -lt 0 ]];
+                  if [[ \${indexdRecord} -lt 0 ]]; then
                     curl -X POST 'https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index' -H "${QA_DCP_CREDS_JSON}" -H "Content-Type: application/json" -d \
                       '{"acl":[],"authz":["/abc/programs"],"file_name":"qa-test.txt","form":"object","hash":{"mds":"404e8919021a03285697647487f528ef"},"size":2681688756,"urls":["gs://dcf-integration-qa/qa-test.txt", "s3://cdis-presigned-url-test/testdata"]}' #pragma: allowlist secret
                   else
                     echo "There are more than 1 record in indexd. We should be good to go .."
+                  fi
 
                   if [ "$LOAD_TEST_DESCRIPTOR" == "audit-presigned-url" ]; then
                     echo "Populating audit-service SQS with presigned-url messages"
