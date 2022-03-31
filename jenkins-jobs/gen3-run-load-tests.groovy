@@ -68,12 +68,20 @@ pipeline {
         }
         stage('Setup for Load Tests') {
             steps {
+                withCredentials(file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON')){
                 sh """#!/bin/bash
 
                   export KUBECTL_NAMESPACE="$TARGET_ENVIRONMENT"
                   # setup gen3 CLI
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
                   source \$GEN3_HOME/gen3/gen3setup.sh
+
+                  indexdRecord=$(curl -s GET 'https://${KUBECTL_NAMESPACE}/index/index' | jq -r '.records | length)
+                  if [[ ${indexdRecord} -lt 0 ]]; 
+                    curl -X POST 'https://${KUBECTL_NAMESPACE}/index/index' -H "$QA_DCP_CREDS_JSON" -H "Content-Type: application/json" -d \
+                      '{"acl":[],"authz":["/abc/programs"],"file_name":"qa-test.txt","form":"object","hash":{"mds":"404e8919021a03285697647487f528ef"},"size":2681688756,"urls":["gs://dcf-integration-qa/qa-test.txt", "s3://cdis-presigned-url-test/testdata"]}'
+                  else
+                    echo "There are more than 1 record in indexd. We should be good to go .."
 
                   if [ "$LOAD_TEST_DESCRIPTOR" == "audit-presigned-url" ]; then
                     echo "Populating audit-service SQS with presigned-url messages"
@@ -92,7 +100,7 @@ pipeline {
                     echo "Presigned URL test was not selected. Skipping auto-scaling changes..."
                   fi
                 """
-            }
+            }}
         }
         stage('run tests') {
             environment {
