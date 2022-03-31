@@ -76,7 +76,7 @@ pipeline {
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
                   source \$GEN3_HOME/gen3/gen3setup.sh
 
-                  indexdRecord="$(curl -s GET 'https://${KUBECTL_NAMESPACE}/index/index' | jq -r '.records | length)"
+                  indexdRecord="${curl -s GET 'https://${KUBECTL_NAMESPACE}/index/index' | jq -r '.records | length}"
                   if [[ ${indexdRecord} -lt 0 ]];
                     curl -X POST 'https://${KUBECTL_NAMESPACE}/index/index' -H "$QA_DCP_CREDS_JSON" -H "Content-Type: application/json" -d \
                       '{"acl":[],"authz":["/abc/programs"],"file_name":"qa-test.txt","form":"object","hash":{"mds":"404e8919021a03285697647487f528ef"},"size":2681688756,"urls":["gs://dcf-integration-qa/qa-test.txt", "s3://cdis-presigned-url-test/testdata"]}' #pragma: allowlist secret
