@@ -77,7 +77,7 @@ pipeline {
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
                   source \$GEN3_HOME/gen3/gen3setup.sh
 
-                  indexdRecord=\$(curl "https://$TARGET_ENVIRONMENT/index/index" | jq -r '.records | length')
+                  export indexdRecord=\$(curl "https://$TARGET_ENVIRONMENT/index/index" | jq -r '.records | length')
                   echo "----"
                   echo "$indexdRecord"
                   echo "----"
