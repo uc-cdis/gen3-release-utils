@@ -68,12 +68,9 @@ pipeline {
         }
         stage('Setup for Load Tests') {
             steps {
-                withCredentials([
-                  file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON')
-                ]){
                 sh """#!/bin/bash
 
-                  export KUBECTL_NAMESPACE="${TARGET_ENVIRONMENT}"
+                  export KUBECTL_NAMESPACE="$TARGET_ENVIRONMENT"
                   # setup gen3 CLI
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
                   source \$GEN3_HOME/gen3/gen3setup.sh
@@ -85,15 +82,9 @@ pipeline {
                     echo "Populating audit-service SQS with login messages"
                     bash gen3-qa/load-testing/audit-service/sendLoginMessages.sh $SQS_URL
                   elif [ "$LOAD_TEST_DESCRIPTOR" == "fence-presigned-url" ]; then
-                    export access_token=\$(gen3 api access-token cdis.autotest@gmail.com)
-                    export indexdRecord=\$(curl "https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index" | jq -r '.records | length')
-                    echo \${indexdRecord}
-                    if [[ \${indexdRecord} -le 0 ]]; then
-                      curl -X POST 'https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index' -H "Authorization: Bearer \${access_token}" -H "Content-Type: application/json" -d \
-                        '{"acl":["phs000178"],"authz":["/programs/QA/projects/test"],"file_name":"qa-test.txt","form":"object","hashes":{"md5":"404e8919021a03285697647487f528ef"},"size":2681688756,"urls":["gs://dcf-integration-qa/qa-test.txt", "s3://cdis-presigned-url-test/testdata"]}' #pragma: allowlist secret
-                    else
-                      echo "There are sufficient record in indexd. We should be good to go .."
-                    fi
+                    # This is not working
+                    # We should use "gen3 gitops configmaps scaling && gen3 scaling apply all" instead.
+                    # gen3 replicas presigned-url-fence $DESIRED_NUMBER_OF_FENCE_PODS
                     gen3 scaling update presigned-url-fence 6 10 14
                     sleep 60
                     g3kubectl get pods | grep fence
@@ -101,7 +92,7 @@ pipeline {
                     echo "Presigned URL test was not selected. Skipping auto-scaling changes..."
                   fi
                 """
-            }}
+            }
         }
         stage('run tests') {
             environment {
@@ -118,8 +109,7 @@ pipeline {
                   file(credentialsId: 'CTDS_TEST_ENV_MTLS_KEY', variable: 'CTDS_TEST_ENV_MTLS_KEY'),
                   file(credentialsId: 'QA_DCP_MTLS_CERT', variable: 'QA_DCP_MTLS_CERT'),
                   file(credentialsId: 'QA_DCP_MTLS_KEY', variable: 'QA_DCP_MTLS_KEY'),
-                  file(credentialsId: 'CTDS_TEST_ENV_CREDS_JSON', variable: 'CTDS_TEST_ENV_CREDS_JSON'),
-                  string(credentialsId: 'DD_API_KEY', variable: 'DD_API_KEY')
+                  file(credentialsId: 'CTDS_TEST_ENV_CREDS_JSON', variable: 'CTDS_TEST_ENV_CREDS_JSON')
                 ]){
                   dir("gen3-qa") {
                       script {
@@ -130,21 +120,6 @@ pipeline {
                           export TEST_DATA_PATH=../testData
                           export GEN3_SKIP_PROJ_SETUP=true
                           export RUNNING_LOCAL=false
-                          export USE_DATADOG=true
-                          export K6_STATSD_ADDR=localhost:8126
-                          export K6_STATSD_ENABLE_TAGS=true
-
-                          DOCKER_CONTENT_TRUST=1 \
-                          docker run -d \
-                              --name datadog \
-                              -v /var/run/docker.sock:/var/run/docker.sock:ro \
-                              -v /proc/:/host/proc/:ro \
-                              -v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro \
-                              -e DD_SITE="datadoghq.com" \
-                              -e DD_API_KEY="$DD_API_KEY" \
-                              -e DD_DOGSTATSD_NON_LOCAL_TRAFFIC=1 \
-                              -p 8125:8125/udp \
-                              datadog/agent:latest
 
                           mv "$QA_DCP_CREDS_JSON" credentials.json
 
@@ -267,10 +242,9 @@ pipeline {
                               ;;
                           esac
 
-                          # node load-testing/loadTestRunner.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
-                          K6_STATSD_ENABLE_TAGS=true k6 run --out statsd --duration 30s $WORKSPACE/script.js
+                          node load-testing/loadTestRunner.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
+
                           echo "done"
-                          docker rm -f datadog
                         """
                         }
                     }

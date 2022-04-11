@@ -57,6 +57,15 @@ pipeline {
                   submoduleCfg: [],
                   userRemoteConfigs: [[credentialsId: 'PlanXCyborgUser', url: 'https://github.com/uc-cdis/gen3-qa.git']]
                 ])
+                // gen3-release-utils
+                checkout([
+                  $class: 'GitSCM',
+                  branches: [[name: 'refs/heads/chore/run_datadog_container_in_load_tests']],
+                  doGenerateSubmoduleConfigurations: false,
+                  extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gen3-release-utils']],
+                  submoduleCfg: [],
+                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUser', url: 'https://github.com/uc-cdis/gen3-qa.git']]
+                ])
             }
         }
         stage('create test data (TODO)') {
