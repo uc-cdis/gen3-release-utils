@@ -66,38 +66,6 @@ pipeline {
                 """
             }
         }
-        stage('Setup for Load Tests') {
-            steps {
-              withCredentials([
-                string(credentialsId: 'DD_API_KEY', variable: 'DD_API_KEY')
-              ]){
-                sh """#!/bin/bash
-
-                  export KUBECTL_NAMESPACE="$TARGET_ENVIRONMENT"
-                  # setup gen3 CLI
-                  export GEN3_HOME=\$WORKSPACE/cloud-automation
-                  source \$GEN3_HOME/gen3/gen3setup.sh
-
-                  if [ "$LOAD_TEST_DESCRIPTOR" == "audit-presigned-url" ]; then
-                    echo "Populating audit-service SQS with presigned-url messages"
-                    bash gen3-qa/load-testing/audit-service/sendPresignedURLMessages.sh $SQS_URL
-                  elif [ "$LOAD_TEST_DESCRIPTOR" == "audit-login" ]; then
-                    echo "Populating audit-service SQS with login messages"
-                    bash gen3-qa/load-testing/audit-service/sendLoginMessages.sh $SQS_URL
-                  elif [ "$LOAD_TEST_DESCRIPTOR" == "fence-presigned-url" ]; then
-                    # This is not working
-                    # We should use "gen3 gitops configmaps scaling && gen3 scaling apply all" instead.
-                    # gen3 replicas presigned-url-fence $DESIRED_NUMBER_OF_FENCE_PODS
-                    gen3 scaling update presigned-url-fence 6 10 14
-                    sleep 60
-                    g3kubectl get pods | grep fence
-                  else
-                    echo "Presigned URL test was not selected. Skipping auto-scaling changes..."
-                  fi
-                """
-              }
-            }
-        }
         stage('run tests') {
             environment {
                 JENKINS_PATH = sh(script: 'pwd', , returnStdout: true).trim()
@@ -147,7 +115,7 @@ pipeline {
                           SELECTED_LOAD_TEST_DESCRIPTOR=""
 
                           # node load-testing/loadTestRunner.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
-                          K6_STATSD_ENABLE_TAGS=true k6 run --out statsd --duration 30s $WORKSPACE/gen3-release-utils/jenkins-jobs/dummy-load-test-script.js
+                          K6_STATSD_ENABLE_TAGS=true k6 run --out statsd --duration 30s $JENKINS_PATH/gen3-release-utils/jenkins-jobs/dummy-load-test-script.js
                           echo "done"
                           docker rm -f datadog
                         """
