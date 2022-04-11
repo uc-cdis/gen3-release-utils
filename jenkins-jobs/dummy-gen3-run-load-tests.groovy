@@ -64,7 +64,7 @@ pipeline {
                   doGenerateSubmoduleConfigurations: false,
                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gen3-release-utils']],
                   submoduleCfg: [],
-                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUser', url: 'https://github.com/uc-cdis/gen3-qa.git']]
+                  userRemoteConfigs: [[credentialsId: 'PlanXCyborgUser', url: 'https://github.com/uc-cdis/gen3-release-utils.git']]
                 ])
             }
         }
