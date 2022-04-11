@@ -138,7 +138,7 @@ pipeline {
                               -e DD_SITE="datadoghq.com" \
                               -e DD_API_KEY="$DD_API_KEY" \
                               -e DD_DOGSTATSD_NON_LOCAL_TRAFFIC=1 \
-                              -p 8126:8126/udp \
+                              -p 8125:8125/udp \
                               datadog/agent:latest
 
                           mv "$QA_DCP_CREDS_JSON" credentials.json
@@ -262,8 +262,8 @@ pipeline {
                               ;;
                           esac
 
-                          node load-testing/loadTestRunner.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
-
+                          # node load-testing/loadTestRunner.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
+                          K6_STATSD_ENABLE_TAGS=true k6 run --out statsd --duration 30s $WORKSPACE/script.js
                           echo "done"
                           docker rm -f datadog
                         """
