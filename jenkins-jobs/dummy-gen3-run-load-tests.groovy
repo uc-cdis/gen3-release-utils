@@ -103,7 +103,7 @@ pipeline {
                           export GEN3_SKIP_PROJ_SETUP=true
                           export RUNNING_LOCAL=false
                           export USE_DATADOG=true
-                          export K6_STATSD_ADDR=172.24.221.60:8125
+                          export K6_STATSD_ADDR=74a6674493ab:8125
 
                           DOCKER_CONTENT_TRUST=1 \
                           docker run -d \
