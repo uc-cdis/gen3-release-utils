@@ -124,7 +124,6 @@ pipeline {
                           # node load-testing/loadTestRunner.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
                           K6_STATSD_ENABLE_TAGS=true k6 run --out statsd --duration 30s $JENKINS_PATH/gen3-release-utils/jenkins-jobs/dummy-load-test-script.js
                           echo "done"
-                          docker rm -f datadog
                         """
                         }
                     }
