@@ -103,7 +103,7 @@ pipeline {
                           export GEN3_SKIP_PROJ_SETUP=true
                           export RUNNING_LOCAL=false
                           export USE_DATADOG=true
-                          export K6_STATSD_ADDR=localhost:8125
+                          export K6_STATSD_ADDR=datadog:8125
 
                           DOCKER_CONTENT_TRUST=1 \
                           docker run -d \
@@ -119,8 +119,6 @@ pipeline {
 
                           mv "$QA_DCP_CREDS_JSON" credentials.json
 
-                          npm install
-
                           SELECTED_LOAD_TEST_DESCRIPTOR=""
 
                           # node load-testing/loadTestRunner.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
@@ -132,11 +130,6 @@ pipeline {
                     }
                 }
             }
-        }
-    }
-    post {
-        always {
-            archiveArtifacts artifacts: 'gen3-qa/result.json'
         }
     }
 }
