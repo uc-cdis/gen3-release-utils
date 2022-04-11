@@ -147,26 +147,12 @@ pipeline {
                           SELECTED_LOAD_TEST_DESCRIPTOR=""
 
                           # node load-testing/loadTestRunner.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
-                          K6_STATSD_ENABLE_TAGS=true k6 run --out statsd --duration 30s $WORKSPACE/jenkins-jobs/dummy-load-test-script.js
+                          K6_STATSD_ENABLE_TAGS=true k6 run --out statsd --duration 30s $WORKSPACE/gen3-release-utils/jenkins-jobs/dummy-load-test-script.js
                           echo "done"
                           docker rm -f datadog
                         """
                         }
                     }
-                }
-            }
-        }
-        stage('upload results') {
-            steps {
-                script {
-                    sh """#!/bin/bash -x
-
-                        echo "uploading results..."
-                        aws s3 cp ./gen3-qa/result.json "s3://qaplanetv1-data-bucket/\$RELEASE_VERSION/\$LOAD_TEST_DESCRIPTOR/result_\$(date +%s).json"
-
-                        # if the TEST_DESCRIPTOR is AUDIT-SERVICE-*, add the result to specific location
-                        # but the location is TBD
-                    """
                 }
             }
         }
