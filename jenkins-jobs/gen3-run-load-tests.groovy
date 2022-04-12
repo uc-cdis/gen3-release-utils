@@ -51,7 +51,7 @@ pipeline {
                 // gen3-qa
                 checkout([
                   $class: 'GitSCM',
-                  branches: [[name: 'refs/heads/master']],
+                  branches: [[name: 'refs/heads/fix/load_tests_for_datadog']],
                   doGenerateSubmoduleConfigurations: false,
                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gen3-qa']],
                   submoduleCfg: [],
@@ -72,12 +72,10 @@ pipeline {
                   file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON')
                 ]){
                 sh """#!/bin/bash
-
                   export KUBECTL_NAMESPACE="${TARGET_ENVIRONMENT}"
                   # setup gen3 CLI
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
                   source \$GEN3_HOME/gen3/gen3setup.sh
-
                   if [ "$LOAD_TEST_DESCRIPTOR" == "audit-presigned-url" ]; then
                     echo "Populating audit-service SQS with presigned-url messages"
                     bash gen3-qa/load-testing/audit-service/sendPresignedURLMessages.sh $SQS_URL
@@ -101,7 +99,8 @@ pipeline {
                     echo "Presigned URL test was not selected. Skipping auto-scaling changes..."
                   fi
                 """
-            }}
+            }
+          }
         }
         stage('run tests') {
             environment {
@@ -129,6 +128,9 @@ pipeline {
                           export TEST_DATA_PATH=../testData
                           export GEN3_SKIP_PROJ_SETUP=true
                           export RUNNING_LOCAL=false
+                          export K6_STATSD_ADDR=\$DD_AGENT_HOST:8125
+                          export K6_STATSD_ENABLE_TAGS=true
+                          export USE_DATADOG=true
 
                           mv "$QA_DCP_CREDS_JSON" credentials.json
 
