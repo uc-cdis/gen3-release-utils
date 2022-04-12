@@ -120,6 +120,8 @@ pipeline {
                           export TEST_DATA_PATH=../testData
                           export GEN3_SKIP_PROJ_SETUP=true
                           export RUNNING_LOCAL=false
+                          export K6_STATSD_ADDR=\$DD_AGENT_HOST:8125
+                          export K6_STATSD_ENABLE_TAGS=true
 
                           mv "$QA_DCP_CREDS_JSON" credentials.json
 
