@@ -103,7 +103,7 @@ pipeline {
                           export GEN3_SKIP_PROJ_SETUP=true
                           export RUNNING_LOCAL=false
                           export USE_DATADOG=true
-                          export K6_STATSD_ADDR=172.24.221.60:8125
+                          export K6_STATSD_ADDR=$DD_AGENT_HOST:8125
 
                           mv "$QA_DCP_CREDS_JSON" credentials.json
 
