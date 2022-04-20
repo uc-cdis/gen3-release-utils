@@ -51,7 +51,7 @@ pipeline {
                 // gen3-qa
                 checkout([
                   $class: 'GitSCM',
-                  branches: [[name: 'refs/heads/master']],
+                  branches: [[name: 'refs/heads/chore/dicom_server_load_test']],
                   doGenerateSubmoduleConfigurations: false,
                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gen3-qa']],
                   submoduleCfg: [],
@@ -250,6 +250,10 @@ pipeline {
                               echo "Selected Audit Service Login test"
                               mv "$QA_NIAID_CREDS" credentials.json
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-audit-login-sample.json"
+                              ;;
+                          dicom-server-metadata)
+                              echo "Selected Dicom Server Metadata test"
+                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-dicom-server-metadata.json"
                               ;;
                           esac
 
