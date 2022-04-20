@@ -253,6 +253,7 @@ pipeline {
                               ;;
                           dicom-server-metadata)
                               echo "Selected Dicom Server Metadata test"
+                              gen3 api api-key cdis.autotest@gmail.com > credentials.json
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-dicom-server-metadata.json"
                               ;;
                           esac
