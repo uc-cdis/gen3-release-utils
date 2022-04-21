@@ -94,7 +94,6 @@ pipeline {
                           export K6_STATSD_ENABLE_TAGS=true
                           export USE_DATADOG=true
 
-                          mv "$QA_DCP_CREDS_JSON" credentials.json
 
                           npm install
 
