@@ -67,7 +67,7 @@ pipeline {
         }
         stage('Setup for Load Tests') {
             steps {
-                sh """#!/bin/bash
+                sh """#!/bin/bash -e
                   export KUBECTL_NAMESPACE="${TARGET_ENVIRONMENT}"
                   # setup gen3 CLI
                   export GEN3_HOME=\$WORKSPACE/cloud-automation
