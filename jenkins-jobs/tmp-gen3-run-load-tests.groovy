@@ -111,7 +111,7 @@ pipeline {
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-dicom-server-metadata.json"
                               ;;
                           esac
-
+                          cat credentials.json
                           node load-testing/loadTestRunner.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
 
                           echo "done"
