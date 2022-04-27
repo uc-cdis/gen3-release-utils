@@ -112,7 +112,7 @@ pipeline {
                               ;;
                           esac
                           cat credentials.json
-                          node load-testing/loadTestRunner.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
+                          node load-testing/loadTestRunnerV2.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
 
                           echo "done"
                         """
