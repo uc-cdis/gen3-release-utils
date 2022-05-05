@@ -23,7 +23,8 @@ commons=("gen3.theanvil.io" "chicagoland.pandemicresponsecommons.org" "gen3.biod
 
 # Select from one randomly
 # TODO: We should cycle through each of them every night (TBD) -- This will pollute the cdis-manifest PRs screen so we should also .. CLOSE the PRs through a morning job :D
-selectedCommons=${commons[$RANDOM % ${#commons[@]} ]}
+seconds=$(date +%s)
+selectedCommons=${commons[(seconds / (24*60*60)) % ${#commons[@]} ]}
 # Log the commons selected
 echo $selectedCommons
 # Update the dictionary into a temp manifest, if you do it directly into the file it can end up empty
