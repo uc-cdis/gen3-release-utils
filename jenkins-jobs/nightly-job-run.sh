@@ -21,8 +21,7 @@ cd cdis-manifest
 
 commons=("gen3.theanvil.io" "chicagoland.pandemicresponsecommons.org" "gen3.biodatacatalyst.nhlbi.nih.gov" "vpodc.data-commons.org")
 
-# Select from one randomly
-# TODO: We should cycle through each of them every night (TBD) -- This will pollute the cdis-manifest PRs screen so we should also .. CLOSE the PRs through a morning job :D
+# Rotate through commons on a daily basis
 seconds=$(date +%s)
 selectedCommons=${commons[(seconds / (24*60*60)) % ${#commons[@]} ]}
 # Log the commons selected
