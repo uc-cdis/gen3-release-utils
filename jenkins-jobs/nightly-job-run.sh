@@ -19,11 +19,11 @@ urlPrefix="https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/uc-cdis/"
 git clone "${urlPrefix}cdis-manifest"
 cd cdis-manifest
 
-commons=("gen3.theanvil.io" "chicagoland.pandemicresponsecommons.org" "gen3.biodatacatalyst.nhlbi.nih.gov" "vpodc.data-commons.org")
+commons=("gen3.theanvil.io" "gen3.biodatacatalyst.nhlbi.nih.gov")
 
-# Select from one randomly
-# TODO: We should cycle through each of them every night (TBD) -- This will pollute the cdis-manifest PRs screen so we should also .. CLOSE the PRs through a morning job :D
-selectedCommons=${commons[$RANDOM % ${#commons[@]} ]}
+# Rotate through commons on a daily basis
+seconds=$(date +%s)
+selectedCommons=${commons[(seconds / (24*60*60)) % ${#commons[@]} ]}
 # Log the commons selected
 echo $selectedCommons
 # Update the dictionary into a temp manifest, if you do it directly into the file it can end up empty
