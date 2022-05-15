@@ -110,6 +110,15 @@ pipeline {
                               gen3 api api-key cdis.autotest@gmail.com > credentials.json
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-dicom-server-metadata.json"
                               ;;
+                          dicom-viewer-study)
+                              echo "Selected Dicom Viewer Study test"
+                              export KUBECTL_NAMESPACE="${TARGET_ENVIRONMENT}"
+                              export GEN3_HOME=\$WORKSPACE/cloud-automation
+                              source \$GEN3_HOME/gen3/gen3setup.sh
+                              gen3 api api-key cdis.autotest@gmail.com > credentials.json
+                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-dicom-viewer-study.json"
+                              ;;
+                          esac
                           esac
                           cat credentials.json
                           node load-testing/loadTestRunnerV2.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
