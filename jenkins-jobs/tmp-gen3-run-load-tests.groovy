@@ -119,7 +119,6 @@ pipeline {
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-dicom-viewer-study.json"
                               ;;
                           esac
-                          esac
                           cat credentials.json
                           node load-testing/loadTestRunnerV2.js credentials.json load-testing/sample-descriptors/\$SELECTED_LOAD_TEST_DESCRIPTOR
 
