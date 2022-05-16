@@ -145,7 +145,7 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts artifacts: 'gen3-qa/result.json'
+            archiveArtifacts artifacts: 'gen3-qa/result.json, gen3-qa/*.png'
         }
     }
 }
