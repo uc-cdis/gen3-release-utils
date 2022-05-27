@@ -60,7 +60,7 @@ while IFS= read -r repo; do
     echo "$result"
     exit 1
   fi
-  if [[ $(wc -l < release_notes.md) -ge 3 ]]; then
+  if [[ $(wc -l < "${repo}_release_notes.md") -ge 3 ]]; then
     cat "${repo}_release_notes.md"
     cat "${repo}_release_notes.md" >> gen3_release_notes.md
   fi
