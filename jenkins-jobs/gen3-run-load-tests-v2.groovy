@@ -65,17 +65,6 @@ pipeline {
                 """
             }
         }
-        stage('Setup for Load Tests') {
-            steps {
-                sh """#!/bin/bash -e
-                  export KUBECTL_NAMESPACE="${TARGET_ENVIRONMENT}"
-                  # setup gen3 CLI
-                  export GEN3_HOME=\$WORKSPACE/cloud-automation
-                  source \$GEN3_HOME/gen3/gen3setup.sh
-                  gen3 api api-key cdis.autotest@gmail.com > ./gen3-qa/credentials.json
-                """
-          }
-        }
         stage('run tests') {
             environment {
                 JENKINS_PATH = sh(script: 'pwd', , returnStdout: true).trim()
