@@ -8,7 +8,7 @@ git clone https://github.com/uc-cdis/gen3-qa.git
 
 cd gen3-qa
 
-export NAMESPACE="default"
+export KUBECTL_NAMESPACE="default"
 node --version
 npm install
 node generate-test-plan.js
