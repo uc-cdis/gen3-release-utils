@@ -2,7 +2,7 @@
   String parameter INTEGRATION_BRANCH
     Default value: integration202109
   String parameter PR_TITLE
-    Default value: Updating CI env with
+    Default value: Updating env
   String parameter TARGET_ENVIRONMENT
     format: qa-dcp.planx-pla.net
   String parameter REPO_NAME
