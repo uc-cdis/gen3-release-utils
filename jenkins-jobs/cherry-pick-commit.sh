@@ -12,7 +12,8 @@
 
 # clone the repo
 git clone https://github.com/uc-cdis/${REPO_NAME}.git
-git pull origin stable
+git fetch --all
+git pull --all
 # check out stable
 git checkout stable
 # cherry-pick commit
