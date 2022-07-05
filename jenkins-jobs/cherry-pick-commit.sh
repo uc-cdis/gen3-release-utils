@@ -12,9 +12,9 @@
 
 # clone the repo
 git clone https://github.com/uc-cdis/${REPO_NAME}.git
+git pull
 # check out stable
 git checkout stable
-git pull
 # cherry-pick commit
 git cherry-pick -m 1 ${COMMIT_ID}
 # print git log top 5 lines
