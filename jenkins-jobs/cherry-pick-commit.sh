@@ -5,7 +5,7 @@
 # String parameter COMMIT_ID
 #   Example: 4fd40e7bcf9aca7d0f5613a23c377f20eb32512a
 # String parameter RELEASE_VERSION
-#   Example: 2021.06
+#   Example: 2022.07
 
 # GITHUB_USERNAME obtained from Jenkins Credentials
 # GITHUB_TOKEN obtained from Jenkins Credentials
