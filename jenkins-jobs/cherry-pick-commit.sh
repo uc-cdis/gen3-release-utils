@@ -16,8 +16,9 @@ cd ${REPO_NAME}
 git fetch --all --tags
 # check out stable
 git checkout stable
-# cherry-pick commit
+# cherry-pick commit and push to stable
 git cherry-pick -m 1 ${COMMIT_ID}
+git push origin stable
 # print git log top 5 lines
 git log | cat | head -n5
 # delete existing tag
