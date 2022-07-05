@@ -11,7 +11,7 @@
 # GITHUB_TOKEN obtained from Jenkins Credentials
 
 # clone the repo, change to the directory and fetch all
-git clone https://github.com/uc-cdis/${REPO_NAME}.git
+git clone https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/uc-cdis/${REPO_NAME}.git
 cd ${REPO_NAME}
 git fetch --all --tags
 # check out stable
