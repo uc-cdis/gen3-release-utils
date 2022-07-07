@@ -55,6 +55,7 @@ with open("repo_list.txt") as repoList:
                 "get-dbgap-metadata",
                 "manifest-indexing",
                 "download-indexd-manifest",
+                "batch-export",
             ]
             for sowerjob in sower_jobs:
                 services = sowerjob.strip()
