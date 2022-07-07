@@ -76,7 +76,7 @@ pipeline {
                         quietPeriod += 1;
                       }
                       else if (githubRepoName == "sower-jobs") {
-                        sowerJobsImages=['metadata-manifest-ingestion', 'get-dbgap-metadata', 'manifest-indexing', 'download-indexd-manifest']
+                        sowerJobsImages=['metadata-manifest-ingestion', 'get-dbgap-metadata', 'manifest-indexing', 'download-indexd-manifest', 'batch-export']
 
                         sowerJobsImages.each{ sowerJobsImg ->
                           println "Applying new image tag ${RELEASE_VERSION} to img from repo ${sowerJobsImg}...";
