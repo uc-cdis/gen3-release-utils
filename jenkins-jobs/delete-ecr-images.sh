@@ -52,8 +52,8 @@ while IFS= read -r repo; do
       ECR_REPO="dataguids"
 
     elif [ "$repo" == "sower-jobs" ]; then
-      echo "## iterating through the list ['metadata-manifest-ingestion', 'get-dbgap-metadata', 'manifest-indexing', 'download-indexd-manifest']"
-      sower_job=(metadata-manifest-ingestion get-dbgap-metadata manifest-indexing download-indexd-manifest)
+      echo "## iterating through the list ['metadata-manifest-ingestion', 'get-dbgap-metadata', 'manifest-indexing', 'download-indexd-manifest', 'batch-export']"
+      sower_job=(metadata-manifest-ingestion get-dbgap-metadata manifest-indexing download-indexd-manifest batch-export)
       for sowerjob in "${sower_job[@]}"; do
         ECR_REPO="$sowerjob"
         set +e
