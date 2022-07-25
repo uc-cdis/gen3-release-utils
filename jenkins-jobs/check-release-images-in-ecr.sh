@@ -25,7 +25,7 @@ while IFS= read -r repo; do
     echo "-------------"
     echo "## Looking for Image .. "
     ECR_REPO="$repo"
-    if ["$repo" == "pelican"]; then
+    if [ "$repo" == "pelican" ]; then
       ECR_REPO="pelican-export"
     elif [ "$repo" == "docker-nginx" ]; then
       ECR_REPO="nginx"
