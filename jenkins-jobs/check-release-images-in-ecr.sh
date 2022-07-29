@@ -11,32 +11,21 @@ export GEN3_HOME=$WORKSPACE/cloud-automation
 source $GEN3_HOME/gen3/gen3setup.sh
 
 check_image () {
-    gen3 ecr describe-image $ECR_REPO $INTEGRATION_BRANCH
+    gen3 ecr describe-image $ECR_REPO $RELEASE_VERSION
     RC=$?
     if [ $RC -ne 0 ]; then
-        echo "## The Image $INTEGRATION_BRANCH doesnot exist in repo gen3/$ECR_REPO"
+        echo "## Release image $RELEASE_VERSION does not exit in repo gen3/$ECR_REPO."
     else
-		echo "## The Image exists. So deleting the image .."
-        delete_image
-    fi
-}
-
-delete_image () {
-    aws ecr batch-delete-image --repository-name gen3/$ECR_REPO --image-ids imageTag=${INTEGRATION_BRANCH}
-    RC=$?
-    if [ $RC -ne 0 ]; then
-        echo "## The Image $INTEGRATION_BRANCH doesnot exist in repo gen3/$ECR_REPO"
-    else
-        echo "## The Image $INTEGRATION_BRANCH is deleted from repo gen3/$ECR_REPO"
+        echo "## Release Image $RELEASE_VERSION exists in repo gen3/$ECR_REPO."
     fi
 }
 
 repo_list="repo_list.txt"
 while IFS= read -r repo; do
-	echo "---------------"
-	echo "##Looking for Image .."
+    echo "-------------"
+    echo "## Looking for Image .. "
     ECR_REPO="$repo"
-    if ["$repo" == "pelican"]; then
+    if [ "$repo" == "pelican" ]; then
       ECR_REPO="pelican-export"
     elif [ "$repo" == "docker-nginx" ]; then
       ECR_REPO="nginx"

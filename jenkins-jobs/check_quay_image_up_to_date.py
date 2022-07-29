@@ -50,6 +50,7 @@ repo_dict = {
     "gen3-fuse": "gen3fuse-sidecar",
     "cloud-automation": "awshelper",
     "dataguids.org": "dataguids",
+    "ACCESS-backend": "access-backend",
 }
 
 print("Check if the Quay Images are ready")
@@ -72,14 +73,12 @@ with open("repo_list.txt") as repoList:
                 "get-dbgap-metadata",
                 "manifest-indexing",
                 "download-indexd-manifest",
+                "batch-export",
             ]
             for sowerjob in sower_jobs:
                 services = sowerjob.strip()
                 get_image()
                 continue
-        elif repo == "ACCESS-backend":
-            print("No docker image found")
-            continue
         get_image()
 
 print(f"List of repos that failed the check : {failed_list}")

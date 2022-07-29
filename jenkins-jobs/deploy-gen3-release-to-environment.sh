@@ -47,6 +47,7 @@ sed -i 's/datareplicate:/dcf-dataservice:/' ${WORKSPACE}/${REPO_NAME}/${TARGET_E
 sed -i 's/\/spark:202/\/gen3-spark:202/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
 sed -i 's/revproxy:202/nginx:202/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
 sed -i 's/\/portal:202/\/data-portal:202/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
+sed -i 's/quay.io\/cdis\/portal:202/707767160287.dkr.ecr.us-east-1.amazonaws.com\/gen3\/data-portal:202/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
 sed -i 's/wts:202/workspace-token-service:202/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifest.json
 sed -i 's/quay.io\/cdis\/gen3fuse-sidecar:202/707767160287.dkr.ecr.us-east-1.amazonaws.com\/gen3\/gen3fuse-sidecar:202/' ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT}/manifests/hatchery/hatchery.json
 
