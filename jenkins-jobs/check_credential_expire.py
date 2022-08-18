@@ -10,7 +10,7 @@ import os
 def main():
     credential_filepath = sys.argv[1]
     CHANNEL_ID = sys.argv[2]
-    slack_token = os.environ["SDET_BOT_SLACK_API_TOKEN"].strip()
+    slack_token = os.environ["SDET_BOT_TOKEN"].strip()
     slack_client = WebClient(token=slack_token)
 
     if os.path.exists(credential_filepath):
