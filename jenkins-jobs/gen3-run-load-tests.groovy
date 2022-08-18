@@ -236,11 +236,6 @@ pipeline {
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-study-viewer.json"
                               sed -i 's/"override_access_token": "<place_access_token_here>",/"override_access_token": "$QA_NIAID_CREDS",/' load-testing/sample-descriptors/load-test-study-viewer.json
                               ;;
-                          study-viewer)
-                              echo "Selected Study Viewer test"
-                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-study-viewer.json"
-                              sed -i 's/"override_access_token": "<place_access_token_here>",/"override_access_token": "$QA_NIAID_CREDS",/' load-testing/sample-descriptors/load-test-study-viewer.json
-                              ;;
                           audit-presigned-url)
                               echo "Selected Audit Service Presigned URL test"
                               mv "$QA_NIAID_CREDS" credentials.json
