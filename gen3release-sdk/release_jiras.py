@@ -80,7 +80,7 @@ user_ids = os.environ["JIRA_USER_IDS"].split(",")
 
 team_members = [
     {"name": "haraprasadj", "id": user_ids[2]},
-    {"name": "yogeshk", "id": user_ids[1]},
+    {"name": "yogeshkalbhore", "id": user_ids[1]},
     {"name": "atharvar", "id": user_ids[0]},
 ]
 
