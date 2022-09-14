@@ -1,6 +1,3 @@
-dcf-dataservice
-ws-storage
-cloud-automation
 dataguids.org
 audit-service
 requestor
