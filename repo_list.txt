@@ -19,10 +19,8 @@ gen3-fuse
 indexs3client
 gen3-spark
 metadata-service
-docker-nginx
 dcf-dataservice
 ws-storage
-ACCESS-backend
 cloud-automation
 dataguids.org
 audit-service
