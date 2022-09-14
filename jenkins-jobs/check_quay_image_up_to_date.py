@@ -48,7 +48,6 @@ repo_dict = {
     "pelican": "pelican-export",
     "docker-nginx": "nginx",
     "gen3-fuse": "gen3fuse-sidecar",
-    "cloud-automation": "awshelper",
     "dataguids.org": "dataguids",
     "ACCESS-backend": "access-backend",
 }
@@ -65,6 +64,10 @@ with open("repo_list.txt") as repoList:
         elif repo == "cdis-data-client":
             print(f"### Services : {services}")
             print("No docker image found")
+            continue
+        elif repo == "cloud-automation":
+            print(f"### Services : {services}")
+            print("The image is directly build in GH actions")
             continue
         elif repo == "sower-jobs":
             print("Iterating through the list of images for sower-jobs")
