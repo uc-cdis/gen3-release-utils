@@ -69,6 +69,10 @@ with open("repo_list.txt") as repoList:
             print(f"### Services : {services}")
             print("The image is directly build in GH actions")
             continue
+        elif repo == "tube":
+            print(f"### Services : {services}")
+            print("The image is directly build in GH actions")
+            continue
         elif repo == "sower-jobs":
             print("Iterating through the list of images for sower-jobs")
             sower_jobs = [
