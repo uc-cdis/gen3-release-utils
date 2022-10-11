@@ -105,6 +105,7 @@ class Env:
             "ohdsi-atlas",
             "ohdsi-webapi",
             "frontend-framework",
+            "kayako-wrapper",
         ]
 
         self.blocks_to_update = {
