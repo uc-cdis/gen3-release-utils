@@ -16,10 +16,10 @@ jobs:
         python-version: 3.7
     - name: Install dependencies
       run: |
-        curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+        pip install poetry
         cd gen3release-sdk
-        $HOME/.poetry/bin/poetry install
+        poetry install
     - name: Test with pytest
       run: |
         cd gen3release-sdk/tests
-        $HOME/.poetry/bin/poetry run pytest -vv
+        poetry run pytest -vv
