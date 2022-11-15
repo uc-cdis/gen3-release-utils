@@ -14,7 +14,7 @@ jira = JIRA(
 tasks = [
     {
         "title": "0. Create RELEASE {} in JIRA".format(release),
-        "description": "Kick off this job: https://jenkins.planx-pla.net/job/create-gen3-release-in-jira/",
+        "description": "Kick off this job: https://jenkins.planx-pla.net/job/create-gen3-release-in-jira/. Also to create release tasks in jira: https://jenkins.planx-pla.net/job/create-jiras-for-gen3-monthly-release/",
     },
     {
         "title": "1. Cut the integration branch integration{}".format(
@@ -80,7 +80,7 @@ user_ids = os.environ["JIRA_USER_IDS"].split(",")
 
 team_members = [
     {"name": "haraprasadj", "id": user_ids[2]},
-    {"name": "jingh8", "id": user_ids[1]},
+    {"name": "yogeshkalbhore", "id": user_ids[1]},
     {"name": "atharvar", "id": user_ids[0]},
 ]
 
