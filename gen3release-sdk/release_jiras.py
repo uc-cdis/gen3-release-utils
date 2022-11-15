@@ -14,7 +14,7 @@ jira = JIRA(
 tasks = [
     {
         "title": "0. Create RELEASE {} in JIRA".format(release),
-        "description": "Kick off this job: https://jenkins.planx-pla.net/job/create-gen3-release-in-jira/",
+        "description": "Kick off this job: https://jenkins.planx-pla.net/job/create-gen3-release-in-jira/. Also to create release tasks in jira: https://jenkins.planx-pla.net/job/create-jiras-for-gen3-monthly-release/",
     },
     {
         "title": "1. Cut the integration branch integration{}".format(
