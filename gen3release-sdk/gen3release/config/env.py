@@ -107,7 +107,7 @@ class Env:
             "frontend-framework",
             "kayako-wrapper",
             "dicom-viewer",
-            "dicom-server,
+            "dicom-server",
         ]
 
         self.blocks_to_update = {
