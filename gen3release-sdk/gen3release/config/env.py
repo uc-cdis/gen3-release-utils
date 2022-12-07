@@ -105,6 +105,9 @@ class Env:
             "ohdsi-atlas",
             "ohdsi-webapi",
             "frontend-framework",
+            "kayako-wrapper",
+            "dicom-viewer",
+            "dicom-server",
         ]
 
         self.blocks_to_update = {
