@@ -11,8 +11,8 @@ pip3 install --editable git+https://github.com/uc-cdis/release-helper.git@gen3re
 
 export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
 
-START_DATE="Fri 14 Oct 2022 11:00:00 PM UTC"
-END_DATE="Fri 11 Nov 2022 11:00:00 PM UTC"
+START_DATE="2022-10-15"
+END_DATE="2022-11-11"
 RELEASE_VERSION="2022.12"
 RELEASE_NAME="Core Gen3 Release $RELEASE_VERSION"
 
@@ -21,8 +21,8 @@ bash ./jenkins-jobs/generate_release_notes.sh --startDate "$START_DATE" --endDat
 
 YEAR=$(echo $RELEASE_VERSION | cut -d"." -f 1)
 MONTH=$(echo $RELEASE_VERSION | cut -d"." -f 2)
-CURR_YEAR=$(date +%Y)
-CURR_MONTH=$(date +%m)
+CURR_YEAR="2022"
+CURR_MONTH="11"
 
 # Get the manifest from the previous monthly release
 curl "https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/releases/${CURR_YEAR}/${CURR_MONTH}/manifest.json" -o manifest.json
