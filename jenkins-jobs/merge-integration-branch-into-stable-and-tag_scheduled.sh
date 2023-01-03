@@ -7,7 +7,7 @@
 # GITHUB_TOKEN
 # Obtained through Jenkins credentials
 
-TODAY=`Fri 22 Dec 2022 06:00:00 PM UTC`
+TODAY="Fri 22 Dec 2022 06:00:00 PM UTC"
 RELEASE_VERSION=`date --date="$TODAY +1 month" +%Y.%m`
 INTEGRATION_BRANCH_NAME=`date --date="$TODAY +1 month" +"integration%Y%m"`
 
