@@ -90,7 +90,10 @@ spec:
                       export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
                       pip3 install -U pip --user
                       poetry install
-                      poetry run gen3release apply -v $INTEGRATION_BRANCH -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} ${TARGET_ENVIRONMENT} - ${INTEGRATION_BRANCH} $(date +%s)" -l gen3-release
+                      if (TARGET_ENVIRONMENT.contains("niaid", "kidsfirst", "jcoin", "ibd"))
+                        poetry run gen3release apply -v $INTEGRATION_BRANCH -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} ${TARGET_ENVIRONMENT} - ${INTEGRATION_BRANCH} $(date +%s)"
+                      else  
+                       poetry run gen3release apply -v $INTEGRATION_BRANCH -e ${WORKSPACE}/${REPO_NAME}/${TARGET_ENVIRONMENT} -pr "${PR_TITLE} ${TARGET_ENVIRONMENT} - ${INTEGRATION_BRANCH} $(date +%s)" -l gen3-release
                     '''
                 }
               }
