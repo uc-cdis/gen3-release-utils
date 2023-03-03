@@ -92,7 +92,8 @@ pipeline {
                     else
                       echo "There are sufficient record in indexd. We should be good to go .."
                     fi
-                    gen3 scaling update presigned-url-fence 6 10 14
+                    gen3 scaling update presigned-url-fence 6 10
+                    gen3 scaling update indexd 6 10
                     sleep 60
                     g3kubectl get pods | grep fence
                   else
