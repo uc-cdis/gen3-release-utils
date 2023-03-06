@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 # String parameter REPO_NAME
 #   Example: data-portal
 # String parameter COMMIT_ID
