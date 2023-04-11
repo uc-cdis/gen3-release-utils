@@ -244,8 +244,10 @@ class Env:
             env_params[block] = json_block.get(block)
 
     def load_environment_params(self, file_name, json_data):
-        """Places environment specific values from target environment into  env object,
-        removes fields from object not found in target and returns the dictionary with fields"""
+        """
+        Places environment specific values from target environment into  env object,
+        removes fields from object not found in target and returns the dictionary with fields
+        """
         logging.debug("storing info from: " + file_name)
         try:
             env_params = self.environment_specific_params[file_name]
