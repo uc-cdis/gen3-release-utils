@@ -108,7 +108,7 @@ class Env:
             "kayako-wrapper",
             "dicom-viewer",
             "dicom-server",
-            "cedar-wrapper,
+            "cedar-wrapper",
         ]
 
         self.blocks_to_update = {
