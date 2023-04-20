@@ -88,7 +88,7 @@ pipeline {
                     echo \${indexdRecord}
                     if [[ \${indexdRecord} -le 0 ]]; then
                       curl -X POST 'https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index' -H "Authorization: Bearer \${access_token}" -H "Content-Type: application/json" -d \
-                        '{"acl":["phs000178"],"authz":["/programs/QA/projects/test"],"file_name":"qa-test.txt","form":"object","hashes":{"md5":"404e8919021a03285697647487f528ef"},"size":2681688756,"urls":["gs://dcf-integration-qa/qa-test.txt", "s3://cdis-presigned-url-test/testdata"]}' #pragma: allowlist secret
+                        '{"acl":["phs000178"],"authz":["/programs/phs000178"],"file_name":"load_test_file","form":"object","hashes":{"md5":"e5c9a0d417f65226f564f438120381c5"},"size":129,"urls":["s3://qa-dcp-databucket-gen3/testdata", "gs://qa-dcp-databucket-gen3/file.txt"]}' #pragma: allowlist secret
                     else
                       echo "There are sufficient record in indexd. We should be good to go .."
                     fi
