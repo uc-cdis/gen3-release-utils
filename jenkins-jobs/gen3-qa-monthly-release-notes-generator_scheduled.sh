@@ -11,9 +11,9 @@ pip3 install --editable git+https://github.com/uc-cdis/release-helper.git@gen3re
 
 export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
 
-START_DATE="2023-01-14"
-END_DATE="2023-02-10"
-RELEASE_VERSION="2023.03"
+START_DATE="2023-03-11"
+END_DATE="2023-04-19"
+RELEASE_VERSION="2023.05"
 RELEASE_NAME="Core Gen3 Release $RELEASE_VERSION"
 
 echo "### Generating Release Notes ###"
