@@ -30,17 +30,17 @@ curl "https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/releases/${
 # replace versions (TODO: Improve this logic to pick up new services from repos_list.txt)
 sed -i "s/${CURR_YEAR}.${CURR_MONTH}/${YEAR}.${MONTH}/" manifest.json
 
-python3.8 -m pip install poetry --user
-python3.8 -m pip install pygithub --user
-python3.8 -m pip uninstall pygit2 --user
-python3.8 -m pip uninstall gen3release -y
+python3.9 -m pip install poetry --user
+python3.9 -m pip install pygithub --user
+python3.9 -m pip uninstall pygit2 --user
+python3.9 -m pip uninstall gen3release -y
 
 cd gen3release-sdk
-python3.8 -m poetry build
+python3.9 -m poetry build
 
 wheel_file=$(ls dist | grep whl | tail -n1)
 
-python3.8 -m pip install dist/${wheel_file} --user
+python3.9 -m pip install dist/${wheel_file} --user
 
 cd $WORKSPACE
 
