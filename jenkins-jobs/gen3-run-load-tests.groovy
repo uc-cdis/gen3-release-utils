@@ -69,7 +69,7 @@ pipeline {
         stage('Setup for Load Tests') {
             steps {
                 withCredentials([
-                  file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON')
+                  file(credentialsId: 'jenkins-perf-credentials-json', variable: 'JENKINS_PERF_CRED_JSON')
                 ]){
                 sh """#!/bin/bash
                   export KUBECTL_NAMESPACE="${TARGET_ENVIRONMENT}"
@@ -112,6 +112,7 @@ pipeline {
                   file(credentialsId: 'fence-google-app-creds-secret', variable: 'GOOGLE_APP_CREDS_JSON'),
                   file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON'),
                   file(credentialsId: 'qa-dcp-credentials-indexing-json', variable: 'QA_DCP_CREDS_INDEXING_JSON'),
+                  file(credentialsId: 'jenkins-perf-credentials-json', variable: 'JENKINS_PERF_CRED_JSON'),
                   file(credentialsId: 'ed-dev-environment-credentials', variable: 'ED_DEV_ENV_CREDS_JSON'),
                   string(credentialsId: 'temporary-qa-dcp-long-living-access-token', variable: 'ACCESS_TOKEN'),
                   file(credentialsId: 'QA-NIAID-CRED', variable: 'QA_NIAID_CREDS'),
@@ -134,7 +135,7 @@ pipeline {
                           export K6_STATSD_ENABLE_TAGS=true
                           export USE_DATADOG=true
 
-                          mv "$QA_DCP_CREDS_JSON" credentials.json
+                          mv "$JENKINS_PERF_CRED_JSON" credentials.json
 
                           npm install
 
