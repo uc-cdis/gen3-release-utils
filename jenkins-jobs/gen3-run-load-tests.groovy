@@ -31,6 +31,9 @@
 pipeline {
     agent { node { label 'gen3-qa-worker' } }
     // agent { node { label 'master' } }
+    environment {
+        PUPPETEER_SKIP_DOWNLOAD = 'true'
+    }
     stages {
         stage('Clean workspace') {
             steps {
