@@ -213,7 +213,7 @@ pipeline {
                           create-indexd-records)
                               echo "Selected create indexd records"
                               # FOR INDEXD RECORDS CREATION
-                              mv "$QA_DCP_CREDS_INDEXING_JSON" credentials.json
+                              mv "$JENKINS_PERF_CRED_JSON" credentials.json
                               sed -i 's/"num_of_records": 1000,/"num_of_records": $INDEXD_NUM_OF_RECORDS_TO_CREATE,/' load-testing/sample-descriptors/load-test-create-indexd-records.json
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-create-indexd-records.json"
                               ;;
