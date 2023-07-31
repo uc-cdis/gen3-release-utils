@@ -40,7 +40,7 @@ python3 -m poetry build
 
 wheel_file=$(ls dist | grep whl | tail -n1)
 
-python3.8 -m pip install dist/${wheel_file} --user
+python3 -m pip install dist/${wheel_file} --user
 
 cd $WORKSPACE
 
