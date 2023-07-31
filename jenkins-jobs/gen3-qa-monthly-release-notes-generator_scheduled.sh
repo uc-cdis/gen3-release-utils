@@ -11,9 +11,9 @@ pip3 install --editable git+https://github.com/uc-cdis/release-helper.git@gen3re
 
 export PATH=$PATH:/home/jenkins/.local/bin:/home/jenkins/.local/lib
 
-START_DATE="2023-03-11"
-END_DATE="2023-04-19"
-RELEASE_VERSION="2023.05"
+START_DATE="2023-05-13"
+END_DATE="2023-07-14"
+RELEASE_VERSION="2023.08"
 RELEASE_NAME="Core Gen3 Release $RELEASE_VERSION"
 
 echo "### Generating Release Notes ###"
@@ -22,7 +22,7 @@ bash ./jenkins-jobs/generate_release_notes.sh --startDate "$START_DATE" --endDat
 YEAR=$(echo $RELEASE_VERSION | cut -d"." -f 1)
 MONTH=$(echo $RELEASE_VERSION | cut -d"." -f 2)
 CURR_YEAR=$(date +%Y)
-CURR_MONTH=$(date +%m)
+CURR_MONTH="06"
 
 # Get the manifest from the previous monthly release
 curl "https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/releases/${CURR_YEAR}/${CURR_MONTH}/manifest.json" -o manifest.json
