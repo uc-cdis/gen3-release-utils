@@ -54,7 +54,6 @@ pipeline {
                         "docker-nginx": "nginx",
                         "gen3-fuse": "gen3fuse-sidecar",
                         "cloud-automation": "awshelper",
-                        "dataguids.org": "dataguids",
                         "cdis-data-client": "gen3-client",
                         "ACCESS-backend": "access-backend"
                     ]
@@ -91,7 +90,7 @@ pipeline {
                           hudson.model.Hudson.instance.queue.schedule(job, quietPeriod, null, paramsAction);
                           quietPeriod += 1;
                         }
-                      } 
+                      }
                       else {
                         println "Applying new image tag ${RELEASE_VERSION} to img ${imgName}...";
 
