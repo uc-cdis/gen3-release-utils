@@ -44,4 +44,5 @@ python3 -m pip install dist/${wheel_file} --user
 
 cd $WORKSPACE
 
-gen3release notes -v ${RELEASE_VERSION} -f gen3_release_notes.md manifest.json
+# gen3_release_notes.md
+gen3release notes -v ${RELEASE_VERSION} -f manifest.json
