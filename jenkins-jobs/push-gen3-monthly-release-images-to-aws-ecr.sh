@@ -47,9 +47,6 @@ while IFS= read -r repo; do
   elif [ "$repo" == "cloud-automation" ]; then
       echo "Found a repo called cloud-automation"
       IMG_TO_PUSH="awshelper"
-  elif [ "$repo" == "dataguids.org" ]; then
-      echo "Found a repo called dataguids.org"
-      IMG_TO_PUSH="dataguids"
   elif [ "$repo" == "sower-jobs" ]; then
       echo "iterate through list ['metadata-manifest-ingestion', 'get-dbgap-metadata', 'manifest-indexing', 'download-indexd-manifest']"
       sower_jobs=(metadata-manifest-ingestion get-dbgap-metadata manifest-indexing download-indexd-manifest)
