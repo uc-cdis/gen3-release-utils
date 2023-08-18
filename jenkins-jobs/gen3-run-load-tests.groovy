@@ -72,7 +72,7 @@ pipeline {
         stage('Setup for Load Tests') {
             steps {
                 withCredentials([
-                  file(credentialsId: 'jenkins-perf-credentials-json', variable: 'JENKINS_PERF_CRED_JSON')
+                  file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON')
                 ]){
                 sh """#!/bin/bash
                   export KUBECTL_NAMESPACE="${TARGET_ENVIRONMENT}"
@@ -138,7 +138,7 @@ pipeline {
                           export K6_STATSD_ENABLE_TAGS=true
                           export USE_DATADOG=true
 
-                          mv "$JENKINS_PERF_CRED_JSON" credentials.json
+                          mv "$QA_DCP_CREDS_JSON" credentials.json
 
                           npm install
 
