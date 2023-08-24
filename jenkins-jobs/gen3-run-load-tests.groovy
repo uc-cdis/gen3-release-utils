@@ -96,7 +96,6 @@ pipeline {
                       echo "There are sufficient record in indexd. We should be good to go .."
                     fi
                     gen3 scaling update presigned-url-fence 6 10
-                    gen3 scaling update indexd 6 10
                     sleep 60
                     g3kubectl get pods | grep fence
                   else
@@ -213,7 +212,6 @@ pipeline {
                           create-indexd-records)
                               echo "Selected create indexd records"
                               # FOR INDEXD RECORDS CREATION
-                              mv "$JENKINS_PERF_CRED_JSON" credentials.json
                               sed -i 's/"num_of_records": 1000,/"num_of_records": $INDEXD_NUM_OF_RECORDS_TO_CREATE,/' load-testing/sample-descriptors/load-test-create-indexd-records.json
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-create-indexd-records.json"
                               ;;
