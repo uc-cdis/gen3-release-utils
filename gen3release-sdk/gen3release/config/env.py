@@ -110,7 +110,7 @@ class Env:
             "dicom-server",
             "cedar-wrapper",
             "ohif-viewer",
-            "orthanc"
+            "orthanc",
         ]
 
         self.blocks_to_update = {
