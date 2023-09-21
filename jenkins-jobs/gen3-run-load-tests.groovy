@@ -115,6 +115,7 @@ pipeline {
                   file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON'),
                   file(credentialsId: 'qa-dcp-credentials-indexing-json', variable: 'QA_DCP_CREDS_INDEXING_JSON'),
                   file(credentialsId: 'jenkins-perf-credentials-json', variable: 'JENKINS_PERF_CRED_JSON'),
+                  file(credentialsId: 'jenkins-perf-indexing-credentials-json', variable: 'JENKINS_PERF_CRED_INDEXING_JSON'),
                   file(credentialsId: 'ed-dev-environment-credentials', variable: 'ED_DEV_ENV_CREDS_JSON'),
                   string(credentialsId: 'temporary-qa-dcp-long-living-access-token', variable: 'ACCESS_TOKEN'),
                   file(credentialsId: 'QA-NIAID-CRED', variable: 'QA_NIAID_CREDS'),
@@ -212,7 +213,7 @@ pipeline {
                           create-indexd-records)
                               echo "Selected create indexd records"
                               # FOR INDEXD RECORDS CREATION
-                              mv "$QA_DCP_CREDS_INDEXING_JSON" credentials.json
+                              mv "$JENKINS_PERF_CRED_INDEXING_JSON" credentials.json
                               sed -i 's/"num_of_records": 1000,/"num_of_records": $INDEXD_NUM_OF_RECORDS_TO_CREATE,/' load-testing/sample-descriptors/load-test-create-indexd-records.json
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-create-indexd-records.json"
                               ;;
