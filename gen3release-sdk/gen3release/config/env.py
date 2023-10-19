@@ -111,6 +111,7 @@ class Env:
             "cedar-wrapper",
             "ohif-viewer",
             "orthanc",
+            "datareplicate",
         ]
 
         self.blocks_to_update = {
