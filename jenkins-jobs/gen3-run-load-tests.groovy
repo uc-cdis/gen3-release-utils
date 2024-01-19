@@ -54,7 +54,7 @@ pipeline {
                 // gen3-qa
                 checkout([
                   $class: 'GitSCM',
-                  branches: [[name: 'refs/heads/master']],
+                  branches: [[name: 'chore/fix_metrics_load_testing']],
                   doGenerateSubmoduleConfigurations: false,
                   extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'gen3-qa']],
                   submoduleCfg: [],
