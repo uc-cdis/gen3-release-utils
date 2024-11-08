@@ -32,7 +32,6 @@ repo_dict = {
     "docker-nginx": "nginx",
     "gen3-fuse": "gen3fuse-sidecar",
     "cloud-automation": "awshelper",
-    "dataguids.org": "dataguids",
 }
 
 print("Check if the Quay Images are ready")

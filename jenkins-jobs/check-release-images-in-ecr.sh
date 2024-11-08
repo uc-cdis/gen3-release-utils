@@ -10,11 +10,14 @@ git clone https://github.com/uc-cdis/cloud-automation.git
 export GEN3_HOME=$WORKSPACE/cloud-automation
 source $GEN3_HOME/gen3/gen3setup.sh
 
+failed_list=()
+
 check_image () {
     gen3 ecr describe-image $ECR_REPO $RELEASE_VERSION
     RC=$?
     if [ $RC -ne 0 ]; then
         echo "## Release image $RELEASE_VERSION does not exit in repo gen3/$ECR_REPO."
+        failed_list+="$ECR_REPO"
     else
         echo "## Release Image $RELEASE_VERSION exists in repo gen3/$ECR_REPO."
     fi
@@ -37,9 +40,6 @@ while IFS= read -r repo; do
       ECR_REPO="gen3fuse-sidecar"
     elif [ "$repo" == "cloud-automation" ]; then
       ECR_REPO="awshelper"
-    elif [ "$repo" == "dataguids.org" ]; then
-      ECR_REPO="dataguids"
-
     elif [ "$repo" == "sower-jobs" ]; then
       echo "## iterating through the list ['metadata-manifest-ingestion', 'get-dbgap-metadata', 'manifest-indexing', 'download-indexd-manifest', 'batch-export']"
       sower_job=(metadata-manifest-ingestion get-dbgap-metadata manifest-indexing download-indexd-manifest batch-export)
@@ -59,3 +59,8 @@ while IFS= read -r repo; do
     check_image
     set -e
 done < "$repo_list"
+
+if [[ -n "$failed_list" ]]; then
+  echo "### FAILED LIST: ${failed_list}"
+  exit 1
+fi

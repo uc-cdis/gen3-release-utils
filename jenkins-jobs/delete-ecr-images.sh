@@ -48,9 +48,6 @@ while IFS= read -r repo; do
       ECR_REPO="gen3fuse-sidecar"
     elif [ "$repo" == "cloud-automation" ]; then
       ECR_REPO="awshelper"
-    elif [ "$repo" == "dataguids.org" ]; then
-      ECR_REPO="dataguids"
-
     elif [ "$repo" == "sower-jobs" ]; then
       echo "## iterating through the list ['metadata-manifest-ingestion', 'get-dbgap-metadata', 'manifest-indexing', 'download-indexd-manifest', 'batch-export']"
       sower_job=(metadata-manifest-ingestion get-dbgap-metadata manifest-indexing download-indexd-manifest batch-export)

@@ -90,7 +90,6 @@ class Git:
         the_pr = github_client.create_pull(
             title=pr_title, body=copy_commit, head=branch_name, base="master"
         )
-        the_pr.add_to_labels("automerge")
 
     def create_pull_request_release_notes(
         self,
@@ -120,7 +119,6 @@ class Git:
         the_pr = github_client.create_pull(
             title=pr_title, body=commit_msg, head=branch_name, base="master"
         )
-        the_pr.add_to_labels("automerge")
         the_pr.add_to_labels("doc-only")
 
     def create_pull_request_apply(
