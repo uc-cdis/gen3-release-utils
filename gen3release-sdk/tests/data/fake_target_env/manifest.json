@@ -12,7 +12,6 @@
     "fence": "quay.io/cdis/fence:2020.06",
     "indexd": "quay.io/cdis/indexd:2020.07",
     "peregrine": "quay.io/cdis/peregrine:2020.06",
-    "pidgin": "quay.io/cdis/pidgin:2020.06",
     "revproxy": "quay.io/cdis/nginx:2020.07",
     "sheepdog": "quay.io/cdis/sheepdog:2020.06",
     "metadata": "quay.io/cdis/metadata-service:2020.06",

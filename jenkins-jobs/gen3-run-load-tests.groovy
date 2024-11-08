@@ -31,6 +31,9 @@
 pipeline {
     agent { node { label 'gen3-qa-worker' } }
     // agent { node { label 'master' } }
+    environment {
+        PUPPETEER_SKIP_DOWNLOAD = 'true'
+    }
     stages {
         stage('Clean workspace') {
             steps {
@@ -69,7 +72,7 @@ pipeline {
         stage('Setup for Load Tests') {
             steps {
                 withCredentials([
-                  file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON')
+                  file(credentialsId: 'jenkins-perf-credentials-json', variable: 'JENKINS_PERF_CRED_JSON')
                 ]){
                 sh """#!/bin/bash
                   export KUBECTL_NAMESPACE="${TARGET_ENVIRONMENT}"
@@ -88,11 +91,11 @@ pipeline {
                     echo \${indexdRecord}
                     if [[ \${indexdRecord} -le 0 ]]; then
                       curl -X POST 'https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index' -H "Authorization: Bearer \${access_token}" -H "Content-Type: application/json" -d \
-                        '{"acl":["phs000178"],"authz":["/programs/QA/projects/test"],"file_name":"qa-test.txt","form":"object","hashes":{"md5":"404e8919021a03285697647487f528ef"},"size":2681688756,"urls":["gs://dcf-integration-qa/qa-test.txt", "s3://cdis-presigned-url-test/testdata"]}' #pragma: allowlist secret
+                        '{"acl":["phs000178"],"authz":["/programs/phs000178"],"file_name":"load_test_file","form":"object","hashes":{"md5":"e5c9a0d417f65226f564f438120381c5"},"size":129,"urls":["s3://qa-dcp-databucket-gen3/testdata", "gs://qa-dcp-databucket-gen3/file.txt"]}' #pragma: allowlist secret
                     else
                       echo "There are sufficient record in indexd. We should be good to go .."
                     fi
-                    gen3 scaling update presigned-url-fence 6 10 14
+                    gen3 scaling update presigned-url-fence 6 10
                     sleep 60
                     g3kubectl get pods | grep fence
                   else
@@ -110,6 +113,9 @@ pipeline {
                 withCredentials([
                   file(credentialsId: 'fence-google-app-creds-secret', variable: 'GOOGLE_APP_CREDS_JSON'),
                   file(credentialsId: 'qa-dcp-credentials-json', variable: 'QA_DCP_CREDS_JSON'),
+                  file(credentialsId: 'qa-dcp-credentials-indexing-json', variable: 'QA_DCP_CREDS_INDEXING_JSON'),
+                  file(credentialsId: 'jenkins-perf-credentials-json', variable: 'JENKINS_PERF_CRED_JSON'),
+                  file(credentialsId: 'jenkins-perf-indexing-credentials-json', variable: 'JENKINS_PERF_CRED_INDEXING_JSON'),
                   file(credentialsId: 'ed-dev-environment-credentials', variable: 'ED_DEV_ENV_CREDS_JSON'),
                   string(credentialsId: 'temporary-qa-dcp-long-living-access-token', variable: 'ACCESS_TOKEN'),
                   file(credentialsId: 'QA-NIAID-CRED', variable: 'QA_NIAID_CREDS'),
@@ -132,7 +138,7 @@ pipeline {
                           export K6_STATSD_ENABLE_TAGS=true
                           export USE_DATADOG=true
 
-                          mv "$QA_DCP_CREDS_JSON" credentials.json
+                          mv "$JENKINS_PERF_CRED_JSON" credentials.json
 
                           npm install
 
@@ -207,7 +213,7 @@ pipeline {
                           create-indexd-records)
                               echo "Selected create indexd records"
                               # FOR INDEXD RECORDS CREATION
-                              mv "$ED_DEV_ENV_CREDS_JSON" credentials.json
+                              mv "$JENKINS_PERF_CRED_INDEXING_JSON" credentials.json
                               sed -i 's/"num_of_records": 1000,/"num_of_records": $INDEXD_NUM_OF_RECORDS_TO_CREATE,/' load-testing/sample-descriptors/load-test-create-indexd-records.json
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-create-indexd-records.json"
                               ;;
@@ -230,11 +236,6 @@ pipeline {
                               echo "Selected Metadata Service filter large database test"
                               # FOR MDS soak test
                               SELECTED_LOAD_TEST_DESCRIPTOR="load-test-metadata-service-create-mds-sample.json"
-                              ;;
-                          study-viewer)
-                              echo "Selected Study Viewer test"
-                              SELECTED_LOAD_TEST_DESCRIPTOR="load-test-study-viewer.json"
-                              sed -i 's/"override_access_token": "<place_access_token_here>",/"override_access_token": "$QA_NIAID_CREDS",/' load-testing/sample-descriptors/load-test-study-viewer.json
                               ;;
                           study-viewer)
                               echo "Selected Study Viewer test"
