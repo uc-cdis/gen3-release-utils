@@ -169,6 +169,8 @@ class Env:
         for svc in json_block:
             if "dashboard" not in json_block:
                 self.svcs_to_ignore.append("dashboard")
+            if "dataguids.org" == self.name:
+                self.svcs_to_ignore.append("portal")
             if svc not in self.svcs_to_ignore:
                 logging.debug("applying version {} to {}".format(version, svc))
                 json_block[svc] = "{}:{}".format(json_block[svc].split(":")[0], version)
