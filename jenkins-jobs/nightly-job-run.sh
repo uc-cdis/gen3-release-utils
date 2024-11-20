@@ -19,7 +19,7 @@ urlPrefix="https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/uc-cdis/"
 git clone "${urlPrefix}cdis-manifest"
 cd cdis-manifest
 
-commons=("gen3.theanvil.io" "gen3.biodatacatalyst.nhlbi.nih.gov")
+commons=("gen3.biodatacatalyst.nhlbi.nih.gov")
 
 # Rotate through commons on a daily basis
 seconds=$(date +%s)
