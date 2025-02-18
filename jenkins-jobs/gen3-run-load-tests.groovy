@@ -86,7 +86,7 @@ pipeline {
                     echo "Populating audit-service SQS with login messages"
                     bash gen3-qa/load-testing/audit-service/sendLoginMessages.sh $SQS_URL
                   elif [ "$LOAD_TEST_DESCRIPTOR" == "fence-presigned-url" ]; then
-                    export access_token=\$(gen3 api access-token cdis.autotest@gmail.com)
+                    export access_token=\$(gen3 api access-token main@example.org)
                     export indexdRecord=\$(curl "https://${TARGET_ENVIRONMENT}.planx-pla.net/index/index" | jq -r '.records | length')
                     echo \${indexdRecord}
                     if [[ \${indexdRecord} -le 0 ]]; then
