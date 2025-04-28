@@ -119,7 +119,7 @@ class Git:
         the_pr = github_client.create_pull(
             title=pr_title, body=commit_msg, head=branch_name, base="master"
         )
-        the_pr.add_to_labels("doc-only")
+        the_pr.add_to_labels("release-notes")
 
     def create_pull_request_apply(
         self,
