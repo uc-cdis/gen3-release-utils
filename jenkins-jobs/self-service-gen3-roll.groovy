@@ -46,6 +46,11 @@ pipeline {
                     sh '''#!/bin/bash +x
                         export GEN3_HOME=\$WORKSPACE/cloud-automation
                         export KUBECTL_NAMESPACE=\${TARGET_ENVIRONMENT}
+                        # Injecting a default aws profile if not exists
+                        mkdir -p ~/.aws
+                        if ! grep -q '^[[]default[]]' ~/.aws/config 2>/dev/null; then
+                          printf '[default]\nregion = %s\n' "${AWS_DEFAULT_REGION}" >> ~/.aws/config
+                        fi                        
 
                         source $GEN3_HOME/gen3/gen3setup.sh
 
