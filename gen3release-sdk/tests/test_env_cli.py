@@ -152,13 +152,13 @@ def test_apply(mocked_env, apply_env, mocked_time, mocked_Gh):
 
 
 @patch("gen3release.env_cli.py_io.write_into_manifest")
-def test_apply_version_to_environment(write_mani, target_env):
+def test_apply_version_to_environment(write_mani):
     """
     Tests files updated in target environment are returned
     """
     write_mani.side_effect = [
-        hashlib.md5("altered".encode("utf-8")),
-        hashlib.md5("altered_again".encode("utf-8")),
+        hashlib.sha256("altered".encode("utf-8")).hexdigest(),
+        hashlib.sha256("altered_again".encode("utf-8")).hexdigest(),
     ]
     modified_files = env_cli.apply_version_to_environment(
         "2020.20", '{"ambassador":"quay.io/datawire/ambassador:9000"}', target_env
