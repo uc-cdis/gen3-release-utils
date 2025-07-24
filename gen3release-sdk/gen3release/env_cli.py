@@ -339,17 +339,17 @@ def apply_version_to_environment(version, override, e):
     for manifest_file_name in e.blocks_to_update.keys():
         manifest = "{}/{}".format(e.full_path, manifest_file_name)
         if path.exists(manifest):
-            current_md5, current_json = py_io.read_manifest(manifest)
+            current_hash, current_json = py_io.read_manifest(manifest)
 
             logging.debug("looking for versions to be replaced in {}".format(manifest))
             json_with_version = e.find_and_replace(
                 version, override, manifest_file_name, current_json
             )
 
-            new_md5 = py_io.write_into_manifest(manifest, json_with_version)
-            logging.debug(f"new{new_md5} old {current_md5}")
+            new_hash = py_io.write_into_manifest(manifest, json_with_version)
+            logging.debug(f"new{new_hash} old {current_hash}")
 
-            if current_md5 != new_md5:
+            if current_hash != new_hash:
                 modified_files.append(manifest)
         else:
             logging.warning(

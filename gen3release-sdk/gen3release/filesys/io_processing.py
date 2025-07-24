@@ -21,7 +21,8 @@ logging.getLogger(__name__)
 
 def generate_safe_index_name(envname, doctype):
     """Makes sure index name follow rules set in
-    https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params"""
+    https://www.elastic.co/guide/en/elasticsearch/reference/7.5/indices-create-index.html#indices-create-api-path-params
+    """
     if not doctype:
         raise NameError("No type given. Environment needs a type")
 
@@ -128,7 +129,9 @@ def write_out_file(filepath, data, flag):
 def read_manifest(manifest):
     with open(manifest, "r") as m:
         contents = m.read()
-        return hashlib.md5(contents.encode("utf-8")), json.loads(contents)
+        return hashlib.sha256(contents.encode("utf-8")).hexdigest(), json.loads(
+            contents
+        )
 
 
 def merge(source, destination):
@@ -154,7 +157,7 @@ def write_into_manifest(manifest, json_with_changes):
         m.seek(0)
         m.write(json.dumps(json_with_changes, indent=2))
         m.truncate()
-        return hashlib.md5(m.read().encode("utf-8"))
+        return hashlib.sha256(m.read().encode("utf-8")).hexdigest()
 
 
 def process_sower_jobs(mani_json, srcEnv_sowers, tgtEnv_sowers):

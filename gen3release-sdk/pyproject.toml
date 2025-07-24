@@ -16,7 +16,7 @@ PyGitHub = "^1.47"
 pygit2 = "^1.2.1"
 'ruamel.yaml' = "^0.16.10"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^5.2.1"
 pytest-cov = "^2.10.1"
 
