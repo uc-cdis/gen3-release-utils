@@ -152,7 +152,7 @@ def test_apply(mocked_env, apply_env, mocked_time, mocked_Gh):
 
 
 @patch("gen3release.env_cli.py_io.write_into_manifest")
-def test_apply_version_to_environment(write_mani):
+def test_apply_version_to_environment(write_mani, target_env):
     """
     Tests files updated in target environment are returned
     """
